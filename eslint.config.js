@@ -1,6 +1,6 @@
-import js from '@eslint/js'
-import vue from 'eslint-plugin-vue'
-import prettier from 'eslint-config-prettier'
+import js from '@eslint/js';
+import vue from 'eslint-plugin-vue';
+import prettier from 'eslint-config-prettier';
 
 export default [
   js.configs.recommended,
@@ -31,8 +31,8 @@ export default [
         alert: 'readonly',
         confirm: 'readonly',
         prompt: 'readonly',
-        Notification: 'readonly'
-      }
+        Notification: 'readonly',
+      },
     },
     rules: {
       // Vue specific rules
@@ -45,10 +45,22 @@ export default [
       'no-debugger': 'warn',
       'no-unused-vars': 'error',
       'prefer-const': 'error',
-      'no-var': 'error'
-    }
+      'no-var': 'error',
+    },
   },
   {
-    ignores: ['dist/', 'node_modules/', '.vite/']
-  }
-]
+    files: ['public/sw.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        self: 'readonly',
+        BroadcastChannel: 'readonly',
+        clients: 'readonly',
+      },
+    },
+  },
+  {
+    ignores: ['dist/', 'node_modules/', '.vite/'],
+  },
+];
