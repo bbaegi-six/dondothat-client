@@ -1,6 +1,7 @@
 <template>
   <nav
-    class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800"
+    class="w-full absolute bottom-0 left-0 right-0"
+    style="background-color: #2f2f2f"
   >
     <div class="flex items-center justify-around py-2 px-4 max-w-md mx-auto">
       <button
