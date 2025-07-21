@@ -2,11 +2,13 @@
   <div class="page-container">
     <h1 class="page-title">Home 페이지 제목</h1>
     <p>이곳에 페이지의 상세 내용을 구성하세요.</p>
+    <Nav></Nav>
   </div>
 </template>
 
 <script setup>
 // 페이지별 스크립트 로직
+import Nav from "../../components/layout/Nav.vue";
 </script>
 
 <style scoped>
