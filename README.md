@@ -41,17 +41,31 @@ npm run dev
 ```
 src/
 ├── assets/         # CSS, 이미지 등 정적 에셋
-├── components/     # 공용 UI 컴포넌트
-│   ├── analytics/  # 분석 페이지 관련 컴포넌트
-│   └── modals/     # 모달 관련 컴포넌트
-├── pages/          # 라우팅되는 페이지 컴포넌트
-│   ├── auth/       # 인증 관련 페이지 (로그인, 회원가입)
-│   ├── main/       # 핵심 기능 페이지 (대시보드, 거래내역)
-│   └── profile/    # 프로필 관련 페이지
+│
+├── components/     # 공용 UI 컴포넌트 (.vue)
+│   ├── analytics/     # 분석 페이지 관련 컴포넌트 (리포트, 그래프)
+│   ├── layout/        # 레이아웃 관련 컴포넌트
+│   └── modals/        # 모달 관련 컴포넌트
+│
+├── pages/          # 라우팅되는 페이지 컴포넌트 기능별 (.vue)
+│   ├── account/       # 자산 연동 (계좌 연결, 관리)
+│   ├── auth/          # 로그인, 회원가입
+│   ├── challenge/     # 챌린지 (목록, 상세)
+│   ├── chat/          # 채팅방
+│   ├── consumption/   # 소비 내역
+│   ├── error/         # 에러
+│   ├── guide/         # 사용자 가이드
+│   ├── home/          # 홈(메인 페이지)
+│   └── profile/       # 마이페이지 (회원정보, 포인트, 챌린지)
+│
 ├── router/         # Vue Router 설정
-├── services/       # API 서비스 로직
-├── stores/         # Pinia 상태 관리 스토어
-├── utils/          # 유틸리티 함수 (Axios 인스턴스 등)
+│
+├── services/       # API 서비스 로직 (.js)
+│
+├── stores/         # Pinia 상태 관리 스토어 (.js)
+│
+├── utils/          # 유틸리티 함수 (Axios 인스턴스 등) (.js)
+│
 ├── App.vue         # 최상위 App 컴포넌트
 └── main.js         # 애플리케이션 진입점
 ```
@@ -105,17 +119,17 @@ API 명세에 따라 `services` 디렉터리에 파일을 생성하고, `src/uti
 
 ```javascript
 // 예시: src/services/transactionService.js
-import { transactionsAPI } from '@/utils/api'
+import { transactionsAPI } from '@/utils/api';
 
 export const transactionService = {
   async fetchTransactions(filters = {}) {
     try {
-      return await transactionsAPI.getAll(filters)
+      return await transactionsAPI.getAll(filters);
     } catch (error) {
-      throw new Error(`거래 내역 조회 실패: ${error.message}`)
+      throw new Error(`거래 내역 조회 실패: ${error.message}`);
     }
-  }
-}
+  },
+};
 ```
 
 **2. 스토어에서 서비스 사용 (`/stores`)**
@@ -124,21 +138,21 @@ Pinia 스토어의 `actions`에서 서비스 함수를 호출하여 상태를 �
 
 ```javascript
 // 예시: src/stores/transactions.js
-import { defineStore } from 'pinia'
-import transactionService from '@/services/transactionService'
+import { defineStore } from 'pinia';
+import transactionService from '@/services/transactionService';
 
 export const useTransactionsStore = defineStore('transactions', {
   actions: {
     async fetchTransactions() {
-      this.loading = true
+      this.loading = true;
       try {
-        this.transactions = await transactionService.fetchTransactions()
+        this.transactions = await transactionService.fetchTransactions();
       } catch (error) {
-        this.error = error.message
+        this.error = error.message;
       } finally {
-        this.loading = false
+        this.loading = false;
       }
-    }
-  }
-})
+    },
+  },
+});
 ```

@@ -1,136 +1,91 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
 
-// Onboarding & Auth Pages
-import Welcome from '../pages/onboarding/Welcome.vue'
-import Login from '../pages/auth/Login.vue'
-import Register from '../pages/auth/Register.vue'
-import ForgotPassword from '../pages/auth/ForgotPassword.vue'
-
-// Main App Pages
-import Home from '../pages/main/Home.vue'
-import Dashboard from '../pages/main/Dashboard.vue'
-import Transactions from '../pages/main/Transactions.vue'
-import Analytics from '../pages/main/Analytics.vue'
-import Budget from '../pages/main/Budget.vue'
-import Goals from '../pages/main/Goals.vue'
-import Categories from '../pages/main/Categories.vue'
-
-// Detail Pages (to be implemented later)
-// import TransactionDetail from '../pages/details/TransactionDetail.vue'
-// import CategoryDetail from '../pages/details/CategoryDetail.vue'
-// import BudgetDetail from '../pages/details/BudgetDetail.vue'
-
-// Settings & Profile
-import Profile from '../pages/profile/Profile.vue'
-import Settings from '../pages/profile/Settings.vue'
-import Notifications from '../pages/profile/Notifications.vue'
-import Security from '../pages/profile/Security.vue'
+// pages
+import Account from '../pages/account/Account.vue';
+import ForgotPassword from '../pages/auth/ForgotPassword.vue';
+import Login from '../pages/auth/Login.vue';
+import Register from '../pages/auth/Register.vue';
+import Challenge from '../pages/challenge/Challenge.vue';
+import Chat from '../pages/chat/Chat.vue';
+import Consumption from '../pages/consumption/Consumption.vue';
+import NotFound from '../pages/error/NotFound.vue';
+import ServerError from '../pages/error/ServerError.vue';
+import Guide from '../pages/guide/Guide.vue';
+import Home from '../pages/home/Home.vue';
+import Notifications from '../pages/profile/Notifications.vue';
+import Profile from '../pages/profile/Profile.vue';
 
 const routes = [
-  // Onboarding Flow
   {
     path: '/',
-    name: 'Welcome',
-    component: Welcome
+    name: 'Home',
+    component: Home,
   },
-
-  // Auth Flow
+  {
+    path: '/account',
+    name: 'Account',
+    component: Account,
+  },
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
   },
   {
     path: '/register',
     name: 'Register',
-    component: Register
+    component: Register,
   },
   {
     path: '/forgot-password',
     name: 'ForgotPassword',
-    component: ForgotPassword
-  },
-
-  // Main App
-  {
-    path: '/home',
-    name: 'Home',
-    component: Home
+    component: ForgotPassword,
   },
   {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: Dashboard
+    path: '/challenge',
+    name: 'Challenge',
+    component: Challenge,
   },
   {
-    path: '/transactions',
-    name: 'Transactions',
-    component: Transactions
+    path: '/chat',
+    name: 'Chat',
+    component: Chat,
   },
   {
-    path: '/analytics',
-    name: 'Analytics',
-    component: Analytics
+    path: '/consumption',
+    name: 'Consumption',
+    component: Consumption,
   },
   {
-    path: '/budget',
-    name: 'Budget',
-    component: Budget
-  },
-  {
-    path: '/goals',
-    name: 'Goals',
-    component: Goals
-  },
-  {
-    path: '/categories',
-    name: 'Categories',
-    component: Categories
-  },
-
-  // Detail Pages (to be implemented later)
-  // {
-  //   path: '/transaction/:id',
-  //   name: 'TransactionDetail',
-  //   component: TransactionDetail
-  // },
-  // {
-  //   path: '/category/:id',
-  //   name: 'CategoryDetail',
-  //   component: CategoryDetail
-  // },
-  // {
-  //   path: '/budget/:id',
-  //   name: 'BudgetDetail',
-  //   component: BudgetDetail
-  // },
-
-  // Profile & Settings
-  {
-    path: '/profile',
-    name: 'Profile',
-    component: Profile
-  },
-  {
-    path: '/settings',
-    name: 'Settings',
-    component: Settings
+    path: '/guide',
+    name: 'Guide',
+    component: Guide,
   },
   {
     path: '/notifications',
     name: 'Notifications',
-    component: Notifications
+    component: Notifications,
   },
   {
-    path: '/security',
-    name: 'Security',
-    component: Security
-  }
-]
+    path: '/profile',
+    name: 'Profile',
+    component: Profile,
+  },
+  {
+    path: '/500',
+    name: 'ServerError',
+    component: ServerError,
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFound,
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;
