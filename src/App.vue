@@ -1,29 +1,38 @@
 <template>
-  <div id="app" class="w-full min-h-screen">
+  <div class="app-container">
     <router-view />
+    <Nav v-if="shouldShowNav" />
   </div>
 </template>
 
 <script setup>
-// App component using Composition API
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import Nav from '@/components/layout/Nav.vue';
+
+const route = useRoute();
+const shouldShowNav = computed(() => {
+  const noNavRoutes = ['/login', '/register', '/forgot-password'];
+  return !noNavRoutes.includes(route.path);
+});
 </script>
 
-<style>
-#app {
+<style scoped>
+.app-container {
   width: 390px;
-  height: 839px;
-  margin: 0 auto; /* 가운데 정렬 (필요하면) */
-  overflow: hidden; /* 넘치는 부분 숨김 */
-  background-color: #2f2f2f; /* 배경 (원하면 지정) */
+  height: 100vh;
+  background-color: #2f2f2f;
   position: relative;
-}
-body,
-html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
+  margin: 0 auto;
+  font-family: 'Pretendard', sans-serif;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  padding-top: 20px;
+}
+
+@media (max-width: 430px) {
+  .app-container {
+    width: 100%;
+  }
 }
 </style>

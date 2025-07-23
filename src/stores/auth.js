@@ -1,33 +1,38 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
 
-export const useMyStore = defineStore('myStore', {
-  // 스토어 ID (예: 'auth', 'transactions')
-
+export const useAuthStore = defineStore('auth', {
   state: () => ({
-    // 이곳에 상태(데이터)를 정의합니다.
-    // 예: user: null,
-    // 예: items: [],
+    isAuthenticated: false,
+    user: null,
     loading: false,
-    error: null
+    error: null,
   }),
-
   getters: {
-    // 이곳에 state를 기반으로 한 계산된 값을 정의합니다.
-    // 예: isLoggedIn: (state) => !!state.user,
+    isLoggedIn: (state) => state.isAuthenticated,
   },
-
   actions: {
-    // 이곳에 상태를 변경하는 함수(메서드)를 정의합니다.
-    // 비동기 로직이나 API 호출 등을 처리합니다.
-    // 예: async function fetchData() {
-    //   this.loading = true;
-    //   try {
-    //     // API 호출
-    //   } catch (error) {
-    //     this.error = error;
-    //   } finally {
-    //     this.loading = false;
-    //   }
-    // },
-  }
-})
+    async login(email, password) {
+      this.loading = true;
+      this.error = null;
+      try {
+        // 백엔드 API 연동 전 임시 로그인 처리
+        if (email && password) {
+          this.isAuthenticated = true;
+          this.user = { email };
+          return true;
+        } else {
+          throw new Error('이메일과 비밀번호를 입력해주세요.');
+        }
+      } catch (error) {
+        this.error = error;
+        return false;
+      } finally {
+        this.loading = false;
+      }
+    },
+    logout() {
+      this.isAuthenticated = false;
+      this.user = null;
+    },
+  },
+});
