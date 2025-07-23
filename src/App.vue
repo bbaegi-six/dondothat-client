@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="w-[390px] h-screen bg-dark-bg relative mx-auto font-pretendard flex flex-col">
     <router-view />
     <Nav v-if="shouldShowNav" />
   </div>
@@ -18,20 +18,8 @@ const shouldShowNav = computed(() => {
 </script>
 
 <style scoped>
-.app-container {
-  width: 390px;
-  height: 100vh;
-  background-color: #2f2f2f;
-  position: relative;
-  margin: 0 auto;
-  font-family: 'Pretendard', sans-serif;
-  display: flex;
-  flex-direction: column;
-  padding-top: 20px;
-}
-
 @media (max-width: 430px) {
-  .app-container {
+  .w-\[390px\] {
     width: 100%;
   }
 }
