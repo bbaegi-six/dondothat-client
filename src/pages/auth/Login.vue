@@ -308,7 +308,8 @@ const handleGoogleLogin = () => {
 /* 하단 링크 */
 .bottom-links {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 20px;
   margin: 24px 0;
 }
 
