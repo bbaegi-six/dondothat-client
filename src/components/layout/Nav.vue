@@ -1,13 +1,16 @@
 <template>
-  <nav class="bottom-nav">
+  <nav class="fixed bottom-0 left-0 right-0 max-w-[390px] mx-auto mb-3 flex justify-between items-center bg-dark-bg rounded-[20px] p-3 px-5 h-[75px] box-border z-[1000]">
     <button
       v-for="item in navItems"
       :key="item.id"
       @click="handleNavigation(item.path)"
-      class="nav-item"
-      :class="{ active: $route.path === item.path }"
+      class="flex flex-col items-center justify-center bg-transparent border-none cursor-pointer w-[69px] h-[46px] transition-transform duration-200 rounded-[12px]"
+      :class="{ 'hover:scale-105': true, 'hover:bg-white/10': true, 'bg-primary-red/20': $route.path === item.path }"
     >
-      <div class="nav-icon" v-html="item.icon"></div>
+      <div class="flex items-center justify-center w-6 h-6 text-white/60"
+           :class="{ 'text-primary-red': $route.path === item.path }">
+        <div v-html="item.icon" class="w-full h-full"></div>
+      </div>
     </button>
   </nav>
 </template>
@@ -51,63 +54,4 @@ const navItems = ref([
 ]);
 </script>
 
-<style scoped>
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  max-width: 390px;
-  margin: 0 auto 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #2f2f2f;
-  border-radius: 20px;
-  padding: 12px 20px;
-  height: 75px;
-  box-sizing: border-box;
-  z-index: 1000; /* 다른 요소 위에 오도록 z-index 추가 */
-}
 
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  cursor: pointer;
-  width: 69px;
-  height: 46px;
-  transition: transform 0.2s;
-  border-radius: 12px;
-}
-
-.nav-item:hover {
-  transform: scale(1.05);
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.nav-item.active {
-  background-color: rgba(255, 85, 85, 0.2);
-}
-
-.nav-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.nav-item.active .nav-icon {
-  color: #ff5555;
-}
-
-.nav-icon svg {
-  width: 100%;
-  height: 100%;
-}
-</style>

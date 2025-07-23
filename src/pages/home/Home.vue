@@ -1,6 +1,6 @@
 <template>
-  <div class="page-container">
-    <h1 class="page-title">Home 페이지 제목</h1>
+  <div class="pt-[60px] px-6">
+    <Header :showLogo="true" :showPoints="true" :points="100" />
     <p>이곳에 페이지의 상세 내용을 구성하세요.</p>
     <Input v-model="email" type="email" placeholder="이메일" />
     <Button label="로그인"></Button>
@@ -17,15 +17,11 @@ import Nav from "../../components/layout/Nav.vue";
 import Button from "../../components/Button.vue";
 import Input from "../../components/Input.vue";
 import BaseCard from "../../components/BaseCard.vue";
+import Header from "../../components/layout/Header.vue";
+import { ref } from 'vue';
+
+const email = ref('');
 </script>
 
 <style scoped>
-.page-container {
-  padding: 1.5rem;
-}
-.page-title {
-  font-size: 1.75rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-}
 </style>

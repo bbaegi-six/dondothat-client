@@ -1,33 +1,31 @@
 <template>
-  <div class="main-content">
+  <div class="flex-1 px-[31px] flex flex-col overflow-y-auto">
     <!-- 로고 -->
-    <div class="logo-section">
-      <div class="money-icon">💰</div>
-      <h1 class="app-title">
+    <div class="text-center my-5 mb-10">
+      <div class="text-[60px] mb-4">💰</div>
+      <h1 class="font-anton-sc text-2xl text-primary-red leading-[22px] m-0 font-normal">
         Don do<br />
         that
       </h1>
     </div>
 
     <!-- 로그인 폼 -->
-    <div class="form-section">
-      <div class="input-group">
-        <input
+    <div class="flex flex-col mb-5 w-82 mx-auto">
+      <div class="relative mb-6">
+        <Input
           v-model="email"
           type="email"
           placeholder="이메일을 입력하세요"
-          class="form-input"
         />
       </div>
 
-      <div class="input-group">
-        <input
+      <div class="relative mb-6">
+        <Input
           v-model="password"
           :type="showPassword ? 'text' : 'password'"
           placeholder="비밀번호를 입력하세요"
-          class="form-input"
         />
-        <button @click="togglePassword" class="password-toggle" type="button">
+        <button @click="togglePassword" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-transparent border-none cursor-pointer text-base" type="button">
           <svg
             v-if="showPassword"
             xmlns="http://www.w3.org/2000/svg"
@@ -55,32 +53,30 @@
         </button>
       </div>
 
-      <button
+      <Button
         @click="handleLogin"
-        class="login-button"
         :disabled="!email || !password"
-      >
-        로그인
-      </button>
+        label="로그인"
+      />
 
       <!-- 간편 로그인 -->
-      <div class="divider">
-        <span>간편 로그인</span>
+      <div class="relative text-center my-6 text-gray-c9 text-sm">
+        <span class="bg-dark-bg px-4">간편 로그인</span>
       </div>
 
-      <div class="social-login">
-        <button @click="handleKakaoLogin" class="kakao-btn">
+      <div class="flex justify-center gap-8 mb-10">
+        <button @click="handleKakaoLogin" class="w-[42px] h-[42px] rounded-full border-none cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-kakao-yellow text-black">
           <div class="kakao-icon">K</div>
         </button>
-        <button @click="handleGoogleLogin" class="google-btn">
+        <button @click="handleGoogleLogin" class="w-[42px] h-[42px] rounded-full border border-light-gray-db cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-white text-dark-gray">
           <div class="google-icon">G</div>
         </button>
       </div>
 
       <!-- 하단 링크 -->
-      <div class="bottom-links">
-        <router-link to="/register" class="link-btn">회원 가입</router-link>
-        <router-link to="/forgot-password" class="link-btn">
+      <div class="flex justify-center gap-5 my-6">
+        <router-link to="/register" class="bg-transparent border-none text-gray-c9 text-sm cursor-pointer font-pretendard no-underline hover:text-primary-red">회원 가입</router-link>
+        <router-link to="/forgot-password" class="bg-transparent border-none text-gray-c9 text-sm cursor-pointer font-pretendard no-underline hover:text-red-500">
           아이디 / 비밀번호 찾기
         </router-link>
       </div>
@@ -92,6 +88,8 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
+import Input from '../../components/Input.vue';
+import Button from '../../components/Button.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -133,120 +131,14 @@ const handleGoogleLogin = () => {
 </script>
 
 <style scoped>
-/* 메인 콘텐츠 */
-.main-content {
-  flex: 1;
-  padding: 0 32px;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  /* 스크롤바 숨기기 */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-}
-
-.main-content::-webkit-scrollbar {
+/* 스크롤바 숨기기 (Tailwind CSS로 직접 변환 불가) */
+.flex-1::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
 
-/* 로고 섹션 */
-.logo-section {
-  text-align: center;
-  margin: 20px 0 40px;
-}
-
-.money-icon {
-  font-size: 60px;
-  margin-bottom: 16px;
-}
-
-.app-title {
-  font-family: 'Anton SC', sans-serif;
-  font-size: 24px;
-  color: #ff5555;
-  line-height: 22px;
-  margin: 0;
-  font-weight: 400;
-}
-
-/* 폼 섹션 */
-.form-section {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-}
-
-.input-group {
-  position: relative;
-  margin-bottom: 24px;
-}
-
-.form-input {
-  width: 328px;
-  height: 48px;
-  background-color: #ffffff;
-  border: none;
-  border-radius: 10px;
-  padding: 0 16px;
-  font-size: 14px;
-  color: #333;
-  box-sizing: border-box;
-}
-
-.form-input::placeholder {
-  color: #a1a1a1;
-}
-
-.form-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px #ff5555;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.login-button {
-  width: 328px;
-  height: 56px;
-  background-color: #ff5555;
-  color: #ffffff;
-  border: none;
-  border-radius: 16px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-bottom: 24px;
-  font-family: 'Pretendard', sans-serif;
-  transition: background-color 0.2s;
-}
-
-.login-button:hover {
-  background-color: #e64545;
-}
-
-.login-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-/* 간편 로그인 */
-.divider {
-  position: relative;
-  text-align: center;
-  margin: 24px 0;
-  color: #c9c9c9;
-  font-size: 14px;
-}
-
-.divider::before,
-.divider::after {
+/* 간편 로그인 구분선 (Tailwind CSS로 직접 변환 불가) */
+.relative.text-center.my-6.text-gray-c9.text-sm::before,
+.relative.text-center.my-6.text-gray-c9.text-sm::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -255,75 +147,11 @@ const handleGoogleLogin = () => {
   background-color: #c9c9c9;
 }
 
-.divider::before {
+.relative.text-center.my-6.text-gray-c9.text-sm::before {
   left: 0;
 }
 
-.divider::after {
+.relative.text-center.my-6.text-gray-c9.text-sm::after {
   right: 0;
-}
-
-.divider span {
-  background-color: #2f2f2f;
-  padding: 0 16px;
-}
-
-.social-login {
-  display: flex;
-  justify-content: center;
-  gap: 32px;
-  margin-bottom: 40px;
-}
-
-.kakao-btn,
-.google-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  transition: transform 0.2s;
-}
-
-.kakao-btn {
-  background-color: #fee500;
-  color: #000;
-}
-
-.google-btn {
-  background-color: white;
-  color: #333;
-  border: 1px solid #dbdbdb;
-}
-
-.kakao-btn:hover,
-.google-btn:hover {
-  transform: scale(1.05);
-}
-
-/* 하단 링크 */
-.bottom-links {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin: 24px 0;
-}
-
-.link-btn {
-  background: none;
-  border: none;
-  color: #c9c9c9;
-  font-size: 14px;
-  cursor: pointer;
-  font-family: 'Pretendard', sans-serif;
-  text-decoration: none;
-}
-
-.link-btn:hover {
-  color: #ff5555;
 }
 </style>
