@@ -7,7 +7,7 @@
     <BaseCard>
       <div>여기에 컴포넌트 넣기</div>
     </BaseCard>
-    <Nav></Nav>
+    
   </div>
 </template>
 

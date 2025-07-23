@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
 
 // pages
 import Account from '../pages/account/Account.vue';
@@ -7,7 +8,7 @@ import Login from '../pages/auth/Login.vue';
 import Register from '../pages/auth/Register.vue';
 import Challenge from '../pages/challenge/Challenge.vue';
 import Chat from '../pages/chat/Chat.vue';
-import Consumption from '../pages/consumption/Consumption.vue';
+import Expenses from '../pages/expenses/Expenses.vue';
 import NotFound from '../pages/error/NotFound.vue';
 import ServerError from '../pages/error/ServerError.vue';
 import Guide from '../pages/guide/Guide.vue';
@@ -20,11 +21,13 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+    meta: { requiresAuth: true },
   },
   {
     path: '/account',
     name: 'Account',
     component: Account,
+    meta: { requiresAuth: true },
   },
   {
     path: '/login',
@@ -45,31 +48,37 @@ const routes = [
     path: '/challenge',
     name: 'Challenge',
     component: Challenge,
+    meta: { requiresAuth: true },
   },
   {
     path: '/chat',
     name: 'Chat',
     component: Chat,
+    meta: { requiresAuth: true },
   },
   {
-    path: '/consumption',
-    name: 'Consumption',
-    component: Consumption,
+    path: '/expenses',
+    name: 'Expenses',
+    component: Expenses,
+    meta: { requiresAuth: true },
   },
   {
     path: '/guide',
     name: 'Guide',
     component: Guide,
+    meta: { requiresAuth: true },
   },
   {
     path: '/notifications',
     name: 'Notifications',
     component: Notifications,
+    meta: { requiresAuth: true },
   },
   {
     path: '/profile',
     name: 'Profile',
     component: Profile,
+    meta: { requiresAuth: true },
   },
   {
     path: '/500',
@@ -86,6 +95,17 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+
+  if (requiresAuth && !authStore.isLoggedIn) {
+    next({ name: 'Login' });
+  } else {
+    next();
+  }
 });
 
 export default router;
