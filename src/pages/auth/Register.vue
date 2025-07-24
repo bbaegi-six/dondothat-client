@@ -1,158 +1,166 @@
 <template>
-  <div class="pt-[60px] px-6">
-    <Header :showBack="true" title="회원가입" />
-    <div class="flex flex-col gap-6 py-6">
-      <div>
-        <Input v-model="name" placeholder="이름" />
-        <div class="h-1">
-          <span
-            :class="{
-              'text-primary-red text-xs mt-1': showErrors && !name,
-              invisible: !(showErrors && !name),
-            }"
-          >
-            * 필수 항목입니다
-          </span>
-        </div>
-      </div>
-
-      <div>
-        <InputWithButton
-          v-model="nickname"
-          placeholder="닉네임"
-          button-label="중복확인"
-          @buttonClick="handleNicknameCheck"
-        />
-        <div class="h-1">
-          <span
-            v-if="showErrors && !nickname"
-            class="text-primary-red text-xs mt-1"
-          >
-            * 필수 항목입니다
-          </span>
-          <span v-else-if="nicknameAvailable" class="text-xs mt-1" :style="{ color: '#C9C9C9' }">
-            사용 가능한 닉네임입니다.
-          </span>
-        </div>
-      </div>
-
-      <div>
-        <Input v-model="password" type="password" placeholder="비밀번호" />
-        <div class="h-1">
-          <span v-if="showErrors && !password" class="text-primary-red text-xs mt-1">
-            * 필수 항목입니다
-          </span>
-          <span v-else-if="passwordError" class="text-primary-red text-xs mt-1">
-            {{ passwordError }}
-          </span>
-        </div>
-      </div>
-
-      <div>
-        <Input
-          v-model="confirmPassword"
-          type="password"
-          placeholder="비밀번호 확인"
-        />
-        <div class="h-1">
-          <span
-            v-if="showErrors && !confirmPassword"
-            class="text-primary-red text-xs mt-1"
-          >
-            * 필수 항목입니다
-          </span>
-          <span
-            v-else-if="confirmPasswordError"
-            class="text-primary-red text-xs mt-1"
-          >
-            {{ confirmPasswordError }}
-          </span>
-        </div>
-      </div>
-
-      <div>
-        <InputWithButton
-          v-model="email"
-          placeholder="이메일"
-          button-label="전송"
-          @buttonClick="handleEmailSend"
-        />
-        <div class="h-1">
-          <span v-if="showErrors && !email" class="text-primary-red text-xs mt-1">
-            * 필수 항목입니다
-          </span>
-          <span
-            v-else-if="showEmailError && emailError"
-            class="text-primary-red text-xs mt-1"
-          >
-            {{ emailError }}
-          </span>
-        </div>
-      </div>
-
-      <div>
-        <Input v-model="verificationCode" placeholder="인증코드" />
-        <div class="h-16">
-          <span
-            :class="{
-              'text-primary-red text-xs mt-1':
-                showErrors && !verificationCode,
-              invisible: !(showErrors && !verificationCode),
-            }"
-          >
-            * 필수 항목입니다
-          </span>
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-3 w-full max-w-md mx-auto">
-        <label class="flex items-center justify-between gap-2 text-white text-sm">
-          <div class="flex items-center gap-2">
-            <input
-              type="checkbox"
-              v-model="agreeTerms"
-              class="w-4 h-4 accent-primary-red"
-            />
-            <span>이용약관 동의 (필수)</span>
+  <div class="pt-[60px]">
+    <div class="mx-auto w-[328px]"> <!-- This div centers the entire content block and sets its width -->
+      <Header :showBack="true" title="회원가입" />
+      <hr class="border-t border-[#414141]" />
+      <div class="flex flex-col gap-6 py-6"> <!-- This div aligns its children -->
+        <div class="w-[328px] mx-auto">
+          <Input v-model="name" placeholder="이름" class="w-full" />
+          <div class="h-1">
+            <span
+              :class="{
+                'text-primary-red text-xs mt-1': showErrors && !name,
+                invisible: !(showErrors && !name),
+              }"
+            >
+              * 필수 항목입니다
+            </span>
           </div>
-          <span
-            :class="{
-              'text-primary-red text-xs': showErrors && !agreeTerms,
-              invisible: !(showErrors && !agreeTerms),
-            }"
-          >
-            * 필수 항목입니다
-          </span>
-        </label>
-        <label class="flex items-center justify-between gap-2 text-white text-sm">
-          <div class="flex items-center gap-2">
-            <input
-              type="checkbox"
-              v-model="agreePrivacy"
-              class="w-4 h-4 accent-primary-red"
-            />
-            <span>개인정보처리방침 동의 (필수)</span>
-          </div>
-          <span
-            :class="{
-              'text-primary-red text-xs': showErrors && !agreePrivacy,
-              invisible: !(showErrors && !agreePrivacy),
-            }"
-          >
-            * 필수 항목입니다
-          </span>
-        </label>
-        <label class="flex items-center gap-2 text-white text-sm">
-          <input
-            type="checkbox"
-            v-model="agreeMarketing"
-            class="w-4 h-4 accent-primary-red"
+        </div>
+
+        <div class="w-[328px] mx-auto">
+          <InputWithButton
+            v-model="nickname"
+            placeholder="닉네임"
+            button-label="중복확인"
+            @buttonClick="handleNicknameCheck"
+            class="w-full"
           />
-          <span>마케팅 정보 수신 동의 (선택)</span>
-        </label>
-      </div>
+          <div class="h-1">
+            <span
+              v-if="showErrors && !nickname"
+              class="text-primary-red text-xs mt-1"
+            >
+              * 필수 항목입니다
+            </span>
+            <span v-else-if="nicknameAvailable" class="text-xs mt-1" :style="{ color: '#C9C9C9' }">
+              사용 가능한 닉네임입니다.
+            </span>
+          </div>
+        </div>
 
-      <Button @click="handleNext" label="다음" />
+        <div class="w-[328px] mx-auto">
+          <Input v-model="password" type="password" placeholder="비밀번호" class="w-full" />
+          <div class="h-1">
+            <span v-if="showErrors && !password" class="text-primary-red text-xs mt-1">
+              * 필수 항목입니다
+            </span>
+            <span v-else-if="passwordError" class="text-primary-red text-xs mt-1">
+              {{ passwordError }}
+            </span>
+          </div>
+        </div>
+
+        <div class="w-[328px] mx-auto">
+          <Input
+            v-model="confirmPassword"
+            type="password"
+            placeholder="비밀번호 확인"
+            class="w-full"
+          />
+          <div class="h-1">
+            <span
+              v-if="showErrors && !confirmPassword"
+              class="text-primary-red text-xs mt-1"
+            >
+              * 필수 항목입니다
+            </span>
+            <span
+              v-else-if="confirmPasswordError"
+              class="text-primary-red text-xs mt-1"
+            >
+              {{ confirmPasswordError }}
+            </span>
+          </div>
+        </div>
+
+        <div class="w-[328px] mx-auto">
+          <InputWithButton
+            v-model="email"
+            placeholder="이메일"
+            button-label="전송"
+            @buttonClick="handleEmailSend"
+            class="w-full"
+          />
+          <div class="h-1">
+            <span v-if="showErrors && !email" class="text-primary-red text-xs mt-1">
+              * 필수 항목입니다
+            </span>
+            <span
+              v-else-if="showEmailError && emailError"
+              class="text-primary-red text-xs mt-1"
+            >
+              {{ emailError }}
+            </span>
+          </div>
+        </div>
+
+        <div class="w-[328px] mx-auto">
+          <Input v-model="verificationCode" placeholder="인증코드" class="w-full" />
+          <div class="h-16">
+            <span
+              :class="{
+                'text-primary-red text-xs mt-1':
+                  showErrors && !verificationCode,
+                invisible: !(showErrors && !verificationCode),
+              }"
+            >
+              * 필수 항목입니다
+            </span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3 w-[328px] mx-auto">
+          <label class="flex items-center justify-between gap-2 text-white text-sm">
+            <div class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                v-model="agreeTerms"
+                class="w-4 h-4 accent-primary-red"
+              />
+              <span>이용약관 동의 (필수)</span>
+            </div>
+            <span
+              :class="{
+                'text-primary-red text-xs': showErrors && !agreeTerms,
+                invisible: !(showErrors && !agreeTerms),
+              }"
+            >
+              * 필수 항목입니다
+            </span>
+          </label>
+          <label class="flex items-center justify-between gap-2 text-white text-sm">
+            <div class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                v-model="agreePrivacy"
+                class="w-4 h-4 accent-primary-red"
+              />
+              <span>개인정보처리방침 동의 (필수)</span>
+            </div>
+            <span
+              :class="{
+                'text-primary-red text-xs': showErrors && !agreePrivacy,
+                invisible: !(showErrors && !agreePrivacy),
+              }"
+            >
+              * 필수 항목입니다
+            </span>
+          </label>
+          <label class="flex items-center gap-2 text-white text-sm">
+            <input
+              type="checkbox"
+              v-model="agreeMarketing"
+              class="w-4 h-4 accent-primary-red"
+            />
+            <span>마케팅 정보 수신 동의 (선택)</span>
+          </label>
+        </div>
+
+        <div class="w-[328px] mx-auto">
+          <Button @click="handleNext" label="다음" class="w-full" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
