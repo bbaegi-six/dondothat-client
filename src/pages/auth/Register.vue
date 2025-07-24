@@ -6,11 +6,10 @@
         <Input v-model="name" placeholder="이름" />
         <div class="h-1">
           <span
-            :class="
-              showErrors && !name
-                ? 'text-primary-red text-xs mt-1'
-                : 'invisible'
-            "
+            :class="{
+              'text-primary-red text-xs mt-1': showErrors && !name,
+              invisible: !(showErrors && !name),
+            }"
           >
             * 필수 항목입니다
           </span>
@@ -26,13 +25,17 @@
         />
         <div class="h-1">
           <span
-            :class="
-              showErrors && !nickname
-                ? 'text-primary-red text-xs mt-1'
-                : 'invisible'
-            "
+            v-if="showErrors && !nickname"
+            class="text-primary-red text-xs mt-1"
           >
             * 필수 항목입니다
+          </span>
+          <span
+            v-else-if="nicknameAvailable"
+            class="text-xs mt-1"
+            :style="{ color: '#C9C9C9' }"
+          >
+            * 사용 가능한 닉네임입니다.
           </span>
         </div>
       </div>
@@ -41,13 +44,13 @@
         <Input v-model="password" type="password" placeholder="비밀번호" />
         <div class="h-1">
           <span
-            :class="
-              showErrors && !password
-                ? 'text-primary-red text-xs mt-1'
-                : 'invisible'
-            "
+            v-if="showErrors && !password"
+            class="text-primary-red text-xs mt-1"
           >
             * 필수 항목입니다
+          </span>
+          <span v-else-if="passwordError" class="text-primary-red text-xs mt-1">
+            {{ passwordError }}
           </span>
         </div>
       </div>
@@ -60,13 +63,16 @@
         />
         <div class="h-1">
           <span
-            :class="
-              showErrors && !confirmPassword
-                ? 'text-primary-red text-xs mt-1'
-                : 'invisible'
-            "
+            v-if="showErrors && !confirmPassword"
+            class="text-primary-red text-xs mt-1"
           >
             * 필수 항목입니다
+          </span>
+          <span
+            v-else-if="confirmPasswordError"
+            class="text-primary-red text-xs mt-1"
+          >
+            {{ confirmPasswordError }}
           </span>
         </div>
       </div>
@@ -80,13 +86,16 @@
         />
         <div class="h-1">
           <span
-            :class="
-              showErrors && !email
-                ? 'text-primary-red text-xs mt-1'
-                : 'invisible'
-            "
+            v-if="showErrors && !email"
+            class="text-primary-red text-xs mt-1"
           >
             * 필수 항목입니다
+          </span>
+          <span
+            v-else-if="showEmailError && emailError"
+            class="text-primary-red text-xs mt-1"
+          >
+            {{ emailError }}
           </span>
         </div>
       </div>
@@ -95,11 +104,10 @@
         <Input v-model="verificationCode" placeholder="인증코드" />
         <div class="h-16">
           <span
-            :class="
-              showErrors && !verificationCode
-                ? 'text-primary-red text-xs mt-1'
-                : 'invisible'
-            "
+            :class="{
+              'text-primary-red text-xs mt-1': showErrors && !verificationCode,
+              invisible: !(showErrors && !verificationCode),
+            }"
           >
             * 필수 항목입니다
           </span>
@@ -113,18 +121,15 @@
             v-model="agreeTerms"
             class="w-4 h-4 accent-primary-red"
           />
-          <div>
-            <span>이용약관 동의 (필수)</span>
-            <span
-              :class="
-                showErrors && !agreeTerms
-                  ? 'text-primary-red text-xs mt-1'
-                  : 'invisible'
-              "
-            >
-              * 필수 항목입니다
-            </span>
-          </div>
+          <span>이용약관 동의 (필수)</span>
+          <span
+            :class="{
+              'text-primary-red text-xs mt-1': showErrors && !agreeTerms,
+              invisible: !(showErrors && !agreeTerms),
+            }"
+          >
+            * 필수 항목입니다
+          </span>
         </label>
         <label class="flex items-center gap-2 text-white text-sm">
           <input
@@ -134,11 +139,10 @@
           />
           <span>개인정보처리방침 동의 (필수)</span>
           <span
-            :class="
-              showErrors && !agreeTerms
-                ? 'text-primary-red text-xs mt-1'
-                : 'invisible'
-            "
+            :class="{
+              'text-primary-red text-xs mt-1': showErrors && !agreePrivacy,
+              invisible: !(showErrors && !agreePrivacy),
+            }"
           >
             * 필수 항목입니다
           </span>
@@ -159,7 +163,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import Header from '../../components/layout/Header.vue';
 import Input from '../../components/Input.vue';
 import InputWithButton from '../../components/InputWithButton.vue';
@@ -174,39 +178,93 @@ const verificationCode = ref('');
 const agreeTerms = ref(false);
 const agreePrivacy = ref(false);
 const agreeMarketing = ref(false);
-const showErrors = ref(false); // 빨간 문구 표시 여부
+const showErrors = ref(false);
+const showEmailError = ref(false);
+const nicknameAvailable = ref(false);
 
-// 에러 메시지 표시 여부
-const showError = ref(false);
+const passwordError = ref('');
+const confirmPasswordError = ref('');
+const emailError = ref('');
+
+const validatePassword = () => {
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,30}$/;
+  if (password.value && !passwordRegex.test(password.value)) {
+    passwordError.value = '* 8~30자리 영대·소문자, 숫자, 특수문자 조합';
+  } else {
+    passwordError.value = '';
+  }
+};
+
+const validateConfirmPassword = () => {
+  if (confirmPassword.value && password.value !== confirmPassword.value) {
+    confirmPasswordError.value = '* 비밀번호가 일치하지 않습니다.';
+  } else {
+    confirmPasswordError.value = '';
+  }
+};
+
+const validateEmail = () => {
+  const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+  if (email.value && !emailRegex.test(email.value)) {
+    emailError.value = '* 올바른 이메일 양식을 입력해주세요.';
+  } else {
+    emailError.value = '';
+  }
+};
+
+watch(password, () => {
+  validatePassword();
+  validateConfirmPassword();
+});
+
+watch(confirmPassword, validateConfirmPassword);
+
+watch(email, () => {
+  if (showEmailError.value) {
+    showEmailError.value = false;
+  }
+});
 
 const handleNicknameCheck = () => {
-  console.log('닉네임 중복확인', nickname.value);
+  // In a real application, you would make an API call to check for nickname availability.
+  // For this example, we'll just simulate a successful check.
+  if (nickname.value) {
+    nicknameAvailable.value = true;
+  }
 };
 
 const handleEmailSend = () => {
-  console.log('이메일 인증코드 전송', email.value);
+  showEmailError.value = true;
+  validateEmail();
+  if (!emailError.value && email.value) {
+    console.log('이메일 인증코드 전송', email.value);
+  }
 };
 
 const handleNext = () => {
-  showErrors.value = true; // 버튼 눌렀을 때만 에러 표시 시작
-  // 유효성 검사
+  showErrors.value = true;
+  showEmailError.value = true;
+  validatePassword();
+  validateConfirmPassword();
+  validateEmail();
+
   if (
     !name.value ||
     !nickname.value ||
     !password.value ||
     !confirmPassword.value ||
     !email.value ||
-    !verificationCode.value
+    !verificationCode.value ||
+    passwordError.value ||
+    confirmPasswordError.value ||
+    emailError.value ||
+    !agreeTerms.value ||
+    !agreePrivacy.value
   ) {
-    showError.value = true;
-    return;
-  }
-  if (!agreeTerms.value || !agreePrivacy.value) {
-    alert('필수 약관에 동의해주세요.');
     return;
   }
 
-  // 모든 값이 있으면 다음 단계로 진행
   console.log('다음 버튼 클릭 - 모든 값 입력됨');
 };
 </script>
