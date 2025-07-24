@@ -133,6 +133,15 @@
             class="w-4 h-4 accent-primary-red"
           />
           <span>개인정보처리방침 동의 (필수)</span>
+          <span
+            :class="
+              showErrors && !agreeTerms
+                ? 'text-primary-red text-xs mt-1'
+                : 'invisible'
+            "
+          >
+            * 필수 항목입니다
+          </span>
         </label>
         <label class="flex items-center gap-2 text-white text-sm">
           <input
@@ -150,18 +159,18 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import Header from "../../components/layout/Header.vue";
-import Input from "../../components/Input.vue";
-import InputWithButton from "../../components/InputWithButton.vue";
-import Button from "../../components/Button.vue";
+import { ref } from 'vue';
+import Header from '../../components/layout/Header.vue';
+import Input from '../../components/Input.vue';
+import InputWithButton from '../../components/InputWithButton.vue';
+import Button from '../../components/Button.vue';
 
-const name = ref("");
-const nickname = ref("");
-const password = ref("");
-const confirmPassword = ref("");
-const email = ref("");
-const verificationCode = ref("");
+const name = ref('');
+const nickname = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+const email = ref('');
+const verificationCode = ref('');
 const agreeTerms = ref(false);
 const agreePrivacy = ref(false);
 const agreeMarketing = ref(false);
@@ -171,11 +180,11 @@ const showErrors = ref(false); // 빨간 문구 표시 여부
 const showError = ref(false);
 
 const handleNicknameCheck = () => {
-  console.log("닉네임 중복확인", nickname.value);
+  console.log('닉네임 중복확인', nickname.value);
 };
 
 const handleEmailSend = () => {
-  console.log("이메일 인증코드 전송", email.value);
+  console.log('이메일 인증코드 전송', email.value);
 };
 
 const handleNext = () => {
@@ -193,11 +202,11 @@ const handleNext = () => {
     return;
   }
   if (!agreeTerms.value || !agreePrivacy.value) {
-    alert("필수 약관에 동의해주세요.");
+    alert('필수 약관에 동의해주세요.');
     return;
   }
 
   // 모든 값이 있으면 다음 단계로 진행
-  console.log("다음 버튼 클릭 - 모든 값 입력됨");
+  console.log('다음 버튼 클릭 - 모든 값 입력됨');
 };
 </script>
