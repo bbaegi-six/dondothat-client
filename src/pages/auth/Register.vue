@@ -30,12 +30,8 @@
           >
             * 필수 항목입니다
           </span>
-          <span
-            v-else-if="nicknameAvailable"
-            class="text-xs mt-1"
-            :style="{ color: '#C9C9C9' }"
-          >
-            * 사용 가능한 닉네임입니다.
+          <span v-else-if="nicknameAvailable" class="text-xs mt-1" :style="{ color: '#C9C9C9' }">
+            사용 가능한 닉네임입니다.
           </span>
         </div>
       </div>
@@ -43,10 +39,7 @@
       <div>
         <Input v-model="password" type="password" placeholder="비밀번호" />
         <div class="h-1">
-          <span
-            v-if="showErrors && !password"
-            class="text-primary-red text-xs mt-1"
-          >
+          <span v-if="showErrors && !password" class="text-primary-red text-xs mt-1">
             * 필수 항목입니다
           </span>
           <span v-else-if="passwordError" class="text-primary-red text-xs mt-1">
@@ -85,10 +78,7 @@
           @buttonClick="handleEmailSend"
         />
         <div class="h-1">
-          <span
-            v-if="showErrors && !email"
-            class="text-primary-red text-xs mt-1"
-          >
+          <span v-if="showErrors && !email" class="text-primary-red text-xs mt-1">
             * 필수 항목입니다
           </span>
           <span
@@ -105,7 +95,8 @@
         <div class="h-16">
           <span
             :class="{
-              'text-primary-red text-xs mt-1': showErrors && !verificationCode,
+              'text-primary-red text-xs mt-1':
+                showErrors && !verificationCode,
               invisible: !(showErrors && !verificationCode),
             }"
           >
@@ -114,33 +105,37 @@
         </div>
       </div>
 
-      <div class="flex flex-col gap-3">
-        <label class="flex items-center gap-2 text-white text-sm">
-          <input
-            type="checkbox"
-            v-model="agreeTerms"
-            class="w-4 h-4 accent-primary-red"
-          />
-          <span>이용약관 동의 (필수)</span>
+      <div class="flex flex-col gap-3 w-full max-w-md mx-auto">
+        <label class="flex items-center justify-between gap-2 text-white text-sm">
+          <div class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              v-model="agreeTerms"
+              class="w-4 h-4 accent-primary-red"
+            />
+            <span>이용약관 동의 (필수)</span>
+          </div>
           <span
             :class="{
-              'text-primary-red text-xs mt-1': showErrors && !agreeTerms,
+              'text-primary-red text-xs': showErrors && !agreeTerms,
               invisible: !(showErrors && !agreeTerms),
             }"
           >
             * 필수 항목입니다
           </span>
         </label>
-        <label class="flex items-center gap-2 text-white text-sm">
-          <input
-            type="checkbox"
-            v-model="agreePrivacy"
-            class="w-4 h-4 accent-primary-red"
-          />
-          <span>개인정보처리방침 동의 (필수)</span>
+        <label class="flex items-center justify-between gap-2 text-white text-sm">
+          <div class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              v-model="agreePrivacy"
+              class="w-4 h-4 accent-primary-red"
+            />
+            <span>개인정보처리방침 동의 (필수)</span>
+          </div>
           <span
             :class="{
-              'text-primary-red text-xs mt-1': showErrors && !agreePrivacy,
+              'text-primary-red text-xs': showErrors && !agreePrivacy,
               invisible: !(showErrors && !agreePrivacy),
             }"
           >
@@ -190,7 +185,8 @@ const validatePassword = () => {
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,30}$/;
   if (password.value && !passwordRegex.test(password.value)) {
-    passwordError.value = '* 8~30자리 영대·소문자, 숫자, 특수문자 조합';
+    passwordError.value =
+      '* 8~30자리 영대·소문자, 숫자, 특수문자 조합';
   } else {
     passwordError.value = '';
   }
@@ -227,8 +223,6 @@ watch(email, () => {
 });
 
 const handleNicknameCheck = () => {
-  // In a real application, you would make an API call to check for nickname availability.
-  // For this example, we'll just simulate a successful check.
   if (nickname.value) {
     nicknameAvailable.value = true;
   }
