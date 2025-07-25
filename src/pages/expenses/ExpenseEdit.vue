@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-[60px] px-6 pb-[90px] bg-dark-bg min-h-screen">
+  <div class="pt-[60px] px-6 pb-6 bg-dark-bg min-h-screen">
     <Header :showBack="true" title="소비 내역" />
 
     <!-- 선 구분 -->
@@ -99,7 +99,7 @@
     </div>
 
     <!-- 버튼들 -->
-    <div class="flex gap-3 mt-12">
+    <div class="flex gap-3 mt-12 mb-16">
       <button
         @click="deleteTransaction"
         class="flex-shrink-0 w-24 h-14 bg-[#c9c9c9] text-[#414141] rounded-16 font-medium transition-colors duration-200 hover:bg-[#b5b5b5]"

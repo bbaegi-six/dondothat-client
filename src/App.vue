@@ -2,7 +2,9 @@
   <div
     class="w-[390px] h-screen bg-dark-bg relative mx-auto font-pretendard flex flex-col"
   >
-    <router-view />
+    <div class="flex-1 overflow-auto">
+      <router-view />
+    </div>
     <Nav v-if="shouldShowNav" />
   </div>
 </template>
