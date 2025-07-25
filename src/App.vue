@@ -1,5 +1,7 @@
 <template>
-  <div class="w-[390px] h-screen bg-dark-bg relative mx-auto font-pretendard flex flex-col">
+  <div
+    class="w-[390px] h-screen bg-dark-bg relative mx-auto font-pretendard flex flex-col"
+  >
     <router-view />
     <Nav v-if="shouldShowNav" />
   </div>

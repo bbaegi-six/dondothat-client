@@ -1,14 +1,22 @@
 <template>
-  <nav class="fixed bottom-0 left-0 right-0 max-w-[390px] mx-auto mb-3 flex justify-between items-center bg-dark-bg rounded-[20px] p-3 px-5 h-[75px] box-border z-[1000]">
+  <nav
+    class="fixed bottom-0 left-0 right-0 max-w-[390px] mx-auto flex justify-between items-center bg-dark-bg p-3 px-5 h-[75px] box-border z-[1000]"
+  >
     <button
       v-for="item in navItems"
       :key="item.id"
       @click="handleNavigation(item.path)"
       class="flex flex-col items-center justify-center bg-transparent border-none cursor-pointer w-[69px] h-[46px] transition-transform duration-200 rounded-[12px]"
-      :class="{ 'hover:scale-105': true, 'hover:bg-white/10': true, 'bg-primary-red/20': $route.path === item.path }"
+      :class="{
+        'hover:scale-105': true,
+        'hover:bg-white/10': true,
+        'bg-primary-red/20': $route.path === item.path,
+      }"
     >
-      <div class="flex items-center justify-center w-6 h-6 text-white/60"
-           :class="{ 'text-primary-red': $route.path === item.path }">
+      <div
+        class="flex items-center justify-center w-6 h-6 text-white/60"
+        :class="{ 'text-primary-red': $route.path === item.path }"
+      >
         <div v-html="item.icon" class="w-full h-full"></div>
       </div>
     </button>
@@ -53,5 +61,3 @@ const navItems = ref([
   },
 ]);
 </script>
-
-
