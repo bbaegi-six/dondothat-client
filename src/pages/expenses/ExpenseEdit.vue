@@ -114,98 +114,100 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { reactive, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useExpensesStore } from '../../stores/expenses.js';
 import Header from '../../components/layout/Header.vue';
 
 const router = useRouter();
 const route = useRoute();
+const expensesStore = useExpensesStore();
 
 // 라우트 파라미터로 거래 ID를 받음
 const transactionId = route.params.id;
 
-// 샘플 거래내역 데이터 (실제로는 API에서 가져와야 함)
-const sampleTransactions = {
-  'gs25-1': {
-    id: 'gs25-1',
-    name: 'GS25 군자점',
-    type: 'expense',
-    amount: 5000,
-    category: '편의점',
-    date: '2025 / 07 / 08 (월)',
-    time: '18:59',
-  },
-  'subway-1': {
-    id: 'subway-1',
-    name: '서울교통공사',
-    type: 'expense',
-    amount: 1500,
-    category: '교통',
-    date: '2025 / 07 / 08 (월)',
-    time: '18:59',
-  },
-  'lotteria-1': {
-    id: 'lotteria-1',
-    name: '롯데리아 군자점',
-    type: 'expense',
-    amount: 18000,
-    category: '식비',
-    date: '2025 / 07 / 08 (월)',
-    time: '18:59',
-  },
-};
-
-// 거래내역 데이터
-const transactionData = ref(
-  sampleTransactions[transactionId] || {
-    id: transactionId,
-    name: '알 수 없는 거래',
-    type: 'expense',
-    amount: 0,
-    category: '기타',
-    date: '2025 / 07 / 08 (월)',
-    time: '00:00',
-  }
-);
+// 스토어에서 거래내역 데이터 가져오기
+const transactionData = computed(() => {
+  const transaction = expensesStore.getTransactionById(transactionId);
+  return (
+    transaction || {
+      id: transactionId,
+      name: '알 수 없는 거래',
+      type: 'expense',
+      amount: 0,
+      category: '기타',
+      date: '2025-07-08',
+      time: '00:00',
+    }
+  );
+});
 
 // 편집 가능한 데이터
 const editableData = reactive({
-  name: transactionData.value.name,
-  type: transactionData.value.type,
-  amount: transactionData.value.amount,
-  category: transactionData.value.category,
-  date: transactionData.value.date,
-  time: transactionData.value.time,
+  name: '',
+  type: 'expense',
+  amount: 0,
+  category: '기타',
+  date: '',
+  time: '00:00',
 });
 
 // 카테고리 선택
 const selectCategory = () => {
-  const categories = ['편의점', '교통', '식비', '쇼핑', '기타'];
   const randomCategory =
-    categories[Math.floor(Math.random() * categories.length)];
+    expensesStore.categories[
+      Math.floor(Math.random() * expensesStore.categories.length)
+    ];
   editableData.category = randomCategory;
   console.log('카테고리 변경:', randomCategory);
 };
 
 // 거래내역 저장
 const saveTransaction = () => {
-  console.log('저장할 데이터:', editableData);
-  alert('저장되었습니다.');
-  router.back();
+  const success = expensesStore.updateTransaction(transactionId, {
+    name: editableData.name,
+    type: editableData.type,
+    amount: Number(editableData.amount),
+    category: editableData.category,
+    date: editableData.date,
+    time: editableData.time,
+  });
+
+  if (success) {
+    console.log('저장할 데이터:', editableData);
+    alert('저장되었습니다.');
+    router.back();
+  } else {
+    alert('저장에 실패했습니다.');
+  }
 };
 
 // 거래내역 삭제
 const deleteTransaction = () => {
   if (confirm('정말로 삭제하시겠습니까?')) {
-    console.log('삭제할 거래내역 ID:', transactionId);
-    alert('삭제되었습니다.');
-    router.back();
+    const success = expensesStore.deleteTransaction(transactionId);
+    if (success) {
+      console.log('삭제할 거래내역 ID:', transactionId);
+      alert('삭제되었습니다.');
+      router.back();
+    } else {
+      alert('삭제에 실패했습니다.');
+    }
   }
 };
 
 onMounted(() => {
   console.log('거래내역 수정 페이지 로드, ID:', transactionId);
   console.log('거래내역 데이터:', transactionData.value);
+
+  // 편집 가능한 데이터 초기화
+  const data = transactionData.value;
+  editableData.name = data.name;
+  editableData.type = data.type;
+  editableData.amount = data.amount;
+  editableData.category = data.category;
+  editableData.date = data.date;
+  editableData.time = data.time;
 });
 </script>
 

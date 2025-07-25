@@ -86,167 +86,41 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useExpensesStore } from '../../stores/expenses.js';
 import Header from '../../components/layout/Header.vue';
 import TransactionCard from '../../components/expenses/TransactionCard.vue';
 
 const router = useRouter();
+const expensesStore = useExpensesStore();
 
-// 현재 선택된 월 (1-12)
-const currentMonth = ref(7);
-
-// 전체 거래내역 데이터 (월별로 구분)
-const allTransactions = ref({
-  6: [
-    {
-      id: 'jun-1',
-      name: '스타벅스',
-      category: '식비',
-      amount: 4500,
-      type: 'expense',
-      time: '14:30',
-      date: '2025-06-30',
-    },
-    {
-      id: 'jun-2',
-      name: '지하철',
-      category: '교통',
-      amount: 1370,
-      type: 'expense',
-      time: '09:15',
-      date: '2025-06-30',
-    },
-  ],
-  7: [
-    {
-      id: 'gs25-1',
-      name: 'GS25 군자점',
-      category: '편의점',
-      amount: 5000,
-      type: 'expense',
-      time: '18:59',
-      date: '2025-07-08',
-    },
-    {
-      id: 'subway-1',
-      name: '서울교통공사',
-      category: '교통',
-      amount: 1500,
-      type: 'expense',
-      time: '18:59',
-      date: '2025-07-08',
-    },
-    {
-      id: 'lotteria-1',
-      name: '롯데리아 군자점',
-      category: '식비',
-      amount: 18000,
-      type: 'expense',
-      time: '18:59',
-      date: '2025-07-08',
-    },
-    {
-      id: 'gs25-2',
-      name: 'GS25 군자점',
-      category: '편의점',
-      amount: 5000,
-      type: 'expense',
-      time: '18:59',
-      date: '2025-07-07',
-    },
-    {
-      id: 'subway-2',
-      name: '서울교통공사',
-      category: '교통',
-      amount: 1500,
-      type: 'expense',
-      time: '18:59',
-      date: '2025-07-07',
-    },
-  ],
-  8: [
-    {
-      id: 'aug-1',
-      name: '카카오페이',
-      category: '기타',
-      amount: 50000,
-      type: 'income',
-      time: '10:00',
-      date: '2025-08-01',
-    },
-    {
-      id: 'aug-2',
-      name: '맥도날드',
-      category: '식비',
-      amount: 8900,
-      type: 'expense',
-      time: '12:30',
-      date: '2025-08-01',
-    },
-  ],
-});
-
-// 계산된 속성들
-const currentMonthDisplay = computed(() => currentMonth.value);
-
+// 계산된 속성들 (스토어에서 가져옴)
+const currentMonthDisplay = computed(() => expensesStore.currentMonth);
 const currentMonthTransactions = computed(
-  () => allTransactions.value[currentMonth.value] || []
+  () => expensesStore.currentMonthTransactions
 );
+const groupedTransactions = computed(() => expensesStore.groupedTransactions);
+const monthlyIncome = computed(() => expensesStore.monthlyIncome);
+const monthlyExpense = computed(() => expensesStore.monthlyExpense);
 
-const groupedTransactions = computed(() => {
-  const groups = {};
-  currentMonthTransactions.value.forEach((transaction) => {
-    const date = transaction.date;
-    if (!groups[date]) {
-      groups[date] = [];
-    }
-    groups[date].push(transaction);
-  });
-  return groups;
-});
-
-const monthlyIncome = computed(() => {
-  return currentMonthTransactions.value
-    .filter((t) => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0);
-});
-
-const monthlyExpense = computed(() => {
-  return currentMonthTransactions.value
-    .filter((t) => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0);
-});
-
-// 메서드들
+// 메서드들 (스토어 액션 사용)
 const previousMonth = () => {
-  if (currentMonth.value > 1) {
-    currentMonth.value--;
-    console.log(`${currentMonth.value}월로 이동`);
-  }
+  expensesStore.previousMonth();
+  console.log(`${expensesStore.currentMonth}월로 이동`);
 };
 
 const nextMonth = () => {
-  if (currentMonth.value < 12) {
-    currentMonth.value++;
-    console.log(`${currentMonth.value}월로 이동`);
-  }
+  expensesStore.nextMonth();
+  console.log(`${expensesStore.currentMonth}월로 이동`);
 };
 
 const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-  const weekday = weekdays[date.getDay()];
-  return `${month}월 ${day}일 (${weekday})`;
+  return expensesStore.formatDate(dateString);
 };
 
 const getDailyTotal = (transactions) => {
-  const total = transactions
-    .filter((t) => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0);
-  return total > 0 ? `-${total.toLocaleString()}원` : '0원';
+  return expensesStore.getDailyTotal(transactions);
 };
 
 const editTransaction = (transaction) => {
