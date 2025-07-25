@@ -1,9 +1,11 @@
 <template>
   <div class="pt-[60px]">
-    <div class="mx-auto w-[328px]"> <!-- This div centers the entire content block and sets its width -->
+    <div class="mx-auto w-[328px]">
+      <!-- This div centers the entire content block and sets its width -->
       <Header :showBack="true" title="회원가입" />
       <hr class="border-t border-[#414141]" />
-      <div class="flex flex-col gap-6 py-6"> <!-- This div aligns its children -->
+      <div class="flex flex-col gap-6 py-6">
+        <!-- This div aligns its children -->
         <div class="w-[328px] mx-auto">
           <Input v-model="name" placeholder="이름" class="w-full" />
           <div class="h-1">
@@ -33,19 +35,34 @@
             >
               * 필수 항목입니다
             </span>
-            <span v-else-if="nicknameAvailable" class="text-xs mt-1" :style="{ color: '#C9C9C9' }">
+            <span
+              v-else-if="nicknameAvailable"
+              class="text-xs mt-1"
+              :style="{ color: '#C9C9C9' }"
+            >
               사용 가능한 닉네임입니다.
             </span>
           </div>
         </div>
 
         <div class="w-[328px] mx-auto">
-          <Input v-model="password" type="password" placeholder="비밀번호" class="w-full" />
+          <Input
+            v-model="password"
+            type="password"
+            placeholder="비밀번호"
+            class="w-full"
+          />
           <div class="h-1">
-            <span v-if="showErrors && !password" class="text-primary-red text-xs mt-1">
+            <span
+              v-if="showErrors && !password"
+              class="text-primary-red text-xs mt-1"
+            >
               * 필수 항목입니다
             </span>
-            <span v-else-if="passwordError" class="text-primary-red text-xs mt-1">
+            <span
+              v-else-if="passwordError"
+              class="text-primary-red text-xs mt-1"
+            >
               {{ passwordError }}
             </span>
           </div>
@@ -83,7 +100,10 @@
             class="w-full"
           />
           <div class="h-1">
-            <span v-if="showErrors && !email" class="text-primary-red text-xs mt-1">
+            <span
+              v-if="showErrors && !email"
+              class="text-primary-red text-xs mt-1"
+            >
               * 필수 항목입니다
             </span>
             <span
@@ -96,7 +116,11 @@
         </div>
 
         <div class="w-[328px] mx-auto">
-          <Input v-model="verificationCode" placeholder="인증코드" class="w-full" />
+          <Input
+            v-model="verificationCode"
+            placeholder="인증코드"
+            class="w-full"
+          />
           <div class="h-16">
             <span
               :class="{
@@ -111,7 +135,9 @@
         </div>
 
         <div class="flex flex-col gap-3 w-[328px] mx-auto">
-          <label class="flex items-center justify-between gap-2 text-white text-sm">
+          <label
+            class="flex items-center justify-between gap-2 text-white text-sm"
+          >
             <div class="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -129,7 +155,9 @@
               * 필수 항목입니다
             </span>
           </label>
-          <label class="flex items-center justify-between gap-2 text-white text-sm">
+          <label
+            class="flex items-center justify-between gap-2 text-white text-sm"
+          >
             <div class="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -193,8 +221,7 @@ const validatePassword = () => {
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,30}$/;
   if (password.value && !passwordRegex.test(password.value)) {
-    passwordError.value =
-      '* 8~30자리 영대·소문자, 숫자, 특수문자 조합';
+    passwordError.value = '* 8~30자리 영대·소문자, 숫자, 특수문자 조합';
   } else {
     passwordError.value = '';
   }
@@ -209,7 +236,7 @@ const validateConfirmPassword = () => {
 };
 
 const validateEmail = () => {
-  const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+  const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,}$/;
   if (email.value && !emailRegex.test(email.value)) {
     emailError.value = '* 올바른 이메일 양식을 입력해주세요.';
   } else {
