@@ -45,25 +45,24 @@
 
       <!-- 금액 -->
       <div class="pb-4 border-b border-[#575757]">
-        <label class="text-white text-base font-medium block mb-4">금액</label>
         <div class="flex items-center justify-between">
-          <input
-            v-model="editableData.amount"
-            type="number"
-            class="text-white text-base font-medium bg-transparent border-none outline-none flex-1 text-right"
-            placeholder="0"
-          />
-          <span class="text-white text-base font-medium ml-2">원</span>
+          <span class="text-white text-base font-medium">금액</span>
+          <div class="flex items-center">
+            <input
+              v-model="editableData.amount"
+              type="number"
+              class="text-white text-base font-medium bg-transparent border-none outline-none text-right w-20"
+              placeholder="0"
+            />
+            <span class="text-white text-base font-medium ml-2">원</span>
+          </div>
         </div>
       </div>
 
       <!-- 카테고리 -->
       <div class="pb-4 border-b border-[#575757]">
-        <label class="text-white text-base font-medium block mb-4"
-          >카테고리</label
-        >
         <div class="flex justify-between items-center">
-          <span class="text-white">카테고리</span>
+          <span class="text-white text-base font-medium">카테고리</span>
           <button
             @click="selectCategory"
             class="text-white text-base font-medium text-right hover:text-[#ff5555] transition-colors"
@@ -75,9 +74,8 @@
 
       <!-- 날짜 -->
       <div class="pb-4 border-b border-[#575757]">
-        <label class="text-white text-base font-medium block mb-4">날짜</label>
         <div class="flex justify-between items-center">
-          <span class="text-white">날짜</span>
+          <span class="text-white text-base font-medium">날짜</span>
           <span class="text-white text-base font-medium">{{
             editableData.date
           }}</span>
@@ -86,9 +84,8 @@
 
       <!-- 시간 -->
       <div class="pb-4 border-b border-[#575757]">
-        <label class="text-white text-base font-medium block mb-4">시간</label>
         <div class="flex justify-between items-center">
-          <span class="text-white">시간</span>
+          <span class="text-white text-base font-medium">시간</span>
           <input
             v-model="editableData.time"
             type="time"
