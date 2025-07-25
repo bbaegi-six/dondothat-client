@@ -1,6 +1,6 @@
 <template>
   <header
-    class="flex justify-between items-center px-5 py-4 bg-dark-bg text-white h-[60px] box-border w-full max-w-[390px] mx-auto fixed top-0 left-0 right-0 z-50"
+    class="flex justify-between items-center px-[31px] py-4 bg-dark-bg text-white h-[60px] box-border w-[390px] mx-auto fixed top-0 left-0 right-0 z-50"
   >
     <div class="flex items-center gap-0">
       <button
@@ -48,12 +48,30 @@
           />
         </svg>
       </div>
+      <button
+        v-if="showAddButton"
+        @click="$emit('add-click')"
+        class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+        style="background-color: #FF5555"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 448 512"
+          width="16"
+          height="16"
+          fill="#ffffff"
+        >
+          <path
+            d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"
+          />
+        </svg>
+      </button>
     </div>
   </header>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -79,7 +97,13 @@ defineProps({
     type: Number,
     default: 0,
   },
+  showAddButton: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+defineEmits(['add-click']);
 </script>
 
 <style scoped></style>
