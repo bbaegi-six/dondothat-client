@@ -52,10 +52,16 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/no-chat',
+    name: 'NoChat',
+    component: () => import('@/pages/chat/NoChat.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/chat',
     name: 'Chat',
-    component: Chat,
-    meta: { requiresAuth: true },
+    component: () => import('@/pages/chat/Chat.vue'),
+    // meta: { requiresAuth: true },
   },
   {
     path: '/expenses',
@@ -109,7 +115,7 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
 
   if (requiresAuth && !authStore.isLoggedIn) {
-    next({ name: 'Login' });
+     next({ name: 'Login' });
   } else {
     next();
   }
