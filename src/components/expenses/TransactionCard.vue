@@ -55,7 +55,7 @@ const handleClick = () => {
   emit('click', props.transaction)
 }
 
-// 카테고리별 색상 매핑
+// 카테고리별 색상 매핑 (스토어에서 가져오기)
 const getCategoryColor = (category) => {
   const colorMap = {
     '편의점': 'bg-[#ffe7ac]',
@@ -70,7 +70,7 @@ const getCategoryColor = (category) => {
   return colorMap[category] || 'bg-[#c9c9c9]'
 }
 
-// 카테고리별 아이콘 매핑
+// 카테고리별 아이콘 매핑 (스토어에서 가져오기)
 const getCategoryIcon = (category) => {
   const iconMap = {
     '편의점': `<svg fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
