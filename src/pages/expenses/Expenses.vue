@@ -1,47 +1,95 @@
 <template>
-  <div class="pt-[60px] px-6 pb-[90px] bg-dark-bg min-h-screen">
-    <Header :showBack="false" title="소비 내역" />
+  <div
+    class="pt-[60px] px-[31px] pb-[90px] min-h-screen w-[390px] mx-auto"
+    style="background-color: #2f2f2f;"
+  >
+    <Header
+      :showBack="false"
+      title="소비 내역"
+      :showAddButton="true"
+      @add-click="addTransaction"
+    />
 
     <!-- 월별 요약 섹션 -->
-    <div class="bg-[#414141] rounded-16 p-4 mb-6" style="margin-top: 20px">
+    <div
+      class="bg-[#414141] rounded-2xl mb-6 relative"
+      style="margin-top: 20px; width: 328px; height: 131px; padding: 16px 18px"
+    >
       <!-- 월 선택 헤더 -->
-      <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center justify-start mb-4 gap-8">
         <button
           @click="previousMonth"
-          class="text-[#c9c9c9] hover:text-white transition-colors p-2"
+          class="w-[10px] h-4 flex items-center justify-center"
         >
-          <svg width="10" height="16" viewBox="0 0 320 512" fill="currentColor">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
             <path
-              d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"
+              d="M6 4L2 8L6 12"
+              stroke="#C9C9C9"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             />
           </svg>
         </button>
-        <h2 class="text-white text-xl font-bold">
+        <h2
+          class="text-white font-bold text-left"
+          style="font-family: Pretendard; font-size: 20px; line-height: 32px"
+        >
           {{ currentMonthDisplay }}월
         </h2>
         <button
           @click="nextMonth"
-          class="text-[#c9c9c9] hover:text-white transition-colors p-2"
+          class="w-[10px] h-4 flex items-center justify-center"
         >
-          <svg width="10" height="16" viewBox="0 0 320 512" fill="currentColor">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
             <path
-              d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"
+              d="M4 4L8 8L4 12"
+              stroke="#C9C9C9"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             />
           </svg>
         </button>
       </div>
 
       <!-- 수입/지출 요약 -->
-      <div class="flex justify-between items-center">
-        <div class="text-center">
-          <p class="text-white text-base font-medium mb-1">수입</p>
-          <p class="text-white text-xl font-bold">
+      <div class="flex" style="gap: 38px">
+        <div class="flex flex-col" style="width: 145px">
+          <p
+            class="text-white font-medium text-center"
+            style="
+              font-family: Pretendard;
+              font-size: 16px;
+              line-height: 21px;
+              margin-bottom: 3px;
+            "
+          >
+            수입
+          </p>
+          <p
+            class="text-white font-bold text-center"
+            style="font-family: Pretendard; font-size: 20px; line-height: 28px"
+          >
             {{ monthlyIncome.toLocaleString() }}원
           </p>
         </div>
-        <div class="text-center">
-          <p class="text-[#ff5555] text-base font-medium mb-1">지출</p>
-          <p class="text-[#ff5555] text-xl font-bold">
+        <div class="flex flex-col" style="width: 145px">
+          <p
+            class="text-[#FF5555] font-medium text-center"
+            style="
+              font-family: Pretendard;
+              font-size: 16px;
+              line-height: 21px;
+              margin-bottom: 3px;
+            "
+          >
+            지출
+          </p>
+          <p
+            class="text-[#FF5555] font-bold text-center"
+            style="font-family: Pretendard; font-size: 20px; line-height: 28px"
+          >
             {{ monthlyExpense.toLocaleString() }}원
           </p>
         </div>
@@ -54,15 +102,15 @@
       <div
         v-for="(group, date) in groupedTransactions"
         :key="date"
-        class="mb-6"
+        class="mb-4"
       >
-        <div class="flex justify-between items-center mb-4">
-          <p class="text-white text-base font-medium">{{ formatDate(date) }}</p>
-          <p class="text-[#ff5555] text-base font-semibold">
+        <div class="flex justify-between items-center mb-3 px-4">
+          <p class="text-white text-sm font-medium">{{ formatDate(date) }}</p>
+          <p class="text-[#ff6b6b] text-sm font-semibold">
             {{ getDailyTotal(group) }}
           </p>
         </div>
-        <div class="border-t border-[#414141]"></div>
+        <div class="border-t border-[#414141] mx-4 mb-2"></div>
 
         <!-- 거래내역 아이템들 -->
         <div class="space-y-0">
@@ -77,8 +125,8 @@
     </div>
 
     <!-- 데이터 없음 표시 -->
-    <div v-else class="text-center py-12">
-      <p class="text-[#c6c6c6] text-base">
+    <div v-else class="text-center py-16">
+      <p class="text-[#9ca3af] text-sm">
         {{ currentMonthDisplay }}월의 거래내역이 없습니다.
       </p>
     </div>
@@ -125,6 +173,12 @@ const getDailyTotal = (transactions) => {
 
 const editTransaction = (transaction) => {
   router.push(`/expenses/edit/${transaction.id}`);
+};
+
+const addTransaction = () => {
+  // TODO: 새 거래 추가 페이지로 이동
+  console.log('새 거래 추가 버튼 클릭');
+  alert('새 거래 추가 기능은 추후 구현 예정입니다.');
 };
 </script>
 
