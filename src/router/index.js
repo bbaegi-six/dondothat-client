@@ -53,8 +53,8 @@ const routes = [
   {
     path: '/chat',
     name: 'Chat',
-    component: Chat,
-    meta: { requiresAuth: true },
+    component: () => import('@/pages/chat/Chat.vue'),
+    // meta: { requiresAuth: true },
   },
   {
     path: '/expenses',
@@ -98,14 +98,14 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore();
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  // const authStore = useAuthStore();
+  // const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
 
-  if (requiresAuth && !authStore.isLoggedIn) {
-    next({ name: 'Login' });
-  } else {
-    next();
-  }
+  // if (requiresAuth && !authStore.isLoggedIn) {
+  //   next({ name: 'Login' });
+  // } else {
+  next();
+  // }
 });
 
 export default router;
