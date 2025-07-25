@@ -1,7 +1,7 @@
 <template>
   <div
     class="pt-[60px] px-[31px] pb-[90px] min-h-screen w-[390px] mx-auto"
-    style="background-color: #2f2f2f;"
+    style="background-color: #2f2f2f"
   >
     <Header
       :showBack="false"
@@ -16,16 +16,16 @@
       style="margin-top: 20px; width: 328px; height: 131px; padding: 16px 18px"
     >
       <!-- 월 선택 헤더 -->
-      <div class="flex items-center justify-start mb-4 gap-8">
+      <div class="flex items-center justify-between mb-4">
         <button
           @click="previousMonth"
-          class="w-[10px] h-4 flex items-center justify-center"
+          class="w-[20px] h-8 flex items-center justify-center"
         >
-          <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+          <svg width="20" height="32" viewBox="0 0 20 32" fill="none">
             <path
-              d="M6 4L2 8L6 12"
+              d="M12 8L6 16L12 24"
               stroke="#C9C9C9"
-              stroke-width="1.5"
+              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
             />
@@ -39,13 +39,13 @@
         </h2>
         <button
           @click="nextMonth"
-          class="w-[10px] h-4 flex items-center justify-center"
+          class="w-[20px] h-8 flex items-center justify-center"
         >
-          <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+          <svg width="20" height="32" viewBox="0 0 20 32" fill="none">
             <path
-              d="M4 4L8 8L4 12"
+              d="M8 8L14 16L8 24"
               stroke="#C9C9C9"
-              stroke-width="1.5"
+              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
             />
@@ -105,8 +105,16 @@
         class="mb-4"
       >
         <div class="flex justify-between items-center mb-3 px-4">
-          <p class="text-white text-sm font-medium">{{ formatDate(date) }}</p>
-          <p class="text-[#ff6b6b] text-sm font-semibold">
+          <p
+            class="text-white font-medium"
+            style="font-family: Pretendard; font-size: 14px; line-height: 18px"
+          >
+            {{ formatDate(date) }}
+          </p>
+          <p
+            class="text-[#ff6b6b] font-semibold"
+            style="font-family: Pretendard; font-size: 14px; line-height: 18px"
+          >
             {{ getDailyTotal(group) }}
           </p>
         </div>
