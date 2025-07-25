@@ -51,6 +51,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/no-chat',
+    name: 'NoChat',
+    component: () => import('@/pages/chat/NoChat.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/chat',
     name: 'Chat',
     component: () => import('@/pages/chat/Chat.vue'),
