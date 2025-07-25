@@ -1,17 +1,20 @@
 <template>
-  <div class="flex flex-col h-screen bg-dark-bg">
+  <div class="flex flex-col h-screen bg-default">
     <!-- Custom Header -->
     <header
       class="flex justify-between items-center px-5 py-4 bg-dark-bg text-white h-[60px] box-border w-full max-w-[390px] mx-auto fixed top-0 left-0 right-0 z-50"
     >
-      <div></div>
-      <!-- Empty div for spacing -->
-      <h2 class="font-pretendard text-xl font-semibold m-0 text-center flex-1">
-        배달음식 금지 챌린지
-      </h2>
-      <div class="flex items-center gap-1">
-        <i class="fas fa-user-group text-[#C9C9C9] text-base"></i>
-        <span class="text-[#C9C9C9] text-base font-medium">10</span>
+      <div class="relative w-full flex items-center justify-between">
+        <div style="width: 40px"></div>
+        <h2
+          class="font-pretendard text-xl font-semibold m-0 text-center absolute left-1/2 -translate-x-1/2 w-max"
+        >
+          배달음식 금지 챌린지
+        </h2>
+        <div class="flex items-center gap-1 ml-auto">
+          <i class="fas fa-user-group text-[#C9C9C9] text-base"></i>
+          <span class="text-[#C9C9C9] text-base font-medium">10</span>
+        </div>
       </div>
     </header>
 
@@ -20,69 +23,13 @@
 
     <!-- Chat Messages -->
     <div class="flex-1 px-[31px] py-4 overflow-y-auto space-y-2">
-      <div v-for="message in messages" :key="message.id">
-        <!-- Other user's message -->
-        <div
-          v-if="message.username !== '나'"
-          class="flex items-start gap-2 mb-2"
-        >
-          <!-- Profile Picture -->
-          <div
-            class="w-8 h-8 bg-white rounded-full flex-shrink-0 flex items-center justify-center"
-          >
-            <i class="fas fa-user text-gray-600 text-sm"></i>
-          </div>
-
-          <!-- Message Content -->
-          <div class="flex-1">
-            <!-- Username -->
-            <div class="mb-1">
-              <span class="text-white text-xs font-extralight">{{
-                message.username
-              }}</span>
-            </div>
-
-            <div class="flex items-end gap-1">
-              <!-- Message Bubble -->
-              <div
-                class="bg-[#414141] rounded-lg px-3 py-2 inline-block max-w-[280px] min-w-[40px]"
-              >
-                <p
-                  class="text-white text-xs font-light leading-4 whitespace-pre-line"
-                >
-                  {{ message.content }}
-                </p>
-              </div>
-
-              <!-- Time -->
-              <span class="text-white text-[8px] font-extralight">{{
-                formatTime(message.time)
-              }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- My message -->
-        <div v-else class="flex justify-end mb-2">
-          <div class="flex items-end gap-1">
-            <!-- Time -->
-            <span class="text-white text-[8px] font-extralight">{{
-              formatTime(message.time)
-            }}</span>
-
-            <!-- Message Bubble -->
-            <div
-              class="bg-[#FF5555] rounded-lg px-3 py-2 inline-block max-w-[280px] min-w-[40px]"
-            >
-              <p
-                class="text-white text-xs font-light leading-4 whitespace-pre-line"
-              >
-                {{ message.content }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ChatMessage
+        v-for="message in messages"
+        :key="message.id"
+        :username="message.username"
+        :content="message.content"
+        :time="formatTime(message.time)"
+      />
     </div>
 
     <!-- Input Area -->
@@ -100,14 +47,14 @@
         <button
           @click="sendMessage"
           :disabled="!newMessage.trim()"
-          class="w-16 h-12 text-white rounded-xl flex items-center justify-center transition-colors duration-200"
+          class="w-12 h-12 text-white rounded-xl flex items-center justify-center transition-colors duration-200"
           :class="
             newMessage.trim()
               ? 'bg-[#FF5555]'
               : 'bg-gray-400 cursor-not-allowed'
           "
         >
-          <i class="fas fa-arrow-up text-xl"></i>
+          <i class="fas fa-arrow-up text-lg"></i>
         </button>
       </div>
     </div>
@@ -119,6 +66,7 @@
 
 <script setup>
 import { ref, nextTick } from 'vue';
+import ChatMessage from '@/components/chat/ChatMessage.vue';
 
 // Reactive data
 const newMessage = ref('');
