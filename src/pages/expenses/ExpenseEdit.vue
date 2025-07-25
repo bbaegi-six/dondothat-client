@@ -1,45 +1,53 @@
 <template>
-  <div class="pt-[60px] px-6 pb-6 bg-dark-bg min-h-screen">
+  <div
+    class="pt-[60px] px-[31px] pb-6 min-h-screen w-[390px] mx-auto"
+    style="background-color: #2f2f2f"
+  >
     <Header :showBack="true" title="소비 내역" />
 
     <!-- 선 구분 -->
-    <div class="border-t border-[#414141] mt-5 mb-6"></div>
+    <div class="border-t border-[#414141] mb-6"></div>
 
     <!-- 거래처명 -->
     <div class="mb-6">
-      <h1 class="text-white text-2xl font-semibold">
-        {{ transactionData.name || '거래처명 없음' }}
-      </h1>
+      <input
+        v-model="editableData.name"
+        type="text"
+        class="text-white text-2xl font-semibold bg-transparent border-none outline-none w-full"
+        placeholder="이름을 입력하세요"
+      />
     </div>
 
     <!-- 폼 필드들 -->
     <div class="space-y-6">
       <!-- 분류 -->
       <div class="pb-4 border-b border-[#575757]">
-        <label class="text-white text-base font-medium block mb-4">분류</label>
-        <div class="flex gap-2">
-          <button
-            @click="editableData.type = 'income'"
-            :class="[
-              'px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200',
-              editableData.type === 'income'
-                ? 'bg-white text-black border border-white'
-                : 'bg-transparent text-white border border-white',
-            ]"
-          >
-            수입
-          </button>
-          <button
-            @click="editableData.type = 'expense'"
-            :class="[
-              'px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200',
-              editableData.type === 'expense'
-                ? 'bg-[#ff5555] text-white border border-[#ff5555]'
-                : 'bg-transparent text-[#ff5555] border border-[#ff5555]',
-            ]"
-          >
-            지출
-          </button>
+        <div class="flex items-center justify-between">
+          <span class="text-white text-base font-medium">분류</span>
+          <div class="flex gap-2">
+            <button
+              @click="editableData.type = 'income'"
+              :class="[
+                'px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200 border hover:bg-white hover:text-[#2f2f2f] active:bg-white active:text-[#2f2f2f]',
+                editableData.type === 'income'
+                  ? 'bg-white text-[#2f2f2f] border-white'
+                  : 'bg-[#2f2f2f] text-white border-white',
+              ]"
+            >
+              수입
+            </button>
+            <button
+              @click="editableData.type = 'expense'"
+              :class="[
+                'px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200 border hover:bg-[#ff5555] hover:text-white active:bg-[#ff5555] active:text-white',
+                editableData.type === 'expense'
+                  ? 'bg-[#ff5555] text-white border-[#ff5555]'
+                  : 'bg-[#2f2f2f] text-[#ff5555] border-[#ff5555]',
+              ]"
+            >
+              지출
+            </button>
+          </div>
         </div>
       </div>
 
@@ -64,10 +72,13 @@
         <div class="flex justify-between items-center">
           <span class="text-white text-base font-medium">카테고리</span>
           <button
-            @click="selectCategory"
-            class="text-white text-base font-medium text-right hover:text-[#ff5555] transition-colors"
+            @click="showCategoryModal = true"
+            class="text-white text-base font-medium text-right hover:text-[#ff5555] transition-colors flex items-center gap-2"
           >
             {{ editableData.category || '미선택' }}
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+              <path d="M2 4L6 8L2 12" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </button>
         </div>
       </div>
@@ -86,11 +97,7 @@
       <div class="pb-4 border-b border-[#575757]">
         <div class="flex justify-between items-center">
           <span class="text-white text-base font-medium">시간</span>
-          <input
-            v-model="editableData.time"
-            type="time"
-            class="text-white text-base font-medium bg-transparent border-none outline-none text-right"
-          />
+          <span class="text-white text-base font-medium">{{ editableData.time }}</span>
         </div>
       </div>
     </div>
@@ -110,11 +117,36 @@
         저장
       </button>
     </div>
+
+    <!-- 카테고리 선택 모달 -->
+    <div v-if="showCategoryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-end z-50">
+      <div class="bg-[#2f2f2f] w-full rounded-t-3xl p-6 max-h-[70vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-white text-xl font-semibold">카테고리 선택</h3>
+          <button @click="showCategoryModal = false" class="text-white text-2xl">&times;</button>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            v-for="category in categories"
+            :key="category"
+            @click="selectCategoryFromModal(category)"
+            :class="[
+              'p-4 rounded-lg text-left transition-colors',
+              editableData.category === category
+                ? 'bg-[#ff5555] text-white'
+                : 'bg-[#414141] text-white hover:bg-[#575757]'
+            ]"
+          >
+            {{ category }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, onMounted, computed } from 'vue';
+import { reactive, ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useExpensesStore } from '../../stores/expenses.js';
 import Header from '../../components/layout/Header.vue';
@@ -152,14 +184,21 @@ const editableData = reactive({
   time: '00:00',
 });
 
+// 모달 상태
+const showCategoryModal = ref(false);
+
+// 카테고리 목록
+const categories = [
+  '식비', '교통비', '쇼핑', '의료비', '교육비', '문화생활',
+  '통신비', '주거비', '보험료', '기타', '급여', '용돈',
+  '투자수익', '부업', '상여금', '기타수입'
+];
+
 // 카테고리 선택
-const selectCategory = () => {
-  const randomCategory =
-    expensesStore.categories[
-      Math.floor(Math.random() * expensesStore.categories.length)
-    ];
-  editableData.category = randomCategory;
-  console.log('카테고리 변경:', randomCategory);
+const selectCategoryFromModal = (category) => {
+  editableData.category = category;
+  showCategoryModal.value = false;
+  console.log('카테고리 변경:', category);
 };
 
 // 거래내역 저장
