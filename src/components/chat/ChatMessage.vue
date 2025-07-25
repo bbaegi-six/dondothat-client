@@ -1,6 +1,13 @@
 <template>
+  <!-- 시스템 메시지 (입장/퇴장 등) -->
+  <div v-if="messageType === 'SYSTEM'" class="flex justify-center my-2">
+    <div class="bg-[#414141] text-[#C9C9C9] text-xs px-3 py-1 rounded-full">
+      {{ content }}
+    </div>
+  </div>
+
   <!-- 받은 메시지 (다른 사용자) -->
-  <div v-if="!isMyMessage" class="flex items-start gap-2 mb-2">
+  <div v-else-if="!isMyMessage" class="flex items-start gap-2 mb-2">
     <!-- Profile Picture -->
     <div
       class="w-8 h-8 bg-white rounded-full flex-shrink-0 flex items-center justify-center"
@@ -67,10 +74,22 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  messageType: {
+    type: String,
+    default: 'MESSAGE',
+  },
+  userId: {
+    type: Number,
+    required: true,
+  },
+  currentUserId: {
+    type: Number,
+    required: true,
+  },
 });
 
-// 내가 보낸 메시지인지 확인
-const isMyMessage = computed(() => props.username === '나');
+// 내가 보낸 메시지인지 확인 - userId로 판단
+const isMyMessage = computed(() => props.userId === props.currentUserId);
 </script>
 
 <style scoped>

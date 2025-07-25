@@ -1,61 +1,114 @@
 <template>
-  <div class="flex flex-col h-screen bg-default">
+  <div class="flex flex-col h-screen bg-dark-bg">
     <!-- Custom Header -->
     <header
-      class="flex justify-between items-center px-5 py-4 bg-dark-bg text-white h-[60px] box-border w-full max-w-[390px] mx-auto fixed top-0 left-0 right-0 z-50"
+      class="flex items-center px-5 py-4 bg-dark-bg text-white h-[60px] box-border w-full max-w-[390px] mx-auto fixed top-0 left-0 right-0 z-50 relative"
     >
-      <div class="relative w-full flex items-center justify-between">
-        <div style="width: 40px"></div>
-        <h2
-          class="font-pretendard text-xl font-semibold m-0 text-center absolute left-1/2 -translate-x-1/2 w-max"
-        >
-          배달음식 금지 챌린지
-        </h2>
-        <div class="flex items-center gap-1 ml-auto">
-          <i class="fas fa-user-group text-[#C9C9C9] text-base"></i>
-          <span class="text-[#C9C9C9] text-base font-medium">10</span>
-        </div>
+      <!-- 채팅방 제목 (헤더 전체 중앙) -->
+      <h2
+        class="font-pretendard text-xl font-semibold m-0 absolute left-1/2 transform -translate-x-1/2"
+      >
+        {{ challengeName }}
+      </h2>
+
+      <!-- 접속자 수 (우측 정렬) -->
+      <div class="flex items-center gap-1 ml-auto">
+        <i class="fas fa-user-group text-[#C9C9C9] text-base"></i>
+        <span class="text-[#C9C9C9] text-base font-medium">{{
+          chatStore.userCount
+        }}</span>
       </div>
     </header>
 
     <!-- Header divider -->
     <div class="pt-[60px] border-b border-[#414141]"></div>
 
+    <!-- Loading Indicator -->
+    <div
+      v-if="chatStore.isConnecting"
+      class="flex-1 flex items-center justify-center"
+    >
+      <div class="text-white text-center">
+        <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+        <p>채팅방에 연결 중...</p>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div
+      v-else-if="chatStore.error"
+      class="flex-1 flex items-center justify-center"
+    >
+      <div class="text-center">
+        <i class="fas fa-exclamation-triangle text-red-500 text-2xl mb-2"></i>
+        <p class="text-white">{{ chatStore.error }}</p>
+        <button
+          @click="reconnect"
+          class="mt-4 px-4 py-2 bg-[#FF5555] text-white rounded-lg hover:bg-red-600 transition-colors"
+        >
+          다시 연결
+        </button>
+      </div>
+    </div>
+
     <!-- Chat Messages -->
-    <div class="flex-1 px-[31px] py-4 overflow-y-auto space-y-2">
+    <div
+      v-else-if="chatStore.isConnected"
+      class="flex-1 px-[31px] py-4 overflow-y-auto space-y-2"
+      ref="chatContainer"
+    >
       <ChatMessage
-        v-for="message in messages"
-        :key="message.id"
-        :username="message.username"
-        :content="message.content"
-        :time="formatTime(message.time)"
+        v-for="message in chatStore.sortedMessages"
+        :key="message.messageId || message.id || Math.random()"
+        :username="
+          message.userName || message.username || '사용자' + message.userId
+        "
+        :content="message.message || message.content"
+        :time="formatTime(message.sentAt || message.time)"
+        :messageType="message.messageType || 'MESSAGE'"
+        :userId="message.userId"
+        :currentUserId="currentUserId"
       />
     </div>
 
     <!-- Input Area -->
-    <div class="px-6 pb-4">
+    <div v-if="chatStore.isConnected" class="px-6 pb-4">
       <div class="flex gap-2 items-center">
         <div class="flex-1 relative">
           <input
             v-model="newMessage"
             @keypress.enter="sendMessage"
+            :disabled="!chatStore.isConnected"
             type="text"
             placeholder="채팅을 입력하세요"
-            class="w-full h-12 px-4 py-3 rounded-xl bg-white text-gray-800 placeholder-gray-400 focus:outline-none text-sm"
+            class="w-full h-12 px-4 py-3 rounded-xl bg-white text-gray-800 placeholder-gray-400 focus:outline-none text-sm disabled:bg-gray-200 disabled:cursor-not-allowed"
           />
         </div>
         <button
           @click="sendMessage"
-          :disabled="!newMessage.trim()"
+          :disabled="!newMessage.trim() || !chatStore.isConnected"
           class="w-12 h-12 text-white rounded-xl flex items-center justify-center transition-colors duration-200"
           :class="
-            newMessage.trim()
-              ? 'bg-[#FF5555]'
+            newMessage.trim() && chatStore.isConnected
+              ? 'bg-[#FF5555] hover:bg-red-600'
               : 'bg-gray-400 cursor-not-allowed'
           "
         >
           <i class="fas fa-arrow-up text-lg"></i>
         </button>
+      </div>
+    </div>
+
+    <!-- Connection Status -->
+    <div
+      v-if="
+        !chatStore.isConnected && !chatStore.isConnecting && !chatStore.error
+      "
+      class="px-6 pb-4"
+    >
+      <div class="text-center text-gray-400">
+        <i class="fas fa-wifi-slash text-xl mb-2"></i>
+        <p>연결이 끊어졌습니다</p>
       </div>
     </div>
 
@@ -65,107 +118,115 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useChatStore } from '@/stores/chat';
+import { useAuthStore } from '@/stores/auth'; // 인증 스토어 추가
 import ChatMessage from '@/components/chat/ChatMessage.vue';
+
+const route = useRoute();
+const router = useRouter();
+const chatStore = useChatStore();
+const authStore = useAuthStore(); // 인증 스토어 사용
 
 // Reactive data
 const newMessage = ref('');
-const messages = ref([
-  {
-    id: 1,
-    username: '정꾸준',
-    time: '09:10',
-    content:
-      '아 오늘 배달 먹을랬는데 참았다..ㅠ 이거 실화? 레알 배고프다 ㅋㅋ\n너넨 오늘 뭐먹냐',
-  },
-  {
-    id: 2,
-    username: '김절약',
-    time: '09:12',
-    content: '나는 오늘 도시락 먹을라고 ㅋㅋ',
-  },
-  { id: 3, username: '정꾸준', time: '09:13', content: 'ㄹㅇㅋㅋ' },
-  {
-    id: 4,
-    username: '신입',
-    time: '09:15',
-    content: '안녕하세요 행님들 신입임니다 ㅎㅎㅎㅎㅎ',
-  },
-  { id: 5, username: '나', time: '09:16', content: '신입님 환영합니다!' },
-  {
-    id: 6,
-    username: '정꾸준',
-    time: '09:17',
-    content: '오늘 점심 뭐 먹지 고민된다',
-  },
-  {
-    id: 7,
-    username: '나',
-    time: '09:18',
-    content: '저는 어제 남은 반찬 먹으려구요',
-  },
-  { id: 8, username: '김절약', time: '09:19', content: '역시 절약왕' },
-  { id: 9, username: '나', time: '09:20', content: 'ㅋㅋㅋㅋ' },
-  { id: 10, username: '정꾸준', time: '09:21', content: '오늘도 화이팅!' },
-  {
-    id: 11,
-    username: '신입',
-    time: '09:22',
-    content: '다들 열심히 하시네요!',
-  },
-  {
-    id: 12,
-    username: '나',
-    time: '09:23',
-    content: '우리 다같이 배달음식 참아봐요!',
-  },
-  { id: 13, username: '김절약', time: '09:24', content: '좋아요~' },
-  { id: 14, username: '정꾸준', time: '09:25', content: '배고프다...' },
-  { id: 15, username: '나', time: '09:26', content: '참아야죠 ㅎㅎ' },
-  {
-    id: 16,
-    username: '신입',
-    time: '09:27',
-    content: '저도 오늘은 도시락 싸왔어요!',
-  },
-  { id: 17, username: '나', time: '09:28', content: '오 멋져요!' },
-  { id: 18, username: '정꾸준', time: '09:29', content: '다들 대단하다' },
-  { id: 19, username: '나', time: '09:30', content: '우리 모두 화이팅!' },
-  { id: 20, username: '김절약', time: '09:31', content: '화이팅!' },
-]);
+const chatContainer = ref(null);
+const challengeName = ref('배달음식 금지 챌린지'); // TODO: 실제 챌린지 이름으로 변경
+
+// 사용자 정보 - 쿼리 파라미터에서 userId 가져오기 (테스트용)
+const currentUserId = ref(
+  parseInt(route.query.userId) || authStore.user?.id || 1
+);
+const currentUserName = ref(
+  route.query.userName || authStore.user?.name || '나'
+);
 
 // Methods
-const formatTime = (timeString) => {
-  return timeString; // 이미 24시간 형식으로 되어있음
+const connectToChat = async () => {
+  try {
+    const challengeId = route.params.challengeId || 1; // TODO: 라우트에서 실제 challengeId 가져오기
+
+    await chatStore.connectToChat(
+      parseInt(challengeId),
+      currentUserId.value,
+      currentUserName.value
+    );
+
+    console.log('✅ 채팅방 연결 완료');
+  } catch (error) {
+    console.error('❌ 채팅방 연결 실패:', error);
+  }
+};
+
+const reconnect = async () => {
+  chatStore.clearError();
+  await connectToChat();
 };
 
 const sendMessage = () => {
-  if (!newMessage.value.trim()) return;
+  if (!newMessage.value.trim() || !chatStore.isConnected) {
+    return;
+  }
 
-  const now = new Date();
-  const timeString = now.toLocaleTimeString('ko-KR', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
+  const success = chatStore.sendMessage(newMessage.value.trim());
+  if (success) {
+    newMessage.value = '';
 
-  messages.value.push({
-    id: Date.now(),
-    username: '나',
-    time: timeString,
-    content: newMessage.value.trim(),
-  });
-
-  newMessage.value = '';
-
-  // Scroll to bottom after message is added
-  nextTick(() => {
-    const chatContainer = document.querySelector('.overflow-y-auto');
-    if (chatContainer) {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-  });
+    // 메시지 전송 후 스크롤을 맨 아래로
+    nextTick(() => {
+      scrollToBottom();
+    });
+  }
 };
+
+const scrollToBottom = () => {
+  if (chatContainer.value) {
+    chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+  }
+};
+
+// 시간 포맷팅 함수
+const formatTime = (timestamp) => {
+  if (!timestamp) return '';
+
+  const date = new Date(timestamp);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  // 오전/오후 형식
+  const period = hours >= 12 ? '오후' : '오전';
+  const hour12 = hours % 12 || 12;
+  const minuteStr = minutes.toString().padStart(2, '0');
+
+  return `${period} ${hour12}:${minuteStr}`;
+};
+
+// 새 메시지가 추가될 때마다 자동 스크롤
+watch(
+  () => chatStore.messages.length,
+  () => {
+    nextTick(() => {
+      scrollToBottom();
+    });
+  }
+);
+
+// Lifecycle
+onMounted(() => {
+  console.log('🚀 Chat 컴포넌트 마운트됨');
+  connectToChat();
+});
+
+onUnmounted(() => {
+  console.log('🔌 Chat 컴포넌트 언마운트됨');
+  chatStore.cleanup();
+});
+
+// 페이지를 벗어날 때 연결 해제
+window.addEventListener('beforeunload', () => {
+  chatStore.disconnect();
+});
 </script>
 
 <style scoped>
@@ -185,6 +246,20 @@ const sendMessage = () => {
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* Loading spinner animation */
+.fa-spin {
+  animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Message animation */
