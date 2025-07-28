@@ -1,6 +1,6 @@
 <!-- BaseCard.vue -->
 <template>
-  <div class="bg-card-bg rounded-16 p-4 min-h-[78px] flex items-center">
+  <div class="bg-gray-1 rounded-16 p-4 min-h-[78px] flex items-center">
     <slot></slot>
   </div>
 </template>
@@ -11,5 +11,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
