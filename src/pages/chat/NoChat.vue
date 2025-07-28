@@ -4,7 +4,7 @@
     style="background-color: #2f2f2f"
   >
     <!-- Header -->
-    <Header :showBack="false" title="채팅" :showAddButton="false" />
+    <Header :showBack="false" :showAddButton="false" />
 
     <!-- 빈 상태 컨텐츠 -->
     <div
@@ -13,42 +13,48 @@
       <!-- 채팅 아이콘 -->
       <div class="mb-8">
         <div
-          class="w-24 h-24 bg-[#414141] rounded-full flex items-center justify-center mb-4"
+          class="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6"
         >
-          <svg
-            width="48"
-            height="48"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#9ca3af"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path
-              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-            />
-          </svg>
+          <i class="fas fa-comments text-4xl text-[#FF5555]"></i>
         </div>
       </div>
 
       <!-- 메인 메시지 -->
+      <div class="text-center mb-6">
+        <h2 class="text-white text-xl font-semibold font-pretendard mb-2">
+          참여 중인
+        </h2>
+        <h2 class="text-white text-xl font-semibold font-pretendard">
+          채팅방이 없어요
+        </h2>
+      </div>
+
+      <!-- 서브 텍스트 -->
       <div class="text-center">
-        <h2 class="text-white text-xl font-semibold">아직 채팅방이 없어요</h2>
+        <p
+          class="text-[#C9C9C9] text-sm font-light font-pretendard leading-relaxed"
+        >
+          채팅지에 도전 중이어야<br />
+          채팅에 참여 할 수 있어요
+        </p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
-import Header from '../../components/layout/Header.vue';
-
-const router = useRouter();
-
-// 스크립트 로직을 여기에 추가할 수 있습니다
+import Header from '@/components/layout/Header.vue';
 </script>
 
 <style scoped>
-/* 추가 스타일이 필요한 경우 여기에 작성 */
+@media (max-width: 430px) {
+  .w-\[390px\] {
+    width: 100%;
+  }
+}
+
+/* 스크롤바 숨기기 */
+::-webkit-scrollbar {
+  display: none;
+}
 </style>
