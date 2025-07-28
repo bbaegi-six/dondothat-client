@@ -34,7 +34,7 @@
         <p
           class="text-[#C9C9C9] text-sm font-light font-pretendard leading-relaxed"
         >
-          채팅지에 도전 중이어야<br />
+          챌린지에 도전 중이어야<br />
           채팅에 참여 할 수 있어요
         </p>
       </div>
