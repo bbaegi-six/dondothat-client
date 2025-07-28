@@ -1,6 +1,9 @@
 <template>
   <!-- 시스템 메시지 (입장/퇴장 등) -->
-  <div v-if="messageType === 'SYSTEM'" class="flex justify-center my-2">
+  <div
+    v-if="messageType === 'SYSTEM'"
+    class="flex justify-center py-2 mt-4 mb-2"
+  >
     <div class="bg-[#414141] text-[#C9C9C9] text-xs px-3 py-1 rounded-full">
       {{ content }}
     </div>
