@@ -12,7 +12,7 @@
   >
     <!-- 카테고리 아이콘 배경 -->
     <div
-      :class="getCategoryBackgroundColor(transaction.category)"
+      :class="getCategoryBackgroundColor()"
       style="
         width: 48px;
         height: 48px;
@@ -26,7 +26,7 @@
       <!-- 폰트어썸 아이콘 -->
       <i
         :class="getCategoryIcon(transaction.category)"
-        :style="getIconStyle()"
+        :style="getIconStyle(transaction.category)"
       ></i>
     </div>
 
@@ -118,20 +118,9 @@ const handleClick = () => {
   emit('click', props.transaction);
 };
 
-// 카테고리별 배경색 매핑 (피그마 기준)
-const getCategoryBackgroundColor = (category) => {
-  // 피그마에서 식비는 하이라이트된 배경(#ffe7ac), 나머지는 기본 배경(#414141)
-  const colorMap = {
-    편의점: 'transaction-icon-default', // #414141
-    교통: 'transaction-icon-default', // #414141
-    식비: 'transaction-icon-default', // #ffe7ac (하이라이트)
-    쇼핑: 'transaction-icon-default', // #414141
-    기타: 'transaction-icon-default', // #414141
-    급여: 'transaction-icon-default', // #414141
-    용돈: 'transaction-icon-default', // #414141
-    부업: 'transaction-icon-default', // #414141
-  };
-  return colorMap[category] || 'transaction-icon-default';
+// 모든 아이콘 배경색은 #414141로 동일
+const getCategoryBackgroundColor = () => {
+  return 'transaction-icon-default';
 };
 
 // 카테고리별 폰트어썸 아이콘 매핑 (피그마 아이콘 기준)
@@ -156,11 +145,26 @@ const getCategoryIcon = (category) => {
 };
 
 // 아이콘 스타일 (피그마 기준 색상)
-const getIconStyle = () => {
+const getIconStyle = (category) => {
+  const colorMap = {
+    배달음식: '#ff7376',
+    카페: '#ff9595',
+    쇼핑: '#ffa66f',
+    택시: '#ffc457',
+    편의점: '#ffe7ac',
+    문화: '#cde897',
+    술: '#72e39c',
+    교통: '#8cc2ff',
+    의료: '#8f95ec',
+    생활: '#cf8fec',
+    식비: '#f680db',
+    그외: '#c9c9c9',
+    수입: '#ffffff',
+  };
   // 피그마에서 아이콘은 흰색(#ffffff)으로 표시
   return {
     fontSize: '20px',
-    color: '#ffffff',
+    color: colorMap[category] || '#ffffff',
   };
 };
 
@@ -176,11 +180,6 @@ const formatAmount = (amount, type) => {
 /* 기본 아이콘 배경 (피그마: #414141) */
 .transaction-icon-default {
   background-color: #414141;
-}
-
-/* 하이라이트된 아이콘 배경 (피그마: #ffe7ac) */
-.transaction-icon-highlighted {
-  background-color: #ffe7ac;
 }
 
 /* 폰트어썸 아이콘 기본 스타일 */

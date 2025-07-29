@@ -324,87 +324,72 @@
     </div>
 
     <!-- 저금통 거래내역 리스트 -->
-    <div v-if="activeTab === 'savings'" style="margin-top: 17px">
-      <div
-        v-for="item in savingsData"
-        :key="item.id"
-        style="
-          width: 328px;
-          height: 80px;
-          margin-top: 0px;
-          display: flex;
-          align-items: center;
-        "
-      >
-        <div
-          style="
-            width: 48px;
-            height: 48px;
-            background-color: #414141;
-            border-radius: 50%;
-            margin-right: 15px;
-          "
-        ></div>
-        <div style="flex: 1">
-          <div style="display: flex; justify-content: space-between">
+    <div v-if="activeTab === 'savings'">
+      <div v-if="Object.keys(groupedSavingsData).length > 0">
+        <!-- 날짜별 그룹 -->
+        <div v-for="(group, date) in groupedSavingsData" :key="date">
+          <!-- 날짜와 금액 -->
+          <div
+            style="
+              margin-top: 28px;
+              width: 328px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
             <div
               style="
                 font-family: 'Pretendard';
                 font-style: normal;
                 font-weight: 500;
                 font-size: 16px;
-                line-height: 24px;
+                line-height: 32px;
                 color: #ffffff;
               "
             >
-              {{ item.name }}
+              {{ formatDate(date) }}
             </div>
             <div
               style="
                 font-family: 'Pretendard';
                 font-style: normal;
-                font-weight: 700;
-                font-size: 14.125px;
+                font-weight: 600;
+                font-size: 16px;
                 line-height: 24px;
                 color: #ffffff;
-                text-align: right;
-                width: 80px;
               "
             >
-              +{{ item.amount.toLocaleString() }}원
+              {{ getDailySavingsTotal(group) }}
             </div>
           </div>
-          <div style="display: flex; justify-content: space-between">
-            <div
-              style="
-                font-family: 'Pretendard';
-                font-style: normal;
-                font-weight: 400;
-                font-size: 14px;
-                line-height: 20px;
-                color: #c6c6c6;
-                margin-top: 2px;
-              "
-            >
-              {{ item.date }}
-            </div>
-            <div
-              style="
-                font-family: 'Pretendard';
-                font-style: normal;
-                font-weight: 400;
-                font-size: 14px;
-                line-height: 20px;
-                color: #c6c6c6;
-                text-align: right;
-                width: 48px;
-                margin-top: 2px;
-              "
-            >
-              {{ item.time }}
-            </div>
+
+          <!-- 구분선 -->
+          <div
+            style="
+              width: 328px;
+              height: 0px;
+              border: 1px solid #414141;
+              margin-top: 0px;
+            "
+          ></div>
+
+          <!-- 저금통 아이템들 -->
+          <div>
+            <TransactionCard
+              v-for="item in group"
+              :key="item.id"
+              :transaction="item"
+            />
           </div>
         </div>
+      </div>
+
+      <!-- 데이터 없음 표시 -->
+      <div v-else class="text-center py-16">
+        <p style="color: #c6c6c6; font-size: 14px">
+          저금통 내역이 없습니다.
+        </p>
       </div>
     </div>
   </div>
@@ -428,27 +413,9 @@ const switchTab = (tab) => {
   activeTab.value = tab;
 };
 
-// 저금통 더미 데이터
-const savingsData = ref([
-  {
-    id: 1,
-    name: '편의점 금지 챌린지',
-    amount: 5000,
-    date: '07/12',
-    time: '18:59',
-  },
-  {
-    id: 2,
-    name: '배달음식 금지 챌린지',
-    amount: 18000,
-    date: '07/25',
-    time: '18:59',
-  },
-]);
-
-const totalSavings = computed(() => {
-  return savingsData.value.reduce((total, item) => total + item.amount, 0);
-});
+// 저금통 관련 계산된 속성들 (스토어에서 가져옴)
+const totalSavings = computed(() => expensesStore.totalSavings);
+const groupedSavingsData = computed(() => expensesStore.groupedSavingsData);
 
 // 계산된 속성들 (스토어에서 가져옴)
 const currentMonthDisplay = computed(() => expensesStore.currentMonth);
@@ -477,9 +444,15 @@ const getDailyTotal = (transactions) => {
   return expensesStore.getDailyTotal(transactions);
 };
 
+const getDailySavingsTotal = (items) => {
+  return expensesStore.getDailySavingsTotal(items);
+};
+
 const editTransaction = (transaction) => {
   router.push(`/expenses/edit/${transaction.id}`);
 };
+
+
 
 const addTransaction = () => {
   // TODO: 새 거래 추가 페이지로 이동

@@ -114,6 +114,27 @@ export const useExpensesStore = defineStore('expenses', {
       '그외',
       '수입',
     ],
+    // 저금통 데이터
+    savingsData: [
+      {
+        id: 'savings-1',
+        name: '편의점 금지 챌린지',
+        category: '편의점',
+        amount: 5000,
+        type: 'savings',
+        time: '18:59',
+        date: '2025-07-12',
+      },
+      {
+        id: 'savings-2',
+        name: '배달음식 금지 챌린지',
+        category: '배달음식',
+        amount: 18000,
+        type: 'savings',
+        time: '18:59',
+        date: '2025-07-25',
+      },
+    ],
   }),
 
   getters: {
@@ -165,6 +186,24 @@ export const useExpensesStore = defineStore('expenses', {
         }
         return null;
       };
+    },
+
+    // 총 저금 금액
+    totalSavings: (state) => {
+      return state.savingsData.reduce((sum, item) => sum + item.amount, 0);
+    },
+
+    // 날짜별로 그룹화된 저금통 데이터
+    groupedSavingsData: (state) => {
+      const groups = {};
+      state.savingsData.forEach((item) => {
+        const date = item.date;
+        if (!groups[date]) {
+          groups[date] = [];
+        }
+        groups[date].push(item);
+      });
+      return groups;
     },
   },
 
@@ -269,6 +308,14 @@ export const useExpensesStore = defineStore('expenses', {
     // 에러 초기화
     clearError() {
       this.error = null;
+    },
+
+
+
+    // 날짜별 저금 총액 계산
+    getDailySavingsTotal(items) {
+      const total = items.reduce((sum, item) => sum + item.amount, 0);
+      return total > 0 ? `+${total.toLocaleString()}원` : '0원';
     },
   },
 });
