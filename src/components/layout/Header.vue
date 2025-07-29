@@ -1,7 +1,6 @@
 <template>
   <header
-    class="flex justify-between items-center text-white w-[390px] mx-auto fixed top-0 left-0 right-0 z-[1000]"
-    style="background-color: #2f2f2f; padding-left: 31px; padding-right: 31px; padding-top: 35px; height: 88px; box-sizing: border-box; border-bottom: 1px solid #414141;"
+    class="flex justify-between items-center px-[31px] py-4 bg-default text-white h-[60px] box-border w-[390px] mx-auto fixed top-0 left-0 right-0 z-50"
   >
     <div class="flex items-center gap-0">
       <button
@@ -76,8 +75,8 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
-import { useRouter } from 'vue-router';
+import { defineProps, defineEmits } from "vue";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 
@@ -88,7 +87,7 @@ defineProps({
   },
   title: {
     type: String,
-    default: '',
+    default: "",
   },
   showLogo: {
     type: Boolean,
@@ -108,7 +107,7 @@ defineProps({
   },
 });
 
-defineEmits(['add-click']);
+defineEmits(["add-click"]);
 </script>
 
 <style scoped></style>
