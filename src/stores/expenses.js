@@ -231,14 +231,20 @@ export const useExpensesStore = defineStore('expenses', {
 
     // 거래내역 추가
     addTransaction(transaction) {
-      const month = new Date(transaction.date).getMonth() + 1;
-      if (!this.allTransactions[month]) {
-        this.allTransactions[month] = [];
+      try {
+        const month = new Date(transaction.date).getMonth() + 1;
+        if (!this.allTransactions[month]) {
+          this.allTransactions[month] = [];
+        }
+        this.allTransactions[month].push({
+          ...transaction,
+          id: this.generateId(),
+        });
+        return true;
+      } catch (error) {
+        console.error('거래내역 추가 실패:', error);
+        return false;
       }
-      this.allTransactions[month].push({
-        ...transaction,
-        id: this.generateId(),
-      });
     },
 
     // 거래내역 수정
@@ -309,8 +315,6 @@ export const useExpensesStore = defineStore('expenses', {
     clearError() {
       this.error = null;
     },
-
-
 
     // 날짜별 저금 총액 계산
     getDailySavingsTotal(items) {
