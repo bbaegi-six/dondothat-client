@@ -26,7 +26,11 @@
       >
         Don do that
       </h1>
-      <h2 v-if="title" class="font-pretendard text-xl font-semibold m-0">
+      <h2 
+        v-if="title" 
+        class="m-0"
+        style="font-family: 'Pretendard'; font-style: normal; font-weight: 600; font-size: 20px; line-height: 32px; color: #ffffff;"
+      >
         {{ title }}
       </h2>
     </div>
@@ -51,8 +55,8 @@
       <button
         v-if="showAddButton"
         @click="$emit('add-click')"
-        class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
-        style="background-color: #ff5555"
+        class="rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+        style="width: 32px; height: 32px; background-color: #FF5555"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
