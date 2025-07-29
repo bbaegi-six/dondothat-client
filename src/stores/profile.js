@@ -10,24 +10,24 @@ export const useUserStore = defineStore("user", () => {
   const accounts = ref([
     {
       id: 1,
-      imageUrl: "src/assets/logo.svg",
+      imageUrl: "src/assets/logo/kb.svg",
       name: "KB 마이핏 통장",
       balance: 1500000,
     },
     {
       id: 2,
-      imageUrl: "src/assets/logo.svg",
+      imageUrl: "src/assets/logo/kb.svg",
       name: "국민 저축 통장",
       balance: 500000,
     },
   ]);
 
   const badges = ref([
-    { image: "src/assets/badge.svg" },
-    { image: "src/assets/badge.svg" },
-    { image: "src/assets/badge.svg" },
-    { image: "src/assets/badge.svg" },
-    { image: "src/assets/badge.svg" },
+    { image: "src/assets/badge/eat.svg" },
+    { image: "src/assets/badge/eat.svg" },
+    { image: "src/assets/badge/eat.svg" },
+    { image: "src/assets/badge/eat.svg" },
+    { image: "src/assets/badge/eat.svg" },
   ]);
 
   //   const nickname = ref("");

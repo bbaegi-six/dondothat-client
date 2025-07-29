@@ -128,7 +128,7 @@ function logout() {
 .badge-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* 한 줄에 3개씩 */
-  gap: 12px; /* 아이템 간격 */
+  gap: 8px; /* 아이템 간격 */
   justify-items: center; /* 아이템 가운데 정렬 */
 }
 .menu {
