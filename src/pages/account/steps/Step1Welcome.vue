@@ -1,9 +1,10 @@
 <!-- step1welcome.vue -->
+<!-- step1welcome.vue -->
 <template>
-  <div class="flex flex-col min-h-screen px-5 relative">
+  <div class="flex flex-col h-full px-5 relative">
     <!-- content -->
     <div
-      class="flex flex-col flex-1 justify-center items-center -translate-y-12"
+      class="flex flex-col flex-1 justify-center items-center -translate-y-20"
     >
       <div class="max-w-[230px] w-full">
         <img
@@ -22,7 +23,7 @@
     </div>
 
     <!-- 하단 버튼 -->
-    <div class="absolute bottom-5 left-5 right-5 z-10">
+    <div class="absolute bottom-10 left-5 right-5 z-10">
       <div class="flex justify-center">
         <div class="w-[328px]">
           <Button
@@ -35,7 +36,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import Button from '../../../components/Button.vue';
 import accountstr from '@/assets/accountstr.svg';

@@ -2,23 +2,29 @@
   <div
     class="w-full max-w-[393px] h-screen bg-[#2F2F2F] overflow-hidden relative mx-auto font-pretendard text-white"
   >
-    <!-- Header Component (첫 번째 페이지에서는 숨김) -->
-    <AccountHeader
-      :current-step="currentStep - 1"
-      :total-steps="totalSteps - 1"
-      :title="getHeaderTitle()"
-      :show-back-button="currentStep > 2 && currentStep < 4"
-      :back-button-text="getBackButtonText()"
-      :show-header="currentStep > 1"
-      :show-dots="currentStep > 1"
-      @back="prevStep"
-    />
+    <!-- Header Component - 항상 65px 공간 확보 -->
+    <div class="h-[61px] relative">
+      <div
+        class="absolute inset-0 transition-opacity duration-300 ease-in-out"
+        :class="
+          currentStep === 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        "
+      >
+        <AccountHeader
+          :current-step="currentStep - 1"
+          :total-steps="totalSteps - 1"
+          :title="getHeaderTitle()"
+          :show-back-button="currentStep > 2 && currentStep < 4"
+          :back-button-text="getBackButtonText()"
+          :show-header="currentStep > 1"
+          :show-dots="currentStep > 1"
+          @back="prevStep"
+        />
+      </div>
+    </div>
 
     <!-- Main Content with Transition -->
-    <div
-      class="relative"
-      :class="currentStep === 1 ? 'h-full' : 'h-[calc(100%-65px)]'"
-    >
+    <div class="relative h-[calc(100%-61px)]">
       <Transition :name="transitionName" mode="out-in">
         <component
           :is="currentStepComponent"

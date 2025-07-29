@@ -34,7 +34,7 @@
     </div>
 
     <!-- Fixed Button at Bottom -->
-    <div class="absolute bottom-5 left-5 right-5 z-10">
+    <div class="absolute bottom-10 left-5 right-5 z-10">
       <div class="flex justify-center">
         <div class="w-[328px]">
           <Button label="다음" :disabled="!selectedBank" @click="nextStep" />
@@ -97,7 +97,7 @@ const banks = ref([
 // 메서드들
 const selectBank = (bank) => {
   selectedBank.value = bank;
-  console.log('Selected bank:', bank.name);
+  // console.log('Selected bank:', bank.name);
 };
 
 const nextStep = () => {

@@ -65,7 +65,7 @@
     </div>
 
     <!-- Bottom Section - 하단에 모든 내용 -->
-    <div class="flex-1 flex flex-col justify-end pb-5 space-y-4 items-center">
+    <div class="flex-1 flex flex-col justify-end pb-10 space-y-4 items-center">
       <!-- 동의 사항 -->
       <div class="space-y-3 w-[328px]">
         <div>

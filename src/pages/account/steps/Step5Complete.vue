@@ -34,7 +34,7 @@
       <div class="flex-1"></div>
 
       <!-- Bottom Section - Fixed spacing -->
-      <div class="pb-5">
+      <div class="pb-10">
         <div class="flex flex-col items-center space-y-4">
           <!-- Account Info Card -->
           <div class="bg-white rounded-xl p-4 w-[328px]">
@@ -114,7 +114,7 @@
       </div>
 
       <!-- Bottom Section - Error Buttons -->
-      <div class="pb-5">
+      <div class="pb-10">
         <div class="flex flex-col items-center">
           <div class="w-[328px]">
             <Button
@@ -154,7 +154,7 @@ onMounted(() => {
   // 예: props.flowData.isSuccess, props.flowData.error 등
 
   // 테스트용: 50% 확률로 실패 (랜덤)
-  const shouldFail = false;
+  const shouldFail = true;
 
   console.log('Step5 결과:', shouldFail ? '실패' : '성공');
 });
