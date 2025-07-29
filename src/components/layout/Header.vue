@@ -1,6 +1,7 @@
 <template>
   <header
-    class="flex justify-between items-center px-[31px] py-4 bg-dark-bg text-white h-[60px] box-border w-[390px] mx-auto fixed top-0 left-0 right-0 z-50"
+    class="flex justify-between items-center text-white w-[390px] mx-auto fixed top-0 left-0 right-0 z-[1000]"
+    style="background-color: #2f2f2f; padding-left: 31px; padding-right: 31px; padding-top: 35px; height: 88px; box-sizing: border-box; border-bottom: 1px solid #414141;"
   >
     <div class="flex items-center gap-0">
       <button
@@ -26,7 +27,11 @@
       >
         Don do that
       </h1>
-      <h2 v-if="title" class="font-pretendard text-xl font-semibold m-0">
+      <h2 
+        v-if="title" 
+        class="m-0"
+        style="font-family: 'Pretendard'; font-style: normal; font-weight: 600; font-size: 20px; line-height: 32px; color: #ffffff;"
+      >
         {{ title }}
       </h2>
     </div>
@@ -51,8 +56,8 @@
       <button
         v-if="showAddButton"
         @click="$emit('add-click')"
-        class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
-        style="background-color: #FF5555"
+        class="rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+        style="width: 32px; height: 32px; background-color: #FF5555"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
