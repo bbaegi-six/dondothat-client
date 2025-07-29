@@ -7,7 +7,6 @@ import ForgotPassword from '../pages/auth/ForgotPassword.vue';
 import Login from '../pages/auth/Login.vue';
 import Register from '../pages/auth/Register.vue';
 import Challenge from '../pages/challenge/Challenge.vue';
-import Chat from '../pages/chat/Chat.vue';
 import Expenses from '../pages/expenses/Expenses.vue';
 import ExpenseEdit from '../pages/expenses/ExpenseEdit.vue';
 import NotFound from '../pages/error/NotFound.vue';
@@ -70,11 +69,18 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/expenses/edit/:id',
+    path: '/expenses/:id',
     name: 'ExpenseEdit',
     component: ExpenseEdit,
     meta: { requiresAuth: true },
   },
+  {
+    path: '/expenses/new',
+    name: 'ExpenseNew',
+    component: ExpenseEdit,
+    meta: { requiresAuth: true },
+  },
+
   {
     path: '/guide',
     name: 'Guide',
@@ -115,7 +121,7 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
 
   if (requiresAuth && !authStore.isLoggedIn) {
-     next({ name: 'Login' });
+    next({ name: 'Login' });
   } else {
     next();
   }

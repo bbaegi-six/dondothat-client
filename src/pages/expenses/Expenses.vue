@@ -449,15 +449,14 @@ const getDailySavingsTotal = (items) => {
 };
 
 const editTransaction = (transaction) => {
-  router.push(`/expenses/edit/${transaction.id}`);
+  router.push(`/expenses/${transaction.id}`);
 };
 
 
 
 const addTransaction = () => {
-  // TODO: 새 거래 추가 페이지로 이동
-  console.log('새 거래 추가 버튼 클릭');
-  alert('새 거래 추가 기능은 추후 구현 예정입니다.');
+  router.push('/expenses/new');
+  console.log('새 거래 추가 페이지로 이동');
 };
 </script>
 
