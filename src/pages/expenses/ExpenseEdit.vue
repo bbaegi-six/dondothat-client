@@ -1,6 +1,6 @@
 <template>
   <div
-    class="pt-[60px] px-[31px] pb-6 min-h-screen w-[390px] mx-auto"
+    class="pt-[88px] px-[31px] pb-6 min-h-screen w-[390px] mx-auto"
     style="background-color: #2f2f2f"
   >
     <Header :showBack="true" title="소비 내역" />
