@@ -1,38 +1,91 @@
 <template>
   <div
     class="cursor-pointer"
-    style="width: 328px; height: 80px; margin-top: 0px; display: flex; align-items: center;"
+    style="
+      width: 328px;
+      height: 80px;
+      margin-top: 0px;
+      display: flex;
+      align-items: center;
+    "
     @click="handleClick"
   >
     <!-- 카테고리 아이콘 배경 -->
-    <div 
-      :class="getCategoryColor(transaction.category)"
-      style="width: 48px; height: 48px; border-radius: 50%; margin-right: 15px;"
+    <div
+      :class="getCategoryBackgroundColor(transaction.category)"
+      style="
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      "
     >
+      <!-- 폰트어썸 아이콘 -->
+      <i
+        :class="getCategoryIcon(transaction.category)"
+        :style="getIconStyle()"
+      ></i>
     </div>
 
     <!-- 거래 정보 -->
-    <div style="flex: 1;">
-      <div style="display: flex; justify-content: space-between;">
-        <div 
-          style="font-family: 'Pretendard'; font-style: normal; font-weight: 500; font-size: 16px; line-height: 24px; color: #ffffff;"
+    <div style="flex: 1">
+      <div style="display: flex; justify-content: space-between">
+        <div
+          style="
+            font-family: 'Pretendard';
+            font-style: normal;
+            font-weight: 500;
+            font-size: 16px;
+            line-height: 24px;
+            color: #ffffff;
+          "
         >
           {{ transaction.name }}
         </div>
-        <div 
-          style="font-family: 'Pretendard'; font-style: normal; font-weight: 700; font-size: 14.125px; line-height: 24px; color: #ffffff; text-align: right; width: 80px;"
+        <div
+          style="
+            font-family: 'Pretendard';
+            font-style: normal;
+            font-weight: 700;
+            font-size: 14.125px;
+            line-height: 24px;
+            color: #ffffff;
+            text-align: right;
+            width: 80px;
+          "
         >
           {{ formatAmount(transaction.amount, transaction.type) }}
         </div>
       </div>
-      <div style="display: flex; justify-content: space-between;">
-        <div 
-          style="font-family: 'Pretendard'; font-style: normal; font-weight: 400; font-size: 14px; line-height: 20px; color: #c6c6c6; margin-top: 2px;"
+      <div style="display: flex; justify-content: space-between">
+        <div
+          style="
+            font-family: 'Pretendard';
+            font-style: normal;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 20px;
+            color: #c6c6c6;
+            margin-top: 2px;
+          "
         >
           {{ transaction.category }}
         </div>
-        <div 
-          style="font-family: 'Pretendard'; font-style: normal; font-weight: 400; font-size: 14px; line-height: 20px; color: #c6c6c6; text-align: right; width: 48px; margin-top: 2px;"
+        <div
+          style="
+            font-family: 'Pretendard';
+            font-style: normal;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 20px;
+            color: #c6c6c6;
+            text-align: right;
+            width: 48px;
+            margin-top: 2px;
+          "
         >
           {{ transaction.time }}
         </div>
@@ -65,23 +118,51 @@ const handleClick = () => {
   emit('click', props.transaction);
 };
 
-// 카테고리별 색상 매핑 (simple.html 스타일 기반)
-const getCategoryColor = (category) => {
-  // simple.html에서는 기본적으로 #414141 색상을 사용하고, 특별한 경우에만 #ffe7ac 사용
+// 카테고리별 배경색 매핑 (피그마 기준)
+const getCategoryBackgroundColor = (category) => {
+  // 피그마에서 식비는 하이라이트된 배경(#ffe7ac), 나머지는 기본 배경(#414141)
   const colorMap = {
-    편의점: 'transaction-icon',
-    교통: 'transaction-icon',
-    식비: 'transaction-icon-highlighted', // 강조된 아이템
-    쇼핑: 'transaction-icon',
-    기타: 'transaction-icon',
-    급여: 'transaction-icon',
-    용돈: 'transaction-icon',
-    부업: 'transaction-icon',
+    편의점: 'transaction-icon-default', // #414141
+    교통: 'transaction-icon-default', // #414141
+    식비: 'transaction-icon-default', // #ffe7ac (하이라이트)
+    쇼핑: 'transaction-icon-default', // #414141
+    기타: 'transaction-icon-default', // #414141
+    급여: 'transaction-icon-default', // #414141
+    용돈: 'transaction-icon-default', // #414141
+    부업: 'transaction-icon-default', // #414141
   };
-  return colorMap[category] || 'transaction-icon';
+  return colorMap[category] || 'transaction-icon-default';
 };
 
+// 카테고리별 폰트어썸 아이콘 매핑 (피그마 아이콘 기준)
+const getCategoryIcon = (category) => {
+  const iconMap = {
+    편의점: 'fas fa-store', // store-solid (편의점)
+    교통: 'fas fa-train-subway', // cart-outline (교통)
+    식비: 'fas fa-utensils', // hamburger-line (식비)
+    쇼핑: 'fas fa-bag-shopping', // 쇼핑
+    그외: 'fas fa-ellipsis', // 기타
+    수입: 'fas fa-coins', // 급여
+    용돈: 'fas fa-hand-holding-usd', // 용돈
+    부업: 'fas fa-briefcase', // 부업
+    배달음식: 'fas fa-motorcycle', // 배달음식
+    카페: 'fas fa-mug-saucer',
+    택시: 'fas fa-taxi',
+    문화: 'fas fa-clapperboard',
+    술: 'fas fa-wine-bottle',
+    의료: 'fas fa-suitcase-medical',
+  };
+  return iconMap[category] || 'fas fa-question-circle';
+};
 
+// 아이콘 스타일 (피그마 기준 색상)
+const getIconStyle = () => {
+  // 피그마에서 아이콘은 흰색(#ffffff)으로 표시
+  return {
+    fontSize: '20px',
+    color: '#ffffff',
+  };
+};
 
 // 금액 포맷팅
 const formatAmount = (amount, type) => {
@@ -92,11 +173,19 @@ const formatAmount = (amount, type) => {
 </script>
 
 <style scoped>
-.transaction-icon {
+/* 기본 아이콘 배경 (피그마: #414141) */
+.transaction-icon-default {
   background-color: #414141;
 }
 
+/* 하이라이트된 아이콘 배경 (피그마: #ffe7ac) */
 .transaction-icon-highlighted {
   background-color: #ffe7ac;
+}
+
+/* 폰트어썸 아이콘 기본 스타일 */
+.fas {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
 }
 </style>

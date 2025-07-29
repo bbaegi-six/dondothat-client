@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
 
 export const useExpensesStore = defineStore('expenses', {
   state: () => ({
@@ -8,7 +8,7 @@ export const useExpensesStore = defineStore('expenses', {
         {
           id: 'jun-1',
           name: '스타벅스',
-          category: '식비',
+          category: '카페',
           amount: 4500,
           type: 'expense',
           time: '14:30',
@@ -46,7 +46,7 @@ export const useExpensesStore = defineStore('expenses', {
         {
           id: 'lotteria-1',
           name: '롯데리아 군자점',
-          category: '식비',
+          category: '배달음식',
           amount: 18000,
           type: 'expense',
           time: '18:59',
@@ -75,7 +75,7 @@ export const useExpensesStore = defineStore('expenses', {
         {
           id: 'aug-1',
           name: '카카오페이',
-          category: '기타',
+          category: '그외',
           amount: 50000,
           type: 'income',
           time: '10:00',
@@ -99,160 +99,176 @@ export const useExpensesStore = defineStore('expenses', {
     // 에러 상태
     error: null,
     // 카테고리 목록
-    categories: ['편의점', '교통', '식비', '쇼핑', '기타', '급여', '용돈', '부업']
+    categories: [
+      '배달음식',
+      '카페',
+      '쇼핑',
+      '택시',
+      '편의점',
+      '문화',
+      '술',
+      '대중교통',
+      '의료',
+      '생활',
+      '식비',
+      '그외',
+      '수입',
+    ],
   }),
 
   getters: {
     // 현재 월의 거래내역
     currentMonthTransactions: (state) => {
-      return state.allTransactions[state.currentMonth] || []
+      return state.allTransactions[state.currentMonth] || [];
     },
 
     // 날짜별로 그룹화된 거래내역
     groupedTransactions: (state) => {
-      const transactions = state.allTransactions[state.currentMonth] || []
-      const groups = {}
+      const transactions = state.allTransactions[state.currentMonth] || [];
+      const groups = {};
       transactions.forEach((transaction) => {
-        const date = transaction.date
+        const date = transaction.date;
         if (!groups[date]) {
-          groups[date] = []
+          groups[date] = [];
         }
-        groups[date].push(transaction)
-      })
-      return groups
+        groups[date].push(transaction);
+      });
+      return groups;
     },
 
     // 월별 수입 총액
     monthlyIncome: (state) => {
-      const transactions = state.allTransactions[state.currentMonth] || []
+      const transactions = state.allTransactions[state.currentMonth] || [];
       return transactions
         .filter((t) => t.type === 'income')
-        .reduce((sum, t) => sum + t.amount, 0)
+        .reduce((sum, t) => sum + t.amount, 0);
     },
 
     // 월별 지출 총액
     monthlyExpense: (state) => {
-      const transactions = state.allTransactions[state.currentMonth] || []
+      const transactions = state.allTransactions[state.currentMonth] || [];
       return transactions
         .filter((t) => t.type === 'expense')
-        .reduce((sum, t) => sum + t.amount, 0)
+        .reduce((sum, t) => sum + t.amount, 0);
     },
 
     // 특정 거래내역 조회
     getTransactionById: (state) => {
       return (id) => {
         for (const month in state.allTransactions) {
-          const transaction = state.allTransactions[month].find(t => t.id === id)
+          const transaction = state.allTransactions[month].find(
+            (t) => t.id === id
+          );
           if (transaction) {
-            return transaction
+            return transaction;
           }
         }
-        return null
-      }
-    }
+        return null;
+      };
+    },
   },
 
   actions: {
     // 월 변경
     setCurrentMonth(month) {
       if (month >= 1 && month <= 12) {
-        this.currentMonth = month
+        this.currentMonth = month;
       }
     },
 
     // 이전 월로 이동
     previousMonth() {
       if (this.currentMonth > 1) {
-        this.currentMonth--
+        this.currentMonth--;
       }
     },
 
     // 다음 월로 이동
     nextMonth() {
       if (this.currentMonth < 12) {
-        this.currentMonth++
+        this.currentMonth++;
       }
     },
 
     // 거래내역 추가
     addTransaction(transaction) {
-      const month = new Date(transaction.date).getMonth() + 1
+      const month = new Date(transaction.date).getMonth() + 1;
       if (!this.allTransactions[month]) {
-        this.allTransactions[month] = []
+        this.allTransactions[month] = [];
       }
       this.allTransactions[month].push({
         ...transaction,
-        id: this.generateId()
-      })
+        id: this.generateId(),
+      });
     },
 
     // 거래내역 수정
     updateTransaction(id, updatedData) {
       for (const month in this.allTransactions) {
-        const index = this.allTransactions[month].findIndex(t => t.id === id)
+        const index = this.allTransactions[month].findIndex((t) => t.id === id);
         if (index !== -1) {
           this.allTransactions[month][index] = {
             ...this.allTransactions[month][index],
-            ...updatedData
-          }
-          return true
+            ...updatedData,
+          };
+          return true;
         }
       }
-      return false
+      return false;
     },
 
     // 거래내역 삭제
     deleteTransaction(id) {
       for (const month in this.allTransactions) {
-        const index = this.allTransactions[month].findIndex(t => t.id === id)
+        const index = this.allTransactions[month].findIndex((t) => t.id === id);
         if (index !== -1) {
-          this.allTransactions[month].splice(index, 1)
-          return true
+          this.allTransactions[month].splice(index, 1);
+          return true;
         }
       }
-      return false
+      return false;
     },
 
     // 날짜별 지출 총액 계산
     getDailyTotal(transactions) {
       const total = transactions
         .filter((t) => t.type === 'expense')
-        .reduce((sum, t) => sum + t.amount, 0)
-      return total > 0 ? `-${total.toLocaleString()}원` : '0원'
+        .reduce((sum, t) => sum + t.amount, 0);
+      return total > 0 ? `-${total.toLocaleString()}원` : '0원';
     },
 
     // 날짜 포맷팅
     formatDate(dateString) {
-      const date = new Date(dateString)
-      const month = date.getMonth() + 1
-      const day = date.getDate()
-      const weekdays = ['일', '월', '화', '수', '목', '금', '토']
-      const weekday = weekdays[date.getDay()]
-      return `${month}월 ${day}일 (${weekday})`
+      const date = new Date(dateString);
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+      const weekday = weekdays[date.getDay()];
+      return `${month}월 ${day}일 (${weekday})`;
     },
 
     // ID 생성 (간단한 구현)
     generateId() {
-      return Date.now().toString() + Math.random().toString(36).substr(2, 9)
+      return Date.now().toString() + Math.random().toString(36).substr(2, 9);
     },
 
     // API 호출 시뮬레이션 (향후 실제 API로 교체)
     async fetchTransactions() {
-      this.loading = true
+      this.loading = true;
       try {
         // 실제 API 호출 로직이 들어갈 자리
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         // this.allTransactions = response.data
       } catch (error) {
-        this.error = error.message
+        this.error = error.message;
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     // 에러 초기화
     clearError() {
-      this.error = null
-    }
-  }
-})
+      this.error = null;
+    },
+  },
+});

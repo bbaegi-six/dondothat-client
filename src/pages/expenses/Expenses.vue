@@ -1,7 +1,13 @@
 <template>
   <div
     class="min-h-screen w-[390px] mx-auto"
-    style="background-color: #2f2f2f; padding-top: 88px; padding-left: 31px; padding-right: 31px; padding-bottom: 90px;"
+    style="
+      background-color: #2f2f2f;
+      padding-top: 88px;
+      padding-left: 31px;
+      padding-right: 31px;
+      padding-bottom: 90px;
+    "
   >
     <Header
       :showBack="false"
@@ -11,12 +17,18 @@
     />
 
     <!-- 탭 -->
-    <div style="width: 328px; height: 38px; margin-top: 4px; display: flex;">
-      <div 
+    <div style="width: 328px; height: 38px; margin-top: 4px; display: flex">
+      <div
         @click="switchTab('account')"
-        style="width: 164px; height: 37px; background-color: #2f2f2f; position: relative; cursor: pointer;"
+        style="
+          width: 164px;
+          height: 37px;
+          background-color: #2f2f2f;
+          position: relative;
+          cursor: pointer;
+        "
       >
-        <div 
+        <div
           :style="{
             fontFamily: 'Pretendard',
             fontStyle: 'normal',
@@ -25,21 +37,33 @@
             lineHeight: '32px',
             textAlign: 'center',
             color: activeTab === 'account' ? '#ff5555' : '#ffffff',
-            paddingTop: '2px'
+            paddingTop: '2px',
           }"
         >
           내 계좌
         </div>
-        <div 
+        <div
           v-if="activeTab === 'account'"
-          style="position: absolute; bottom: 0; width: 164px; height: 0px; border: 1px solid #ff5555;"
+          style="
+            position: absolute;
+            bottom: 0;
+            width: 164px;
+            height: 0px;
+            border: 1px solid #ff5555;
+          "
         ></div>
       </div>
-      <div 
+      <div
         @click="switchTab('savings')"
-        style="width: 164px; height: 37px; background-color: #2f2f2f; position: relative; cursor: pointer;"
+        style="
+          width: 164px;
+          height: 37px;
+          background-color: #2f2f2f;
+          position: relative;
+          cursor: pointer;
+        "
       >
-        <div 
+        <div
           :style="{
             fontFamily: 'Pretendard',
             fontStyle: 'normal',
@@ -48,14 +72,20 @@
             lineHeight: '32px',
             textAlign: 'center',
             color: activeTab === 'savings' ? '#ff5555' : '#ffffff',
-            paddingTop: '2px'
+            paddingTop: '2px',
           }"
         >
           저금통
         </div>
-        <div 
+        <div
           v-if="activeTab === 'savings'"
-          style="position: absolute; bottom: 0; width: 164px; height: 0px; border: 1px solid #ff5555;"
+          style="
+            position: absolute;
+            bottom: 0;
+            width: 164px;
+            height: 0px;
+            border: 1px solid #ff5555;
+          "
         ></div>
       </div>
     </div>
@@ -65,33 +95,79 @@
       <!-- 월별 요약 섹션 -->
       <div
         class="relative"
-        style="width: 328px; height: 120px; background-color: #414141; border-radius: 16px; margin-top: 10px;"
+        style="
+          width: 328px;
+          height: 120px;
+          background-color: #414141;
+          border-radius: 16px;
+          margin-top: 10px;
+        "
       >
         <!-- 월 표시 -->
-        <div 
-          style="font-family: 'Pretendard'; font-style: normal; font-weight: 700; font-size: 14px; line-height: 32px; text-align: center; color: #ffffff; position: absolute; left: 154px; top: 8px; width: 22px; height: 32px;"
+        <div
+          style="
+            font-family: 'Pretendard';
+            font-style: normal;
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 32px;
+            text-align: center;
+            color: #ffffff;
+            position: absolute;
+            left: 154px;
+            top: 4px;
+            width: 22px;
+            height: 32px;
+          "
         >
           {{ currentMonthDisplay }}월
         </div>
-        
+
         <!-- 총 지출 타이틀 -->
-        <div 
-          style="font-family: 'Pretendard'; font-style: normal; font-weight: 500; font-size: 14px; line-height: 32px; text-align: center; color: #ffffff; position: absolute; left: 136px; top: 35px; width: 58px; height: 21px;"
+        <div
+          style="
+            font-family: 'Pretendard';
+            font-style: normal;
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 32px;
+            text-align: center;
+            color: #ffffff;
+            position: absolute;
+            left: 136px;
+            top: 40px;
+            width: 58px;
+            height: 21px;
+          "
         >
           총 지출
         </div>
-        
+
         <!-- 금액 -->
-        <div 
-          style="font-family: 'Pretendard'; font-style: normal; font-weight: 600; font-size: 24px; line-height: 28px; text-align: center; color: #ff5555; position: absolute; left: 13px; top: 60px; width: 302px; height: 28px;"
+        <div
+          style="
+            font-family: 'Pretendard';
+            font-style: normal;
+            font-weight: 600;
+            font-size: 24px;
+            line-height: 28px;
+            text-align: center;
+            color: #ff5555;
+            position: absolute;
+            left: 13px;
+            top: 75px;
+            width: 302px;
+            height: 28px;
+          "
         >
           {{ monthlyExpense.toLocaleString() }}원
         </div>
-        
+
         <!-- 월 변경 버튼들 -->
         <button
           @click="previousMonth"
-          class="absolute left-2 top-2 w-[20px] h-[20px] flex items-center justify-center bg-transparent border-none"
+          class="absolute w-[20px] h-[20px] flex items-center justify-center bg-transparent border-none"
+          style="left: 120px; top: 10px"
         >
           <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
             <path
@@ -105,7 +181,8 @@
         </button>
         <button
           @click="nextMonth"
-          class="absolute right-2 top-2 w-[20px] h-[20px] flex items-center justify-center bg-transparent border-none"
+          class="absolute w-[20px] h-[20px] flex items-center justify-center bg-transparent border-none"
+          style="right: 120px; top: 10px"
         >
           <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
             <path
@@ -125,18 +202,50 @@
       <!-- 저금통 요약 섹션 -->
       <div
         class="relative"
-        style="width: 328px; height: 120px; background-color: #414141; border-radius: 16px; margin-top: 10px;"
+        style="
+          width: 328px;
+          height: 120px;
+          background-color: #414141;
+          border-radius: 16px;
+          margin-top: 10px;
+        "
       >
         <!-- 저금통 타이틀 -->
-        <div 
-          style="font-family: 'Pretendard'; font-style: normal; font-weight: 500; font-size: 16px; line-height: 32px; text-align: center; color: #ffffff; position: absolute; left: 88px; top: 35px; width: 153px; height: 21px;"
+        <div
+          style="
+            font-family: 'Pretendard';
+            font-style: normal;
+            font-weight: 500;
+            font-size: 16px;
+            line-height: 32px;
+            text-align: center;
+            color: #ffffff;
+            position: absolute;
+            left: 88px;
+            top: 35px;
+            width: 153px;
+            height: 21px;
+          "
         >
           지금까지 절약한 금액
         </div>
-        
+
         <!-- 금액 -->
-        <div 
-          style="font-family: 'Pretendard'; font-style: normal; font-weight: 600; font-size: 24px; line-height: 28px; text-align: center; color: #ff5555; position: absolute; left: 13px; top: 60px; width: 302px; height: 28px;"
+        <div
+          style="
+            font-family: 'Pretendard';
+            font-style: normal;
+            font-weight: 600;
+            font-size: 24px;
+            line-height: 28px;
+            text-align: center;
+            color: #ff5555;
+            position: absolute;
+            left: 13px;
+            top: 60px;
+            width: 302px;
+            height: 28px;
+          "
         >
           {{ totalSavings.toLocaleString() }}원
         </div>
@@ -147,28 +256,52 @@
     <div v-if="activeTab === 'account'">
       <div v-if="currentMonthTransactions.length > 0">
         <!-- 날짜별 그룹 -->
-        <div
-          v-for="(group, date) in groupedTransactions"
-          :key="date"
-        >
+        <div v-for="(group, date) in groupedTransactions" :key="date">
           <!-- 날짜와 금액 -->
-          <div 
-            style="margin-top: 28px; width: 328px; display: flex; justify-content: space-between; align-items: center;"
+          <div
+            style="
+              margin-top: 28px;
+              width: 328px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
           >
-            <div 
-              style="font-family: 'Pretendard'; font-style: normal; font-weight: 500; font-size: 16px; line-height: 32px; color: #ffffff;"
+            <div
+              style="
+                font-family: 'Pretendard';
+                font-style: normal;
+                font-weight: 500;
+                font-size: 16px;
+                line-height: 32px;
+                color: #ffffff;
+              "
             >
               {{ formatDate(date) }}
             </div>
-            <div 
-              style="font-family: 'Pretendard'; font-style: normal; font-weight: 600; font-size: 16px; line-height: 24px; color: #ffffff;"
+            <div
+              style="
+                font-family: 'Pretendard';
+                font-style: normal;
+                font-weight: 600;
+                font-size: 16px;
+                line-height: 24px;
+                color: #ffffff;
+              "
             >
               {{ getDailyTotal(group) }}
             </div>
           </div>
-          
+
           <!-- 구분선 -->
-          <div style="width: 328px; height: 0px; border: 1px solid #414141; margin-top: 0px;"></div>
+          <div
+            style="
+              width: 328px;
+              height: 0px;
+              border: 1px solid #414141;
+              margin-top: 0px;
+            "
+          ></div>
 
           <!-- 거래내역 아이템들 -->
           <div>
@@ -184,34 +317,90 @@
 
       <!-- 데이터 없음 표시 -->
       <div v-else class="text-center py-16">
-        <p style="color: #c6c6c6; font-size: 14px;">
+        <p style="color: #c6c6c6; font-size: 14px">
           {{ currentMonthDisplay }}월의 거래내역이 없습니다.
         </p>
       </div>
     </div>
 
     <!-- 저금통 거래내역 리스트 -->
-    <div v-if="activeTab === 'savings'" style="margin-top: 17px;">
+    <div v-if="activeTab === 'savings'" style="margin-top: 17px">
       <div
         v-for="item in savingsData"
         :key="item.id"
-        style="width: 328px; height: 80px; margin-top: 0px; display: flex; align-items: center;"
+        style="
+          width: 328px;
+          height: 80px;
+          margin-top: 0px;
+          display: flex;
+          align-items: center;
+        "
       >
-        <div style="width: 48px; height: 48px; background-color: #414141; border-radius: 50%; margin-right: 15px;"></div>
-        <div style="flex: 1;">
-          <div style="display: flex; justify-content: space-between;">
-            <div style="font-family: 'Pretendard'; font-style: normal; font-weight: 500; font-size: 16px; line-height: 24px; color: #ffffff;">
+        <div
+          style="
+            width: 48px;
+            height: 48px;
+            background-color: #414141;
+            border-radius: 50%;
+            margin-right: 15px;
+          "
+        ></div>
+        <div style="flex: 1">
+          <div style="display: flex; justify-content: space-between">
+            <div
+              style="
+                font-family: 'Pretendard';
+                font-style: normal;
+                font-weight: 500;
+                font-size: 16px;
+                line-height: 24px;
+                color: #ffffff;
+              "
+            >
               {{ item.name }}
             </div>
-            <div style="font-family: 'Pretendard'; font-style: normal; font-weight: 700; font-size: 14.125px; line-height: 24px; color: #ffffff; text-align: right; width: 80px;">
+            <div
+              style="
+                font-family: 'Pretendard';
+                font-style: normal;
+                font-weight: 700;
+                font-size: 14.125px;
+                line-height: 24px;
+                color: #ffffff;
+                text-align: right;
+                width: 80px;
+              "
+            >
               +{{ item.amount.toLocaleString() }}원
             </div>
           </div>
-          <div style="display: flex; justify-content: space-between;">
-            <div style="font-family: 'Pretendard'; font-style: normal; font-weight: 400; font-size: 14px; line-height: 20px; color: #c6c6c6; margin-top: 2px;">
+          <div style="display: flex; justify-content: space-between">
+            <div
+              style="
+                font-family: 'Pretendard';
+                font-style: normal;
+                font-weight: 400;
+                font-size: 14px;
+                line-height: 20px;
+                color: #c6c6c6;
+                margin-top: 2px;
+              "
+            >
               {{ item.date }}
             </div>
-            <div style="font-family: 'Pretendard'; font-style: normal; font-weight: 400; font-size: 14px; line-height: 20px; color: #c6c6c6; text-align: right; width: 48px; margin-top: 2px;">
+            <div
+              style="
+                font-family: 'Pretendard';
+                font-style: normal;
+                font-weight: 400;
+                font-size: 14px;
+                line-height: 20px;
+                color: #c6c6c6;
+                text-align: right;
+                width: 48px;
+                margin-top: 2px;
+              "
+            >
               {{ item.time }}
             </div>
           </div>
@@ -246,15 +435,15 @@ const savingsData = ref([
     name: '편의점 금지 챌린지',
     amount: 5000,
     date: '07/12',
-    time: '18:59'
+    time: '18:59',
   },
   {
     id: 2,
     name: '배달음식 금지 챌린지',
     amount: 18000,
     date: '07/25',
-    time: '18:59'
-  }
+    time: '18:59',
+  },
 ]);
 
 const totalSavings = computed(() => {
