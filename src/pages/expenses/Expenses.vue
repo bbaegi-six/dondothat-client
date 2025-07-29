@@ -1,25 +1,97 @@
 <template>
   <div
-    class="pt-[60px] px-[31px] pb-[90px] min-h-screen w-[390px] mx-auto"
-    style="background-color: #2f2f2f"
+    class="min-h-screen w-[390px] mx-auto"
+    style="background-color: #2f2f2f; padding-top: 88px; padding-left: 31px; padding-right: 31px; padding-bottom: 90px;"
   >
     <Header
       :showBack="false"
-      title="소비 내역"
+      title="내역"
       :showAddButton="true"
       @add-click="addTransaction"
     />
 
-    <!-- 월별 요약 섹션 -->
-    <div
-      class="bg-[#414141] rounded-2xl mb-6 relative"
-      style="margin-top: 20px; width: 328px; height: 131px; padding: 16px 18px"
-    >
-      <!-- 월 선택 헤더 -->
-      <div class="flex items-center justify-start mb-4 gap-8">
+    <!-- 탭 -->
+    <div style="width: 328px; height: 38px; margin-top: 4px; display: flex;">
+      <div 
+        @click="switchTab('account')"
+        style="width: 164px; height: 37px; background-color: #2f2f2f; position: relative; cursor: pointer;"
+      >
+        <div 
+          :style="{
+            fontFamily: 'Pretendard',
+            fontStyle: 'normal',
+            fontWeight: '500',
+            fontSize: '16px',
+            lineHeight: '32px',
+            textAlign: 'center',
+            color: activeTab === 'account' ? '#ff5555' : '#ffffff',
+            paddingTop: '2px'
+          }"
+        >
+          내 계좌
+        </div>
+        <div 
+          v-if="activeTab === 'account'"
+          style="position: absolute; bottom: 0; width: 164px; height: 0px; border: 1px solid #ff5555;"
+        ></div>
+      </div>
+      <div 
+        @click="switchTab('savings')"
+        style="width: 164px; height: 37px; background-color: #2f2f2f; position: relative; cursor: pointer;"
+      >
+        <div 
+          :style="{
+            fontFamily: 'Pretendard',
+            fontStyle: 'normal',
+            fontWeight: '500',
+            fontSize: '16px',
+            lineHeight: '32px',
+            textAlign: 'center',
+            color: activeTab === 'savings' ? '#ff5555' : '#ffffff',
+            paddingTop: '2px'
+          }"
+        >
+          저금통
+        </div>
+        <div 
+          v-if="activeTab === 'savings'"
+          style="position: absolute; bottom: 0; width: 164px; height: 0px; border: 1px solid #ff5555;"
+        ></div>
+      </div>
+    </div>
+
+    <!-- 내 계좌 섹션 -->
+    <div v-if="activeTab === 'account'">
+      <!-- 월별 요약 섹션 -->
+      <div
+        class="relative"
+        style="width: 328px; height: 120px; background-color: #414141; border-radius: 16px; margin-top: 10px;"
+      >
+        <!-- 월 표시 -->
+        <div 
+          style="font-family: 'Pretendard'; font-style: normal; font-weight: 700; font-size: 14px; line-height: 32px; text-align: center; color: #ffffff; position: absolute; left: 154px; top: 8px; width: 22px; height: 32px;"
+        >
+          {{ currentMonthDisplay }}월
+        </div>
+        
+        <!-- 총 지출 타이틀 -->
+        <div 
+          style="font-family: 'Pretendard'; font-style: normal; font-weight: 500; font-size: 14px; line-height: 32px; text-align: center; color: #ffffff; position: absolute; left: 136px; top: 35px; width: 58px; height: 21px;"
+        >
+          총 지출
+        </div>
+        
+        <!-- 금액 -->
+        <div 
+          style="font-family: 'Pretendard'; font-style: normal; font-weight: 600; font-size: 24px; line-height: 28px; text-align: center; color: #ff5555; position: absolute; left: 13px; top: 60px; width: 302px; height: 28px;"
+        >
+          {{ monthlyExpense.toLocaleString() }}원
+        </div>
+        
+        <!-- 월 변경 버튼들 -->
         <button
           @click="previousMonth"
-          class="w-[10px] h-4 flex items-center justify-center"
+          class="absolute left-2 top-2 w-[20px] h-[20px] flex items-center justify-center bg-transparent border-none"
         >
           <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
             <path
@@ -31,15 +103,9 @@
             />
           </svg>
         </button>
-        <h2
-          class="text-white font-bold text-left"
-          style="font-family: Pretendard; font-size: 20px; line-height: 32px"
-        >
-          {{ currentMonthDisplay }}월
-        </h2>
         <button
           @click="nextMonth"
-          class="w-[10px] h-4 flex items-center justify-center"
+          class="absolute right-2 top-2 w-[20px] h-[20px] flex items-center justify-center bg-transparent border-none"
         >
           <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
             <path
@@ -52,89 +118,111 @@
           </svg>
         </button>
       </div>
-
-      <!-- 수입/지출 요약 -->
-      <div class="flex" style="gap: 38px">
-        <div class="flex flex-col" style="width: 145px">
-          <p
-            class="text-white font-medium text-center"
-            style="
-              font-family: Pretendard;
-              font-size: 16px;
-              line-height: 21px;
-              margin-bottom: 3px;
-            "
-          >
-            수입
-          </p>
-          <p
-            class="text-white font-bold text-center"
-            style="font-family: Pretendard; font-size: 20px; line-height: 28px"
-          >
-            {{ monthlyIncome.toLocaleString() }}원
-          </p>
-        </div>
-        <div class="flex flex-col" style="width: 145px">
-          <p
-            class="text-[#FF5555] font-medium text-center"
-            style="
-              font-family: Pretendard;
-              font-size: 16px;
-              line-height: 21px;
-              margin-bottom: 3px;
-            "
-          >
-            지출
-          </p>
-          <p
-            class="text-[#FF5555] font-bold text-center"
-            style="font-family: Pretendard; font-size: 20px; line-height: 28px"
-          >
-            {{ monthlyExpense.toLocaleString() }}원
-          </p>
-        </div>
-      </div>
     </div>
 
-    <!-- 거래내역 리스트 -->
-    <div class="space-y-0" v-if="currentMonthTransactions.length > 0">
-      <!-- 날짜별 그룹 -->
+    <!-- 저금통 섹션 -->
+    <div v-if="activeTab === 'savings'">
+      <!-- 저금통 요약 섹션 -->
       <div
-        v-for="(group, date) in groupedTransactions"
-        :key="date"
-        class="mb-4"
+        class="relative"
+        style="width: 328px; height: 120px; background-color: #414141; border-radius: 16px; margin-top: 10px;"
       >
-        <div class="flex justify-between items-center mb-3 px-4">
-          <p class="text-white text-sm font-medium">{{ formatDate(date) }}</p>
-          <p class="text-[#ff6b6b] text-sm font-semibold">
-            {{ getDailyTotal(group) }}
-          </p>
+        <!-- 저금통 타이틀 -->
+        <div 
+          style="font-family: 'Pretendard'; font-style: normal; font-weight: 500; font-size: 16px; line-height: 32px; text-align: center; color: #ffffff; position: absolute; left: 88px; top: 35px; width: 153px; height: 21px;"
+        >
+          지금까지 절약한 금액
         </div>
-        <div class="border-t border-[#414141] mx-4 mb-2"></div>
-
-        <!-- 거래내역 아이템들 -->
-        <div class="space-y-0">
-          <TransactionCard
-            v-for="transaction in group"
-            :key="transaction.id"
-            :transaction="transaction"
-            @click="editTransaction"
-          />
+        
+        <!-- 금액 -->
+        <div 
+          style="font-family: 'Pretendard'; font-style: normal; font-weight: 600; font-size: 24px; line-height: 28px; text-align: center; color: #ff5555; position: absolute; left: 13px; top: 60px; width: 302px; height: 28px;"
+        >
+          {{ totalSavings.toLocaleString() }}원
         </div>
       </div>
     </div>
 
-    <!-- 데이터 없음 표시 -->
-    <div v-else class="text-center py-16">
-      <p class="text-[#9ca3af] text-sm">
-        {{ currentMonthDisplay }}월의 거래내역이 없습니다.
-      </p>
+    <!-- 내 계좌 거래내역 리스트 -->
+    <div v-if="activeTab === 'account'">
+      <div v-if="currentMonthTransactions.length > 0">
+        <!-- 날짜별 그룹 -->
+        <div
+          v-for="(group, date) in groupedTransactions"
+          :key="date"
+        >
+          <!-- 날짜와 금액 -->
+          <div 
+            style="margin-top: 28px; width: 328px; display: flex; justify-content: space-between; align-items: center;"
+          >
+            <div 
+              style="font-family: 'Pretendard'; font-style: normal; font-weight: 500; font-size: 16px; line-height: 32px; color: #ffffff;"
+            >
+              {{ formatDate(date) }}
+            </div>
+            <div 
+              style="font-family: 'Pretendard'; font-style: normal; font-weight: 600; font-size: 16px; line-height: 24px; color: #ffffff;"
+            >
+              {{ getDailyTotal(group) }}
+            </div>
+          </div>
+          
+          <!-- 구분선 -->
+          <div style="width: 328px; height: 0px; border: 1px solid #414141; margin-top: 0px;"></div>
+
+          <!-- 거래내역 아이템들 -->
+          <div>
+            <TransactionCard
+              v-for="transaction in group"
+              :key="transaction.id"
+              :transaction="transaction"
+              @click="editTransaction"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- 데이터 없음 표시 -->
+      <div v-else class="text-center py-16">
+        <p style="color: #c6c6c6; font-size: 14px;">
+          {{ currentMonthDisplay }}월의 거래내역이 없습니다.
+        </p>
+      </div>
+    </div>
+
+    <!-- 저금통 거래내역 리스트 -->
+    <div v-if="activeTab === 'savings'" style="margin-top: 17px;">
+      <div
+        v-for="item in savingsData"
+        :key="item.id"
+        style="width: 328px; height: 80px; margin-top: 0px; display: flex; align-items: center;"
+      >
+        <div style="width: 48px; height: 48px; background-color: #414141; border-radius: 50%; margin-right: 15px;"></div>
+        <div style="flex: 1;">
+          <div style="display: flex; justify-content: space-between;">
+            <div style="font-family: 'Pretendard'; font-style: normal; font-weight: 500; font-size: 16px; line-height: 24px; color: #ffffff;">
+              {{ item.name }}
+            </div>
+            <div style="font-family: 'Pretendard'; font-style: normal; font-weight: 700; font-size: 14.125px; line-height: 24px; color: #ffffff; text-align: right; width: 80px;">
+              +{{ item.amount.toLocaleString() }}원
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <div style="font-family: 'Pretendard'; font-style: normal; font-weight: 400; font-size: 14px; line-height: 20px; color: #c6c6c6; margin-top: 2px;">
+              {{ item.date }}
+            </div>
+            <div style="font-family: 'Pretendard'; font-style: normal; font-weight: 400; font-size: 14px; line-height: 20px; color: #c6c6c6; text-align: right; width: 48px; margin-top: 2px;">
+              {{ item.time }}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useExpensesStore } from '../../stores/expenses.js';
 import Header from '../../components/layout/Header.vue';
@@ -143,13 +231,42 @@ import TransactionCard from '../../components/expenses/TransactionCard.vue';
 const router = useRouter();
 const expensesStore = useExpensesStore();
 
+// 탭 상태 관리
+const activeTab = ref('account'); // 'account' 또는 'savings'
+
+// 탭 전환 함수
+const switchTab = (tab) => {
+  activeTab.value = tab;
+};
+
+// 저금통 더미 데이터
+const savingsData = ref([
+  {
+    id: 1,
+    name: '편의점 금지 챌린지',
+    amount: 5000,
+    date: '07/12',
+    time: '18:59'
+  },
+  {
+    id: 2,
+    name: '배달음식 금지 챌린지',
+    amount: 18000,
+    date: '07/25',
+    time: '18:59'
+  }
+]);
+
+const totalSavings = computed(() => {
+  return savingsData.value.reduce((total, item) => total + item.amount, 0);
+});
+
 // 계산된 속성들 (스토어에서 가져옴)
 const currentMonthDisplay = computed(() => expensesStore.currentMonth);
 const currentMonthTransactions = computed(
   () => expensesStore.currentMonthTransactions
 );
 const groupedTransactions = computed(() => expensesStore.groupedTransactions);
-const monthlyIncome = computed(() => expensesStore.monthlyIncome);
 const monthlyExpense = computed(() => expensesStore.monthlyExpense);
 
 // 메서드들 (스토어 액션 사용)
