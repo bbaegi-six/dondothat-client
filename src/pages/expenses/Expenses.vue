@@ -1,7 +1,7 @@
 <template>
   <div
     class="pt-[60px] px-[31px] pb-[90px] min-h-screen w-[390px] mx-auto"
-    style="background-color: #2f2f2f;"
+    style="background-color: #2f2f2f"
   >
     <Header
       :showBack="false"
