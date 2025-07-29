@@ -1,5 +1,18 @@
 import { defineStore } from 'pinia';
 
+// 상수 정의
+const TRANSACTION_TYPES = {
+  INCOME: 'income',
+  EXPENSE: 'expense',
+  SAVINGS: 'savings',
+};
+
+const COLORS = {
+  INCOME: '#72e39c',
+  EXPENSE: '#ff5555',
+  DEFAULT: '#c9c9c9',
+};
+
 export const useExpensesStore = defineStore('expenses', {
   state: () => ({
     // 전체 거래내역 데이터 (월별로 구분)
@@ -98,7 +111,7 @@ export const useExpensesStore = defineStore('expenses', {
     loading: false,
     // 에러 상태
     error: null,
-    // 카테고리 목록
+    // 카테고리 목록과 메타데이터
     categories: [
       '배달음식',
       '카페',
@@ -107,13 +120,29 @@ export const useExpensesStore = defineStore('expenses', {
       '편의점',
       '문화',
       '술',
-      '대중교통',
+      '교통',
       '의료',
       '생활',
       '식비',
       '그외',
       '수입',
     ],
+    // 카테고리별 메타데이터 (아이콘, 색상 등)
+    categoryMetadata: {
+      배달음식: { icon: 'fas fa-motorcycle', color: '#ff7376' },
+      카페: { icon: 'fas fa-mug-saucer', color: '#ff9595' },
+      쇼핑: { icon: 'fas fa-bag-shopping', color: '#ffa66f' },
+      택시: { icon: 'fas fa-taxi', color: '#ffc457' },
+      편의점: { icon: 'fas fa-store', color: '#ffe7ac' },
+      문화: { icon: 'fas fa-clapperboard', color: '#cde897' },
+      술: { icon: 'fas fa-wine-bottle', color: '#72e39c' },
+      교통: { icon: 'fas fa-train-subway', color: '#8cc2ff' },
+      의료: { icon: 'fas fa-suitcase-medical', color: '#8f95ec' },
+      생활: { icon: 'fas fa-home', color: '#cf8fec' },
+      식비: { icon: 'fas fa-utensils', color: '#f680db' },
+      그외: { icon: 'fas fa-ellipsis', color: '#c9c9c9' },
+      수입: { icon: 'fas fa-coins', color: '#ffffff' },
+    },
     // 저금통 데이터
     savingsData: [
       {
@@ -161,7 +190,7 @@ export const useExpensesStore = defineStore('expenses', {
     monthlyIncome: (state) => {
       const transactions = state.allTransactions[state.currentMonth] || [];
       return transactions
-        .filter((t) => t.type === 'income')
+        .filter((t) => t.type === TRANSACTION_TYPES.INCOME)
         .reduce((sum, t) => sum + t.amount, 0);
     },
 
@@ -169,7 +198,7 @@ export const useExpensesStore = defineStore('expenses', {
     monthlyExpense: (state) => {
       const transactions = state.allTransactions[state.currentMonth] || [];
       return transactions
-        .filter((t) => t.type === 'expense')
+        .filter((t) => t.type === TRANSACTION_TYPES.EXPENSE)
         .reduce((sum, t) => sum + t.amount, 0);
     },
 
@@ -277,9 +306,11 @@ export const useExpensesStore = defineStore('expenses', {
     // 날짜별 지출 총액 계산
     getDailyTotal(transactions) {
       const total = transactions
-        .filter((t) => t.type === 'expense')
+        .filter((t) => t.type === TRANSACTION_TYPES.EXPENSE)
         .reduce((sum, t) => sum + t.amount, 0);
-      return total > 0 ? `-${total.toLocaleString()}원` : '0원';
+      return total > 0
+        ? this.formatAmount(total, TRANSACTION_TYPES.EXPENSE)
+        : '0원';
     },
 
     // 날짜 포맷팅
@@ -319,7 +350,33 @@ export const useExpensesStore = defineStore('expenses', {
     // 날짜별 저금 총액 계산
     getDailySavingsTotal(items) {
       const total = items.reduce((sum, item) => sum + item.amount, 0);
-      return total > 0 ? `+${total.toLocaleString()}원` : '0원';
+      return total > 0
+        ? this.formatAmount(total, TRANSACTION_TYPES.INCOME)
+        : '0원';
+    },
+
+    // 카테고리 메타데이터 조회
+    getCategoryMetadata(category) {
+      return (
+        this.categoryMetadata[category] || {
+          icon: 'fas fa-question-circle',
+          color: COLORS.DEFAULT,
+        }
+      );
+    },
+
+    // 금액 포맷팅 (공통 유틸리티)
+    formatAmount(amount, type = TRANSACTION_TYPES.EXPENSE) {
+      const formattedAmount = new Intl.NumberFormat('ko-KR').format(
+        Math.abs(amount)
+      );
+      const prefix = type === TRANSACTION_TYPES.EXPENSE ? '-' : '+';
+      return `${prefix}${formattedAmount}원`;
+    },
+
+    // 거래 유형별 색상 반환
+    getTransactionTypeColor(type) {
+      return type === TRANSACTION_TYPES.INCOME ? COLORS.INCOME : COLORS.EXPENSE;
     },
   },
 });
