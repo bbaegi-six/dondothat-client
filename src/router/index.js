@@ -73,14 +73,21 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/expenses/edit/:id",
-    name: "ExpenseEdit",
+    path: '/expenses/:id',
+    name: 'ExpenseEdit',
     component: ExpenseEdit,
     meta: { requiresAuth: true },
   },
   {
-    path: "/guide",
-    name: "Guide",
+    path: '/expenses/new',
+    name: 'ExpenseNew',
+    component: ExpenseEdit,
+    meta: { requiresAuth: true },
+  },
+
+  {
+    path: '/guide',
+    name: 'Guide',
     component: Guide,
     meta: { requiresAuth: true },
   },
@@ -136,7 +143,7 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
 
   if (requiresAuth && !authStore.isLoggedIn) {
-    next({ name: "Login" });
+    next({ name: 'Login' });
   } else {
     next();
   }
