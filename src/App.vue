@@ -22,6 +22,7 @@ const shouldShowNav = computed(() => {
     '/forgot-password',
     '/account',
     '/profile/edit',
+    '/profile/mychallenge',
   ];
   return !noNavRoutes.includes(route.path);
 });
