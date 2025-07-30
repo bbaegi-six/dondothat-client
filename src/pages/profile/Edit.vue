@@ -25,7 +25,7 @@
       <div class="fixed bottom-4">
         <Button
           @click="handleNext"
-          label="다음"
+          label="저장"
           :disabled="!nicknameAvailable"
         ></Button>
       </div>
@@ -51,6 +51,8 @@ const router = useRouter();
 const handleNicknameCheck = () => {
   if (nickname.value) {
     nicknameAvailable.value = true;
+  } else {
+    showErrors.value = true;
   }
 };
 
