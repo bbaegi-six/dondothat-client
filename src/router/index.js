@@ -6,7 +6,7 @@ import Account from '../pages/account/Account.vue';
 import ForgotPassword from '../pages/auth/ForgotPassword.vue';
 import Login from '../pages/auth/Login.vue';
 import Register from '../pages/auth/Register.vue';
-import Challenge from '../pages/challenge/Challenge.vue';
+import Challenge from '../pages/challenge/Challenge.vue'; // 챌린지 메인으로 직접 사용
 import Chat from '../pages/chat/Chat.vue';
 import Expenses from '../pages/expenses/Expenses.vue';
 import ExpenseEdit from '../pages/expenses/ExpenseEdit.vue';
@@ -51,7 +51,7 @@ const routes = [
   {
     path: '/challenge',
     name: 'Challenge',
-    component: Challenge,
+    component: Challenge, // Challenge.vue를 바로 메인 페이지로 사용
     meta: { requiresAuth: true },
   },
   {
@@ -138,6 +138,7 @@ const router = createRouter({
   routes,
 });
 
+// 인증 필요 라우트 처리
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
