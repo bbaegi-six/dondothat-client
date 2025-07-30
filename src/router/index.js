@@ -16,9 +16,9 @@ import Guide from '../pages/guide/Guide.vue';
 import Home from '../pages/home/Home.vue';
 import Profile from '../pages/profile/Profile.vue';
 import Edit from '../pages/profile/Edit.vue';
-import Completed from '../pages/profile/Completed.vue';
 import Terms from '../pages/profile/Terms.vue';
 import Policy from '../pages/profile/Policy.vue';
+import MyChallenge from '../pages/profile/MyChallenge.vue';
 
 const routes = [
   {
@@ -104,9 +104,9 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/profile/completed',
-    name: 'Completed',
-    component: Completed,
+    path: '/profile/mychallenge',
+    name: 'MyChallenge',
+    component: MyChallenge,
     meta: { requiresAuth: true },
   },
   {
