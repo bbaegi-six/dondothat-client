@@ -7,7 +7,10 @@
       :type="type"
       width="260px"
     />
-    <button @click="$emit('buttonClick')" class="w-16 h-[46px] bg-primary-red text-white border-none rounded-10 text-sm cursor-pointer flex-shrink-0">
+    <button
+      @click="$emit('buttonClick')"
+      class="w-16 h-[46px] bg-brand text-white border-none rounded-10 text-sm cursor-pointer flex-shrink-0"
+    >
       {{ buttonLabel }}
     </button>
   </div>
@@ -32,5 +35,4 @@ defineProps({
 defineEmits(['update:modelValue', 'buttonClick']);
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
