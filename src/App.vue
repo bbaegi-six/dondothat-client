@@ -20,6 +20,7 @@ const shouldShowNav = computed(() => {
     '/login',
     '/register',
     '/forgot-password',
+    '/account',
     '/profile/edit',
   ];
   return !noNavRoutes.includes(route.path);
