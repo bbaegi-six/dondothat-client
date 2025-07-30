@@ -48,7 +48,7 @@
       @confirm="handleConfirm"
     ></ConfirmModal>
     <div class="menu">
-      <button @click="router.push('/profile/completed')">
+      <button @click="router.push('/profile/mychallenge')">
         <Typography text="챌린지 목록" padding="12px"></Typography>
       </button>
       <button>

@@ -6,7 +6,6 @@ import { ref } from 'vue';
 export const useUserStore = defineStore('user', () => {
   const nickname = ref('홍길동');
   const email = ref('hong@example.com');
-
   const accounts = ref([
     {
       id: 1,
@@ -21,7 +20,6 @@ export const useUserStore = defineStore('user', () => {
       balance: 500000,
     },
   ]);
-
   const badges = ref([
     { image: 'src/assets/badge/eat.svg' },
     { image: 'src/assets/badge/eat.svg' },
@@ -29,39 +27,64 @@ export const useUserStore = defineStore('user', () => {
     { image: 'src/assets/badge/eat.svg' },
     { image: 'src/assets/badge/eat.svg' },
   ]);
+  const successChallenges = ref([
+    {
+      id: 1,
+      name: '카페 금지 챌린지',
+      startDate: '2025-05-01',
+      endDate: '2025-05-07',
+      icon: 'fas fa-coffee',
+      category: 'cafe',
+    },
+    {
+      id: 2,
+      name: '배달음식 금지 챌린지',
+      startDate: '2025-05-01',
+      endDate: '2025-05-07',
+      icon: 'fas fa-motorcycle',
+      category: 'delivery',
+    },
+  ]);
+  const failedChallenges = ref([
+    {
+      id: 1,
+      name: '카페 금지 챌린지',
+      startDate: '2025-05-01',
+      endDate: '2025-05-07',
+      icon: 'fas fa-coffee',
+      category: 'cafe',
+    },
+    {
+      id: 2,
+      name: '배달음식 금지 챌린지',
+      startDate: '2025-05-01',
+      endDate: '2025-05-07',
+      icon: 'fas fa-motorcycle',
+      category: 'delivery',
+    },
+  ]);
 
   function setNickname(newNickname) {
     nickname.value = newNickname;
   }
-
-  //   const nickname = ref("");
-  //   const email = ref("");
-  //   const accounts = ref([]);
-  //   const badges = ref([]);
-
-  //   async function fetchUserData() {
-  //     try {
-  //       const [accountsRes, badgesRes, userRes] = await Promise.all([
-  //         fetch("/api/accounts").then((res) => res.json()),
-  //         fetch("/api/badges").then((res) => res.json()),
-  //         axios.get("/api/user"),
-  //       ]);
-
-  //       accounts.value = accountsRes; // [{id, imageUrl, name, balance}, ...]
-  //       badges.value = badgesRes; // [{image: 'badge1.svg'}, ...]
-  //       nickname.value = userRes.data.nickname;
-  //       email.value = userRes.data.email;
-  //     } catch (err) {
-  //       console.error("데이터 불러오기 실패:", err);
-  //     }
-  //   }
 
   function resetStore() {
     nickname.value = '';
     email.value = '';
     accounts.value = [];
     badges.value = [];
+    successChallenges.value = [];
+    failedChallenges.value = [];
   }
 
-  return { nickname, email, accounts, badges, resetStore, setNickname };
+  return {
+    nickname,
+    email,
+    accounts,
+    badges,
+    successChallenges,
+    failedChallenges,
+    resetStore,
+    setNickname,
+  };
 });
