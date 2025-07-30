@@ -116,6 +116,7 @@ function logout() {
 .page-container {
   padding: 31px;
   padding-top: 70px;
+  margin-bottom: 50px;
   display: flex;
   flex-direction: column;
   gap: 20px;
