@@ -69,17 +69,17 @@
 </template>
 
 <script setup>
-import Header from "../../components/layout/Header.vue";
-import Square from "../../components/Square.vue";
-import Typography from "../../components/profile/Typography.vue";
-import AccountCard from "../../components/profile/AccountCard.vue";
-import ConfirmModal from "./ConfirmModal.vue";
+import Header from '../../components/layout/Header.vue';
+import Square from '../../components/Square.vue';
+import Typography from '../../components/profile/Typography.vue';
+import AccountCard from '../../components/profile/AccountCard.vue';
+import ConfirmModal from './ConfirmModal.vue';
 
 // import { onMounted } from "vue";
-import { ref } from "vue";
-import { storeToRefs } from "pinia";
-import { useUserStore } from "../../stores/profile";
-import { useRouter } from "vue-router";
+import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useUserStore } from '../../stores/profile';
+import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
 const { nickname, email, accounts, badges } = storeToRefs(userStore);
@@ -98,14 +98,14 @@ function handleChange() {
 
 function handleConfirm() {
   showModal.value = false;
-  router.push("/account"); // 원하는 경로로 변경
+  router.push('/account'); // 원하는 경로로 변경
 }
 
 function logout() {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
   resetStore();
-  router.push("/login");
+  router.push('/login');
 }
 </script>
 
