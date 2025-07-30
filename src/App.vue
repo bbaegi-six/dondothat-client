@@ -10,13 +10,18 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useRoute } from "vue-router";
-import Nav from "@/components/layout/Nav.vue";
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import Nav from '@/components/layout/Nav.vue';
 
 const route = useRoute();
 const shouldShowNav = computed(() => {
-  const noNavRoutes = ["/login", "/register", "/forgot-password"];
+  const noNavRoutes = [
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/profile/edit',
+  ];
   return !noNavRoutes.includes(route.path);
 });
 </script>
