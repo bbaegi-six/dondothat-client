@@ -3,29 +3,32 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 //import axios from "axios";
 
+import kbLogo from '@/assets/logo/kb.svg';
+import eatBadge from '@/assets/badge/eat.svg';
+
 export const useUserStore = defineStore('user', () => {
   const nickname = ref('홍길동');
   const email = ref('hong@example.com');
   const accounts = ref([
     {
       id: 1,
-      imageUrl: 'src/assets/logo/kb.svg',
+      imageUrl: kbLogo,
       name: 'KB 마이핏 통장',
       balance: 1500000,
     },
     {
       id: 2,
-      imageUrl: 'src/assets/logo/kb.svg',
+      imageUrl: kbLogo,
       name: '국민 저축 통장',
       balance: 500000,
     },
   ]);
   const badges = ref([
-    { image: 'src/assets/badge/eat.svg' },
-    { image: 'src/assets/badge/eat.svg' },
-    { image: 'src/assets/badge/eat.svg' },
-    { image: 'src/assets/badge/eat.svg' },
-    { image: 'src/assets/badge/eat.svg' },
+    { image: eatBadge },
+    { image: eatBadge },
+    { image: eatBadge },
+    { image: eatBadge },
+    { image: eatBadge },
   ]);
   const successChallenges = ref([
     {
