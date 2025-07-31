@@ -66,6 +66,42 @@ export const useUserStore = defineStore('user', () => {
       category: 'delivery',
     },
   ]);
+  const successChallenges = ref([
+    {
+      id: 1,
+      name: '카페 금지 챌린지',
+      startDate: '2025-05-01',
+      endDate: '2025-05-07',
+      icon: 'fas fa-coffee',
+      category: 'cafe',
+    },
+    {
+      id: 2,
+      name: '배달음식 금지 챌린지',
+      startDate: '2025-05-01',
+      endDate: '2025-05-07',
+      icon: 'fas fa-motorcycle',
+      category: 'delivery',
+    },
+  ]);
+  const failedChallenges = ref([
+    {
+      id: 1,
+      name: '카페 금지 챌린지',
+      startDate: '2025-05-01',
+      endDate: '2025-05-07',
+      icon: 'fas fa-coffee',
+      category: 'cafe',
+    },
+    {
+      id: 2,
+      name: '배달음식 금지 챌린지',
+      startDate: '2025-05-01',
+      endDate: '2025-05-07',
+      icon: 'fas fa-motorcycle',
+      category: 'delivery',
+    },
+  ]);
 
   function setNickname(newNickname) {
     nickname.value = newNickname;
