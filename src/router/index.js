@@ -80,7 +80,7 @@ const routes = [
     path: '/expenses',
     name: 'Expenses',
     component: Expenses,
-    meta: { requiresAuth: true },
+    // meta: { requiresAuth: true }, // 테스트용으로 주석 처리
   },
   {
     path: '/expenses/:id',
