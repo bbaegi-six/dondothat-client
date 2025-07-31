@@ -103,7 +103,7 @@
     cafe: {
       title: '카페 금지 챌린지',
       description: '카페에서 결제하지 않기',
-      icon: 'CafeIcon',
+      icon: 'fas fa-coffee',
       iconColor: 'text-cafe'
     },
     delivery: {
