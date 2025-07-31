@@ -12,11 +12,18 @@
         @challenge-selected="handleChallengeSelected"
       />
       
-      <!-- 3단계: Days Input - 실제 컴포넌트 사용 -->
+      <!-- 3단계: Days Input -->
       <ChallengeDaysInput 
-        v-if="currentStep === 'days-input'"
+        v-else-if="currentStep === 'days-input'"
         :selected-challenge="selectedChallenge"
         @date-complete="handleDateComplete"
+      />
+      
+      <!-- 4단계: Progress -->
+      <ChallengeProgress 
+        v-else-if="currentStep === 'progress'"
+        :selected-challenge="selectedChallenge"
+        :challenge-days="challengeDays"
       />
     </div>
   </template>
@@ -25,10 +32,12 @@
   import { ref } from 'vue';
   import ChallengeLoading from './ChallengeLoading.vue';
   import ChallengeSelection from './ChallengeSelection.vue';
-  import ChallengeDaysInput from './ChallengeDaysInput.vue'; // 주석 해제!
+  import ChallengeDaysInput from './ChallengeDaysInput.vue';
+  import ChallengeProgress from './ChallengeProgress.vue';
   
   const currentStep = ref('loading');
   const selectedChallenge = ref(null);
+  const challengeDays = ref(0);
   
   const handleLoadingComplete = () => {
     console.log('✅ 로딩 완료 → 선택 페이지로');
@@ -43,6 +52,17 @@
   
   const handleDateComplete = (data) => {
     console.log('✅ 날짜 입력 완료:', data);
-    // 여기서 다음 단계로 이동하거나 완료 처리
+    // 챌린지 데이터 저장
+    selectedChallenge.value = data.challenge;
+    challengeDays.value = data.days;
+    
+    // 진행 현황 페이지로 이동
+    currentStep.value = 'progress';
+    
+    console.log(`🎯 ${data.challenge} 챌린지 ${data.days}일 시작!`);
   };
   </script>
+  
+  <style scoped>
+  /* 페이지 전환 애니메이션 */
+  </style>
