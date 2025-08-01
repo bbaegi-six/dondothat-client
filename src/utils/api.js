@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // API 기본 설정
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:8080/api'),
+  baseURL: '/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -50,6 +50,8 @@ api.interceptors.response.use(
 
 // API 메서드들
 export const authAPI = {
+  checkNickname: (nickname) =>
+    api.get("/user/check-nickname", { params: { nickname } }),
   // 현재 구현된 API
   // 이메일 인증 코드
   sendVerification: (email) => api.post('/user/send-verification', { email }),

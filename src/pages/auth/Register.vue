@@ -11,7 +11,7 @@
           <div class="h-1">
             <span
               :class="{
-                'text-primary-red text-xs mt-1': showErrors && !name,
+                'text-brand text-xs mt-1': showErrors && !name,
                 invisible: !(showErrors && !name),
               }"
             >
@@ -31,7 +31,7 @@
           <div class="h-1">
             <span
               v-if="showErrors && !nickname"
-              class="text-primary-red text-xs mt-1"
+              class="text-brand text-xs mt-1"
             >
               * 필수 항목입니다
             </span>
@@ -41,6 +41,12 @@
               :style="{ color: '#C9C9C9' }"
             >
               사용 가능한 닉네임입니다.
+            </span>
+            <span
+              v-else-if="nicknameDuplicate"
+              class="text-brand text-xs mt-1"
+            >
+              이미 사용중인 닉네임입니다.
             </span>
           </div>
         </div>
@@ -55,13 +61,13 @@
           <div class="h-1">
             <span
               v-if="showErrors && !password"
-              class="text-primary-red text-xs mt-1"
+              class="text-brand text-xs mt-1"
             >
               * 필수 항목입니다
             </span>
             <span
               v-else-if="passwordError"
-              class="text-primary-red text-xs mt-1"
+              class="text-brand text-xs mt-1"
             >
               {{ passwordError }}
             </span>
@@ -78,13 +84,13 @@
           <div class="h-1">
             <span
               v-if="showErrors && !confirmPassword"
-              class="text-primary-red text-xs mt-1"
+              class="text-brand text-xs mt-1"
             >
               * 필수 항목입니다
             </span>
             <span
               v-else-if="confirmPasswordError"
-              class="text-primary-red text-xs mt-1"
+              class="text-brand text-xs mt-1"
             >
               {{ confirmPasswordError }}
             </span>
@@ -92,49 +98,24 @@
         </div>
 
         <div class="w-[328px] mx-auto">
-          <InputWithButton
-            v-model="email"
-            placeholder="이메일"
-            button-label="전송"
-            @buttonClick="handleEmailSend"
-            class="w-full"
-          />
+          <Input v-model="email" placeholder="이메일" class="w-full" />
           <div class="h-1">
             <span
               v-if="showErrors && !email"
-              class="text-primary-red text-xs mt-1"
+              class="text-brand text-xs mt-1"
             >
               * 필수 항목입니다
             </span>
             <span
-              v-else-if="showEmailError && emailError"
-              class="text-primary-red text-xs mt-1"
+              v-else-if="emailError"
+              class="text-brand text-xs mt-1"
             >
               {{ emailError }}
             </span>
           </div>
         </div>
 
-        <div class="w-[328px] mx-auto">
-          <Input
-            v-model="verificationCode"
-            placeholder="인증코드"
-            class="w-full"
-          />
-          <div class="h-16">
-            <span
-              :class="{
-                'text-primary-red text-xs mt-1':
-                  showErrors && !verificationCode,
-                invisible: !(showErrors && !verificationCode),
-              }"
-            >
-              * 필수 항목입니다
-            </span>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-3 w-[328px] mx-auto">
+        <div class="flex flex-col gap-3 w-[328px] mx-auto pt-12">
           <label
             class="flex items-center justify-between gap-2 text-white text-sm"
           >
@@ -148,7 +129,7 @@
             </div>
             <span
               :class="{
-                'text-primary-red text-xs': showErrors && !agreeTerms,
+                'text-brand text-xs': showErrors && !agreeTerms,
                 invisible: !(showErrors && !agreeTerms),
               }"
             >
@@ -168,7 +149,7 @@
             </div>
             <span
               :class="{
-                'text-primary-red text-xs': showErrors && !agreePrivacy,
+                'text-brand text-xs': showErrors && !agreePrivacy,
                 invisible: !(showErrors && !agreePrivacy),
               }"
             >
@@ -200,18 +181,23 @@ import Input from '../../components/Input.vue';
 import InputWithButton from '../../components/InputWithButton.vue';
 import Button from '../../components/Button.vue';
 
+import { authAPI } from '../../utils/api.js';
+
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
 const name = ref('');
 const nickname = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const email = ref('');
-const verificationCode = ref('');
 const agreeTerms = ref(false);
 const agreePrivacy = ref(false);
 const agreeMarketing = ref(false);
 const showErrors = ref(false);
-const showEmailError = ref(false);
 const nicknameAvailable = ref(false);
+const nicknameDuplicate = ref(false);
 
 const passwordError = ref('');
 const confirmPasswordError = ref('');
@@ -251,29 +237,29 @@ watch(password, () => {
 
 watch(confirmPassword, validateConfirmPassword);
 
-watch(email, () => {
-  if (showEmailError.value) {
-    showEmailError.value = false;
-  }
-});
+watch(email, validateEmail);
 
-const handleNicknameCheck = () => {
+const handleNicknameCheck = async () => {
   if (nickname.value) {
-    nicknameAvailable.value = true;
+    try {
+      const isAvailable = await authAPI.checkNickname(nickname.value);
+      if (isAvailable === false) {
+        nicknameAvailable.value = true;
+        nicknameDuplicate.value = false;
+      } else {
+        nicknameAvailable.value = false;
+        nicknameDuplicate.value = true;
+      }
+    } catch (error) {
+      console.error('닉네임 중복 확인 실패:', error);
+      nicknameAvailable.value = false;
+      nicknameDuplicate.value = false;
+    }
   }
 };
 
-const handleEmailSend = () => {
-  showEmailError.value = true;
-  validateEmail();
-  if (!emailError.value && email.value) {
-    console.log('이메일 인증코드 전송', email.value);
-  }
-};
-
-const handleNext = () => {
+const handleNext = async () => {
   showErrors.value = true;
-  showEmailError.value = true;
   validatePassword();
   validateConfirmPassword();
   validateEmail();
@@ -284,16 +270,30 @@ const handleNext = () => {
     !password.value ||
     !confirmPassword.value ||
     !email.value ||
-    !verificationCode.value ||
     passwordError.value ||
     confirmPasswordError.value ||
     emailError.value ||
     !agreeTerms.value ||
-    !agreePrivacy.value
+    !agreePrivacy.value ||
+    !nicknameAvailable.value
   ) {
     return;
   }
 
-  console.log('다음 버튼 클릭 - 모든 값 입력됨');
+  try {
+    await authAPI.signUp({
+      name: name.value,
+      nickname: nickname.value,
+      password: password.value,
+      email: email.value,
+      agreeTerms: agreeTerms.value,
+      agreePrivacy: agreePrivacy.value,
+      agreeMarketing: agreeMarketing.value,
+    });
+    router.push('/login');
+  } catch (error) {
+    console.error('회원가입 실패:', error);
+    alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+  }
 };
 </script>
