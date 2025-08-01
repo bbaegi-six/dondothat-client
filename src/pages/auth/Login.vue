@@ -135,13 +135,19 @@ const handleLogin = async () => {
 };
 
 const handleNaverLogin = () => {
-  const currentOrigin = window.location.origin; // http://localhost:5173
-  window.location.href = `http://dondothat.duckdns.org:8080/oauth2/authorization/naver?redirect_uri=${encodeURIComponent(currentOrigin + '/oauth-redirect')}`;
+  const currentOrigin = window.location.origin; // https://dondothat.netlify.app
+  const redirectUrl = `${currentOrigin}/oauth-redirect`;
+  
+  window.location.href = 
+    `http://dondothat.duckdns.org:8080/oauth2/authorization/naver?redirect_uri=${encodeURIComponent(redirectUrl)}`;
 };
 
 const handleGoogleLogin = () => {
   const currentOrigin = window.location.origin;
-  window.location.href = `http://dondothat.duckdns.org:8080/oauth2/authorization/google?redirect_uri=${encodeURIComponent(currentOrigin + '/oauth-redirect')}`;
+  const redirectUrl = `${currentOrigin}/oauth-redirect`;
+  
+  window.location.href = 
+    `http://dondothat.duckdns.org:8080/oauth2/authorization/google?redirect_uri=${encodeURIComponent(redirectUrl)}`;
 };
 </script>
 
