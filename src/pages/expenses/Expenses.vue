@@ -254,7 +254,9 @@
 
     <!-- 내 계좌 거래내역 리스트 -->
     <div v-if="activeTab === 'account'">
-      <div v-if="currentMonthTransactions.length > 0">
+      <div
+        v-if="currentMonthTransactions && currentMonthTransactions.length > 0"
+      >
         <!-- 날짜별 그룹 -->
         <div v-for="(group, date) in groupedTransactions" :key="date">
           <!-- 날짜와 금액 -->
@@ -387,16 +389,14 @@
 
       <!-- 데이터 없음 표시 -->
       <div v-else class="text-center py-16">
-        <p style="color: #c6c6c6; font-size: 14px">
-          저금통 내역이 없습니다.
-        </p>
+        <p style="color: #c6c6c6; font-size: 14px">저금통 내역이 없습니다.</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useExpensesStore } from '../../stores/expenses.js';
 import Header from '../../components/layout/Header.vue';
@@ -404,6 +404,11 @@ import TransactionCard from '../../components/expenses/TransactionCard.vue';
 
 const router = useRouter();
 const expensesStore = useExpensesStore();
+
+// 컴포넌트가 처음 로드될 때 API를 호출하여 데이터를 가져옴
+onMounted(() => {
+  expensesStore.fetchExpensesFromAPI();
+});
 
 // 탭 상태 관리
 const activeTab = ref('account'); // 'account' 또는 'savings'
@@ -451,8 +456,6 @@ const getDailySavingsTotal = (items) => {
 const editTransaction = (transaction) => {
   router.push(`/expenses/${transaction.id}`);
 };
-
-
 
 const addTransaction = () => {
   router.push('/expenses/new');
