@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // API 기본 설정
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:8080/api'),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
