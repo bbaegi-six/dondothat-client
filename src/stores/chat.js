@@ -56,9 +56,10 @@ export const useChatStore = defineStore('chat', () => {
       );
 
       // SockJS + STOMP 연결
-      socket.value = new SockJS(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/ws/chat`
-      );
+      // socket.value = new SockJS(
+      //   `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/ws/chat`
+      // );
+      socket.value = new SockJS('http://localhost:8080/ws/chat');
       stompClient.value = Stomp.over(socket.value);
 
       // 디버그 비활성화 (프로덕션용)
