@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // API 기본 설정
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:8080/api'),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -29,11 +29,14 @@ api.interceptors.response.use(
     return response.data;
   },
   (error) => {
-    // 401 에러 시 자동 로그아웃
+    // 401 에러 시 자동 로그아웃 (배포 환경에서 Mixed Content 에러 방지)
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      // 현재 도메인 기준으로 로그인 페이지로 이동
+      if (typeof window !== 'undefined' && window.location) {
+        window.location.href = `${window.location.origin}/login`;
+      }
     }
 
     // 에러 메시지 표준화
@@ -48,9 +51,11 @@ api.interceptors.response.use(
 // API 메서드들
 export const authAPI = {
   // 이메일 인증 코드
-  sendVerification: (email) => api.post('/users/send-verification', { email }),
+  sendVerification: (email) => api.post('/user/send-verification', { email }),
   // 회원가입
-  signUp: (userData) => api.post('/users/signup', userData),
+  signUp: (userData) => api.post('/user/signup', userData),
+  // 사용자 정보 조회
+  fetchMe: () => api.get('/user/me'),
 };
 
 export const expensesAPI = {
