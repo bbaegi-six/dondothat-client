@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // API 기본 설정
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:8080/api'),
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -51,10 +51,14 @@ api.interceptors.response.use(
 
 // API 메서드들
 export const authAPI = {
-  // 이메일 인증 코드
-  sendVerification: (email) => api.post('/users/send-verification', { email }),
-  // 회원가입
-  signUp: (userData) => api.post('/users/signup', userData),
+  login: (credentials) => api.post('/auth/login', credentials),
+  register: (userData) => api.post('/auth/register', userData),
+  logout: () => api.post('/auth/logout'),
+  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+  resetPassword: (token, password) =>
+    api.post('/auth/reset-password', { token, password }),
+  refreshToken: () => api.post('/auth/refresh'),
+  updateProfile: (userData) => api.put('/auth/profile', userData),
 };
 
 export const expensesAPI = {
