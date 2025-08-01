@@ -140,8 +140,8 @@ const handleNaverLogin = () => {
 };
 
 const handleGoogleLogin = () => {
-  window.location.href =
-    'http://dondothat.duckdns.org:8080/oauth2/authorization/google';
+  const currentOrigin = window.location.origin;
+  window.location.href = `http://dondothat.duckdns.org:8080/oauth2/authorization/google?redirect_uri=${encodeURIComponent(currentOrigin + '/oauth2/redirect')}`;
 };
 </script>
 
