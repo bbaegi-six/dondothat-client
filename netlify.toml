@@ -9,7 +9,6 @@
   command = "npm run build"
   publish = "dist"
 
-
 [[redirects]]
   from = "/api/*"
   to = "http://dondothat.duckdns.org:8080/api/:splat"
