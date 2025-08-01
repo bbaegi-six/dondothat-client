@@ -57,8 +57,7 @@ export const useChatStore = defineStore('chat', () => {
 
       // SockJS + STOMP 연결
       socket.value = new SockJS(
-        // `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/ws/chat`
-        'http://localhost:8080/ws/chat'
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/ws/chat`
       );
       stompClient.value = Stomp.over(socket.value);
 

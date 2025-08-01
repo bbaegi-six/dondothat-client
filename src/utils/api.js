@@ -54,43 +54,29 @@ export const authAPI = {
   fetchMe: () => api.get('/user/me')
 }
 
-export const transactionsAPI = {
-  getAll: (params) => api.get('/transactions', { params }),
-  getById: (id) => api.get(`/transactions/${id}`),
-  create: (data) => api.post('/transactions', data),
-  update: (id, data) => api.put(`/transactions/${id}`, data),
-  delete: (id) => api.delete(`/transactions/${id}`),
-  getCategories: () => api.get('/transactions/categories'),
-  createCategory: (data) => api.post('/transactions/categories', data)
+export const expensesAPI = {
+  getAll: (params) => api.get('/expenses', { params }),
+  getById: (id) => api.get(`/expenses/${id}`),
+  create: (data) => api.post('/expenses', data),
+  update: (id, data) => api.put(`/expenses/${id}`, data),
+  delete: (id) => api.delete(`/expenses/${id}`),
+  getCategories: () => api.get('/expenses/categories')
 }
 
-export const budgetAPI = {
-  getAll: (params) => api.get('/budgets', { params }),
-  getById: (id) => api.get(`/budgets/${id}`),
-  create: (data) => api.post('/budgets', data),
-  update: (id, data) => api.put(`/budgets/${id}`, data),
-  delete: (id) => api.delete(`/budgets/${id}`),
-  copyFromPrevious: (year, month) => api.post('/budgets/copy', { year, month })
+export const assetsAPI = {
+  connect: (userId) => api.post(`/assets/connect?userId=${userId}`),
+  delete: (userId) => api.delete(`/assets?userId=${userId}`)
 }
 
-export const goalsAPI = {
-  getAll: () => api.get('/goals'),
-  getById: (id) => api.get(`/goals/${id}`),
-  create: (data) => api.post('/goals', data),
-  update: (id, data) => api.put(`/goals/${id}`, data),
-  delete: (id) => api.delete(`/goals/${id}`),
-  contribute: (id, amount, description) => api.post(`/goals/${id}/contribute`, { amount, description }),
-  pause: (id) => api.patch(`/goals/${id}/pause`),
-  resume: (id) => api.patch(`/goals/${id}/resume`),
-  complete: (id) => api.patch(`/goals/${id}/complete`)
+export const challengesAPI = {
+  getById: (id) => api.get(`/challenges/${id}`),
 }
 
-export const settingsAPI = {
-  get: () => api.get('/settings'),
-  update: (data) => api.put('/settings', data),
-  export: () => api.get('/settings/export'),
-  import: (data) => api.post('/settings/import', data),
-  clearCache: () => api.delete('/settings/cache')
+export const chatAPI = {
+  getUserChatRooms: (userId) => api.get(`/chat/user/${userId}`),
+  getChatInfo: (challengeId) => api.get(`/chat/${challengeId}/info`),
+  getParticipants: (challengeId) => api.get(`/chat/${challengeId}/participants`),
+  getParticipantCount: (challengeId) => api.get(`/chat/${challengeId}/participants/count`)
 }
 
 export default api
