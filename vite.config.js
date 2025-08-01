@@ -41,7 +41,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://dondothat.duckdns.org:8080',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },
     },

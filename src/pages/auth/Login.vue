@@ -62,7 +62,7 @@
       />
 
       <!-- 간편 로그인 -->
-      <div class="relative text-center my-6 text-gray-c9 text-sm">
+      <div class="relative text-center my-6 text-white text-sm">
         <span class="bg-dark-bg px-4">간편 로그인</span>
       </div>
 
@@ -85,12 +85,12 @@
       <div class="flex justify-center gap-5 my-6">
         <router-link
           to="/register"
-          class="bg-transparent border-none text-gray-c9 text-sm cursor-pointer font-pretendard no-underline hover:text-primary-red"
+          class="bg-transparent border-none text-white text-sm cursor-pointer font-pretendard no-underline hover:text-primary-red"
           >회원 가입</router-link
         >
         <router-link
           to="/forgot-password"
-          class="bg-transparent border-none text-gray-c9 text-sm cursor-pointer font-pretendard no-underline hover:text-red-500"
+          class="bg-transparent border-none text-white text-sm cursor-pointer font-pretendard no-underline hover:text-red-500"
         >
           아이디 / 비밀번호 찾기
         </router-link>
@@ -114,6 +114,16 @@ const email = ref('');
 const password = ref('');
 const showPassword = ref(false);
 
+// API 기본 URL 설정
+const getApiBaseUrl = () => {
+  // 개발 환경에서는 프록시를 통해 요청하므로 현재 origin 사용
+  if (import.meta.env.DEV) {
+    return window.location.origin;
+  }
+  // 프로덕션 환경에서는 실제 API 서버 URL 사용
+  return 'http://dondothat.duckdns.org:8080';
+};
+
 // 메서드들
 const togglePassword = () => {
   showPassword.value = !showPassword.value;
@@ -135,19 +145,39 @@ const handleLogin = async () => {
 };
 
 const handleNaverLogin = () => {
-  const currentOrigin = window.location.origin; // https://dondothat.netlify.app
+  const currentOrigin = window.location.origin;
   const redirectUrl = `${currentOrigin}/oauth-redirect`;
-  
-  window.location.href = 
-    `http://dondothat.duckdns.org:8080/oauth2/authorization/naver?redirect_uri=${encodeURIComponent(redirectUrl)}`;
+  const apiBaseUrl = getApiBaseUrl();
+
+  console.log('=== Naver Login Debug Info ===');
+  console.log('Current Origin:', currentOrigin);
+  console.log('Redirect URL:', redirectUrl);
+  console.log('API Base URL:', apiBaseUrl);
+  console.log('Environment:', import.meta.env.MODE);
+
+  // 수정된 경로 사용 (/oauth/naver)
+  const oauthUrl = `${apiBaseUrl}/oauth/naver?redirect_uri=${encodeURIComponent(redirectUrl)}`;
+  console.log('Final OAuth URL:', oauthUrl);
+
+  window.location.href = oauthUrl;
 };
 
 const handleGoogleLogin = () => {
   const currentOrigin = window.location.origin;
   const redirectUrl = `${currentOrigin}/oauth-redirect`;
-  
-  window.location.href = 
-    `http://dondothat.duckdns.org:8080/oauth2/authorization/google?redirect_uri=${encodeURIComponent(redirectUrl)}`;
+  const apiBaseUrl = getApiBaseUrl();
+
+  console.log('=== Google Login Debug Info ===');
+  console.log('Current Origin:', currentOrigin);
+  console.log('Redirect URL:', redirectUrl);
+  console.log('API Base URL:', apiBaseUrl);
+  console.log('Environment:', import.meta.env.MODE);
+
+  // 수정된 경로 사용 (/oauth/google)
+  const oauthUrl = `http://localhost:8080/oauth2/authorization/google?redirect_uri=${encodeURIComponent(redirectUrl)}`;
+  console.log('Final OAuth URL:', oauthUrl);
+
+  window.location.href = oauthUrl;
 };
 </script>
 
@@ -158,21 +188,21 @@ const handleGoogleLogin = () => {
 }
 
 /* 간편 로그인 구분선 (Tailwind CSS로 직접 변환 불가) */
-.relative.text-center.my-6.text-gray-c9.text-sm::before,
-.relative.text-center.my-6.text-gray-c9.text-sm::after {
+.relative.text-center.my-6.text-white.text-sm::before,
+.relative.text-center.my-6.text-white.text-sm::after {
   content: '';
   position: absolute;
   top: 50%;
   width: 120px;
   height: 1px;
-  background-color: #c9c9c9;
+  background-color: white;
 }
 
-.relative.text-center.my-6.text-gray-c9.text-sm::before {
+.relative.text-center.my-6.text-white.text-sm::before {
   left: 0;
 }
 
-.relative.text-center.my-6.text-gray-c9.text-sm::after {
+.relative.text-center.my-6.text-white.text-sm::after {
   right: 0;
 }
 </style>
