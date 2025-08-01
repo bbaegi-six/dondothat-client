@@ -3,7 +3,9 @@
     <!-- 로고 -->
     <div class="text-center my-5 mb-10">
       <div class="text-[60px] mb-4">💰</div>
-      <h1 class="font-anton-sc text-2xl text-primary-red leading-[22px] m-0 font-normal">
+      <h1
+        class="font-anton-sc text-2xl text-primary-red leading-[22px] m-0 font-normal"
+      >
         Don do<br />
         that
       </h1>
@@ -12,11 +14,7 @@
     <!-- 로그인 폼 -->
     <div class="flex flex-col mb-5 w-82 mx-auto">
       <div class="relative mb-6">
-        <Input
-          v-model="email"
-          type="email"
-          placeholder="이메일을 입력하세요"
-        />
+        <Input v-model="email" type="email" placeholder="이메일을 입력하세요" />
       </div>
 
       <div class="relative mb-6">
@@ -25,7 +23,11 @@
           :type="showPassword ? 'text' : 'password'"
           placeholder="비밀번호를 입력하세요"
         />
-        <button @click="togglePassword" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-transparent border-none cursor-pointer text-base" type="button">
+        <button
+          @click="togglePassword"
+          class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-transparent border-none cursor-pointer text-base"
+          type="button"
+        >
           <svg
             v-if="showPassword"
             xmlns="http://www.w3.org/2000/svg"
@@ -65,18 +67,31 @@
       </div>
 
       <div class="flex justify-center gap-8 mb-10">
-        <button @click="handleKakaoLogin" class="w-[42px] h-[42px] rounded-full border-none cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-kakao-yellow text-black">
-          <div class="kakao-icon">K</div>
+        <button
+          @click="handleNaverLogin"
+          class="w-[42px] h-[42px] rounded-full border-none cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-[#03C75A] text-white"
+        >
+          <div class="naver-icon">N</div>
         </button>
-        <button @click="handleGoogleLogin" class="w-[42px] h-[42px] rounded-full border border-light-gray-db cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-white text-dark-gray">
+        <button
+          @click="handleGoogleLogin"
+          class="w-[42px] h-[42px] rounded-full border border-light-gray-db cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-white text-dark-gray"
+        >
           <div class="google-icon">G</div>
         </button>
       </div>
 
       <!-- 하단 링크 -->
       <div class="flex justify-center gap-5 my-6">
-        <router-link to="/register" class="bg-transparent border-none text-gray-c9 text-sm cursor-pointer font-pretendard no-underline hover:text-primary-red">회원 가입</router-link>
-        <router-link to="/forgot-password" class="bg-transparent border-none text-gray-c9 text-sm cursor-pointer font-pretendard no-underline hover:text-red-500">
+        <router-link
+          to="/register"
+          class="bg-transparent border-none text-gray-c9 text-sm cursor-pointer font-pretendard no-underline hover:text-primary-red"
+          >회원 가입</router-link
+        >
+        <router-link
+          to="/forgot-password"
+          class="bg-transparent border-none text-gray-c9 text-sm cursor-pointer font-pretendard no-underline hover:text-red-500"
+        >
           아이디 / 비밀번호 찾기
         </router-link>
       </div>
@@ -119,14 +134,14 @@ const handleLogin = async () => {
   }
 };
 
-const handleKakaoLogin = () => {
-  console.log('카카오 로그인');
-  // 카카오 로그인 로직
+const handleNaverLogin = () => {
+  window.location.href =
+    'http://dondothat.duckdns.org:8080/oauth2/authorization/naver';
 };
 
 const handleGoogleLogin = () => {
-  console.log('구글 로그인');
-  // 구글 로그인 로직
+  window.location.href =
+    'http://dondothat.duckdns.org:8080/oauth2/authorization/google';
 };
 </script>
 

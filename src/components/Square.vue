@@ -23,7 +23,7 @@
 
 <script>
 export default {
-  name: "Square",
+  name: 'Square',
   props: {
     // 이미지 URL
     image: {

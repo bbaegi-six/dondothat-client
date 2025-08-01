@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // API 기본 설정
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseURL: '/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
@@ -50,7 +50,8 @@ export const authAPI = {
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
   resetPassword: (token, password) => api.post('/auth/reset-password', { token, password }),
   refreshToken: () => api.post('/auth/refresh'),
-  updateProfile: (userData) => api.put('/auth/profile', userData)
+  updateProfile: (userData) => api.put('/auth/profile', userData),
+  fetchMe: () => api.get('/user/me')
 }
 
 export const transactionsAPI = {

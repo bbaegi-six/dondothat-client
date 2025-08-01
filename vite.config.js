@@ -38,7 +38,14 @@ export default defineConfig({
       };
     },
   },
-  server: {},
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://dondothat.duckdns.org:8080',
+        changeOrigin: true,
+      },
+    },
+  },
   define: {
     global: 'globalThis',
   },
