@@ -20,7 +20,14 @@ import Terms from '../pages/profile/Terms.vue';
 import Policy from '../pages/profile/Policy.vue';
 import MyChallenge from '../pages/profile/MyChallenge.vue';
 
+import OAuthRedirect from '../pages/auth/OAuthRedirect.vue';
+
 const routes = [
+  {
+    path: '/oauth-redirect',
+    name: 'OAuthRedirect',
+    component: OAuthRedirect,
+  },
   {
     path: '/',
     name: 'Home',
