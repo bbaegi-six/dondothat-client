@@ -12,5 +12,6 @@
 
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "http://dondothat.duckdns.org:8080/api/:splat"
   status = 200
+  force = true
