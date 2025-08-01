@@ -135,12 +135,12 @@ const handleLogin = async () => {
 };
 
 const handleNaverLogin = () => {
-  const currentOrigin = window.location.origin; // http://localhost:5173
+  const currentOrigin = window.location.origin; // 현재 도메인 (localhost 또는 netlify)
   window.location.href = `http://dondothat.duckdns.org:8080/oauth2/authorization/naver?redirect_uri=${encodeURIComponent(currentOrigin + '/oauth-redirect')}`;
 };
 
 const handleGoogleLogin = () => {
-  const currentOrigin = window.location.origin;
+  const currentOrigin = window.location.origin; // 현재 도메인 (localhost 또는 netlify)
   window.location.href = `http://dondothat.duckdns.org:8080/oauth2/authorization/google?redirect_uri=${encodeURIComponent(currentOrigin + '/oauth-redirect')}`;
 };
 </script>

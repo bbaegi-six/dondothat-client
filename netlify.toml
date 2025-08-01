@@ -9,7 +9,6 @@
   command = "npm run build"
   publish = "dist"
 
-
 [[redirects]]
   from = "/api/*"
   to = "http://dondothat.duckdns.org:8080/api/:splat"
@@ -20,15 +19,3 @@
   from = "/*"
   to = "/index.html"
   status = 200
-
-  [[redirects]]
-    from = "/oauth2/*"
-    to = "http://dondothat.duckdns.org:8080/oauth2/:splat"
-    status = 200
-    force = true
-
-  [[redirects]]
-    from = "/login/*"
-    to = "http://dondothat.duckdns.org:8080/login/:splat"
-    status = 200
-    force = true

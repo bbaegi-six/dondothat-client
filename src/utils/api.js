@@ -47,15 +47,10 @@ api.interceptors.response.use(
 
 // API 메서드들
 export const authAPI = {
-  login: (credentials) => api.post('/auth/login', credentials),
-  register: (userData) => api.post('/auth/register', userData),
-  logout: () => api.post('/auth/logout'),
-  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
-  resetPassword: (token, password) =>
-    api.post('/auth/reset-password', { token, password }),
-  refreshToken: () => api.post('/auth/refresh'),
-  updateProfile: (userData) => api.put('/auth/profile', userData),
-  fetchMe: () => api.get('/user/me'),
+  // 이메일 인증 코드
+  sendVerification: (email) => api.post('/users/send-verification', { email }),
+  // 회원가입
+  signUp: (userData) => api.post('/users/signup', userData),
 };
 
 export const expensesAPI = {
@@ -67,22 +62,23 @@ export const expensesAPI = {
   getCategories: () => api.get('/expenses/categories'),
 };
 
-export const assetsAPI = {
-  connect: (userId) => api.post(`/assets/connect?userId=${userId}`),
-  delete: (userId) => api.delete(`/assets?userId=${userId}`),
-};
+// 필요시 나중에 추가
+// export const assetsAPI = {
+//   connect: (userId) => api.post(`/assets/connect?userId=${userId}`),
+//   delete: (userId) => api.delete(`/assets?userId=${userId}`),
+// };
 
-export const challengesAPI = {
-  getById: (id) => api.get(`/challenges/${id}`),
-};
+// export const challengesAPI = {
+//   getById: (id) => api.get(`/challenges/${id}`),
+// };
 
-export const chatAPI = {
-  getUserChatRooms: (userId) => api.get(`/chat/user/${userId}`),
-  getChatInfo: (challengeId) => api.get(`/chat/${challengeId}/info`),
-  getParticipants: (challengeId) =>
-    api.get(`/chat/${challengeId}/participants`),
-  getParticipantCount: (challengeId) =>
-    api.get(`/chat/${challengeId}/participants/count`),
-};
+// export const chatAPI = {
+//   getUserChatRooms: (userId) => api.get(`/chat/user/${userId}`),
+//   getChatInfo: (challengeId) => api.get(`/chat/${challengeId}/info`),
+//   getParticipants: (challengeId) =>
+//     api.get(`/chat/${challengeId}/participants`),
+//   getParticipantCount: (challengeId) =>
+//     api.get(`/chat/${challengeId}/participants/count`),
+// };
 
 export default api;
