@@ -50,12 +50,22 @@ api.interceptors.response.use(
 
 // API 메서드들
 export const authAPI = {
+  // 현재 구현된 API
   // 이메일 인증 코드
   sendVerification: (email) => api.post('/user/send-verification', { email }),
   // 회원가입
   signUp: (userData) => api.post('/user/signup', userData),
   // 사용자 정보 조회
   fetchMe: () => api.get('/user/me'),
+  
+  // 미래에 구현될 API (구현 후 주석 해제)
+  // login: (credentials) => api.post('/auth/login', credentials),
+  // register: (userData) => api.post('/auth/register', userData),
+  // logout: () => api.post('/auth/logout'),
+  // forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+  // resetPassword: (token, password) => api.post('/auth/reset-password', { token, password }),
+  // refreshToken: () => api.post('/auth/refresh'),
+  // updateProfile: (userData) => api.put('/auth/profile', userData),
 };
 
 export const expensesAPI = {
