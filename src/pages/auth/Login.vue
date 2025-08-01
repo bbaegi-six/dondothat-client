@@ -135,13 +135,13 @@ const handleLogin = async () => {
 };
 
 const handleNaverLogin = () => {
-  window.location.href =
-    'http://dondothat.duckdns.org:8080/oauth2/authorization/naver';
+  const currentOrigin = window.location.origin; // http://localhost:5173
+  window.location.href = `http://localhost:8080/oauth2/authorization/naver?redirect_uri=${encodeURIComponent(currentOrigin + '/oauth-redirect')}`;
 };
 
 const handleGoogleLogin = () => {
   const currentOrigin = window.location.origin;
-  window.location.href = `http://dondothat.duckdns.org:8080/oauth2/authorization/google?redirect_uri=${encodeURIComponent(currentOrigin + '/oauth2/redirect')}`;
+  window.location.href = `http://localhost:8080/oauth2/authorization/google?redirect_uri=${encodeURIComponent(currentOrigin + '/oauth-redirect')}`;
 };
 </script>
 
