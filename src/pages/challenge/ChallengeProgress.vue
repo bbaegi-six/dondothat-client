@@ -135,7 +135,7 @@
   });
   
   // Reactive data
-  const currentDay = ref(1) // 36일차로 설정하여 완료 상태 확인 (35일 챌린지 완료)
+  const currentDay = ref(36) // 36일차로 설정하여 완료 상태 확인 (35일 챌린지 완료)
   const savedAmount = ref(0);
   const dailyProgress = ref({}); // { 1: 'success', 2: 'fail', 3: 'pending' }
   const isSavingCompleted = ref(false); // 저금 완료 상태

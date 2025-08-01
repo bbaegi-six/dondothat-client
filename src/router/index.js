@@ -59,7 +59,7 @@ const routes = [
     path: '/challenge',
     name: 'Challenge',
     component: Challenge, // Challenge.vue를 바로 메인 페이지로 사용
-    meta: { requiresAuth: true },
+    // meta: { requiresAuth: true }, //로그인 해결되면 주석 해제
   },
   {
     path: '/challenge/flow',
@@ -71,6 +71,15 @@ const routes = [
     component: () => import('../pages/challenge/ChallengeDaysInput.vue'),
     meta: { requiresAuth: true },
   },
+<<<<<<< Updated upstream
+=======
+{
+  path: '/challenge/days-input',
+  name: 'ChallengeDaysInput', 
+  component: () => import('../pages/challenge/ChallengeDaysInput.vue'),
+  // meta: { requiresAuth: true }, //로그인 해결되면 주석 해제
+},
+>>>>>>> Stashed changes
   {
     path: '/no-chat',
     name: 'NoChat',
