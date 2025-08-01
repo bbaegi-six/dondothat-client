@@ -40,13 +40,16 @@
               class="text-xs mt-1"
               :style="{ color: '#C9C9C9' }"
             >
-              사용 가능한 닉네임입니다.
+              사용 가능한 닉네임입니다
+            </span>
+            <span v-else-if="nicknameDuplicate" class="text-brand text-xs mt-1">
+              * 이미 사용중인 닉네임입니다
             </span>
             <span
-              v-else-if="nicknameDuplicate"
+              v-else-if="showNicknameCheckError"
               class="text-brand text-xs mt-1"
             >
-              이미 사용중인 닉네임입니다.
+              * 닉네임 중복 확인을 해주세요
             </span>
           </div>
         </div>
@@ -65,10 +68,7 @@
             >
               * 필수 항목입니다
             </span>
-            <span
-              v-else-if="passwordError"
-              class="text-brand text-xs mt-1"
-            >
+            <span v-else-if="passwordError" class="text-brand text-xs mt-1">
               {{ passwordError }}
             </span>
           </div>
@@ -100,16 +100,10 @@
         <div class="w-[328px] mx-auto">
           <Input v-model="email" placeholder="이메일" class="w-full" />
           <div class="h-1">
-            <span
-              v-if="showErrors && !email"
-              class="text-brand text-xs mt-1"
-            >
+            <span v-if="showErrors && !email" class="text-brand text-xs mt-1">
               * 필수 항목입니다
             </span>
-            <span
-              v-else-if="emailError"
-              class="text-brand text-xs mt-1"
-            >
+            <span v-else-if="emailError" class="text-brand text-xs mt-1">
               {{ emailError }}
             </span>
           </div>
@@ -198,6 +192,7 @@ const agreeMarketing = ref(false);
 const showErrors = ref(false);
 const nicknameAvailable = ref(false);
 const nicknameDuplicate = ref(false);
+const showNicknameCheckError = ref(false);
 
 const passwordError = ref('');
 const confirmPasswordError = ref('');
@@ -215,7 +210,7 @@ const validatePassword = () => {
 
 const validateConfirmPassword = () => {
   if (confirmPassword.value && password.value !== confirmPassword.value) {
-    confirmPasswordError.value = '* 비밀번호가 일치하지 않습니다.';
+    confirmPasswordError.value = '* 비밀번호가 일치하지 않습니다';
   } else {
     confirmPasswordError.value = '';
   }
@@ -224,7 +219,7 @@ const validateConfirmPassword = () => {
 const validateEmail = () => {
   const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,}$/;
   if (email.value && !emailRegex.test(email.value)) {
-    emailError.value = '* 올바른 이메일 양식을 입력해주세요.';
+    emailError.value = '* 올바른 이메일 양식을 입력해주세요';
   } else {
     emailError.value = '';
   }
@@ -239,6 +234,12 @@ watch(confirmPassword, validateConfirmPassword);
 
 watch(email, validateEmail);
 
+watch(nickname, () => {
+  nicknameAvailable.value = false;
+  nicknameDuplicate.value = false;
+  showNicknameCheckError.value = false; // 닉네임 변경 시 오류 메시지 초기화
+});
+
 const handleNicknameCheck = async () => {
   if (nickname.value) {
     try {
@@ -246,14 +247,17 @@ const handleNicknameCheck = async () => {
       if (isAvailable === false) {
         nicknameAvailable.value = true;
         nicknameDuplicate.value = false;
+        showNicknameCheckError.value = false; // 중복 확인 성공 시 오류 메시지 초기화
       } else {
         nicknameAvailable.value = false;
         nicknameDuplicate.value = true;
+        showNicknameCheckError.value = false; // 중복 확인 실패 시 오류 메시지 초기화
       }
     } catch (error) {
       console.error('닉네임 중복 확인 실패:', error);
       nicknameAvailable.value = false;
       nicknameDuplicate.value = false;
+      showNicknameCheckError.value = false; // API 호출 실패 시 오류 메시지 초기화
     }
   }
 };
@@ -274,9 +278,14 @@ const handleNext = async () => {
     confirmPasswordError.value ||
     emailError.value ||
     !agreeTerms.value ||
-    !agreePrivacy.value ||
-    !nicknameAvailable.value
+    !agreePrivacy.value
   ) {
+    return;
+  }
+
+  // 닉네임 중복 확인 여부 체크
+  if (!nicknameAvailable.value) {
+    showNicknameCheckError.value = true;
     return;
   }
 
