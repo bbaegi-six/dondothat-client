@@ -160,7 +160,7 @@
         </div>
 
         <div class="w-[328px] mx-auto">
-          <Button @click="handleNext" label="다음" class="w-full" />
+          <Button @click="handleNext" label="다음" class="w-full" :disabled="isSubmitting" />
         </div>
       </div>
     </div>
@@ -191,6 +191,7 @@ const agreeTerms = ref(false);
 const agreePrivacy = ref(false);
 const agreeMarketing = ref(false);
 const showErrors = ref(false);
+const isSubmitting = ref(false); // 새로운 상태 변수
 
 const emailAvailable = ref(false);
 const emailDuplicate = ref(false);
@@ -290,6 +291,9 @@ const handleNext = async () => {
     return;
   }
 
+  if (isSubmitting.value) return; // 이미 제출 중이면 중복 호출 방지
+  isSubmitting.value = true; // 제출 시작
+
   try {
     await authAPI.signUp({
       name: name.value,
@@ -301,10 +305,15 @@ const handleNext = async () => {
       agreeMarketing: agreeMarketing.value,
     });
 
+    // 회원가입 성공 후 사용자 정보 가져오기 (자동 로그인)
+    await authStore.checkAuth();
+
     router.push('/'); // 홈으로 이동
   } catch (error) {
     console.error('회원가입 실패:', error);
     alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+  } finally {
+    isSubmitting.value = false; // 제출 완료 (성공 또는 실패)
   }
 };
 </script>
