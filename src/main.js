@@ -12,7 +12,7 @@ app.use(pinia)
 
 // 앱 시작 시 인증 상태 확인
 const authStore = useAuthStore();
-authStore.checkAuth();
+await authStore.checkAuth(); // 비동기 작업이 완료될 때까지 기다립니다.
 
 app.use(router)
 

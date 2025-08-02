@@ -156,9 +156,14 @@ const router = createRouter({
 });
 
 // 인증 필요 라우트 처리
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+
+  // 인증 상태를 항상 최신으로 유지
+  if (!authStore.isLoggedIn && requiresAuth) {
+    await authStore.checkAuth();
+  }
 
   if (requiresAuth && !authStore.isLoggedIn) {
     next({ name: 'Login' });
