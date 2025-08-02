@@ -49,8 +49,8 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       try {
         await authAPI.logout();
-        this.isAuthenticated = false;
-        this.user = null;
+        // 로그아웃 후 인증 상태 재확인
+        await this.checkAuth(); // /me 요청으로 실제 상태 확인
       } catch (error) {
         this.error = error;
       } finally {
