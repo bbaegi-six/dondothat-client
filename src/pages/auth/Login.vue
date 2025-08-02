@@ -14,7 +14,7 @@
     <!-- 로그인 폼 -->
     <div class="flex flex-col mb-5 w-82 mx-auto">
       <div class="relative mb-6">
-        <Input v-model="nickname" type="text" placeholder="닉네임을 입력하세요" />
+        <Input v-model="email" type="email" placeholder="이메일을 입력하세요" />
       </div>
 
       <div class="relative mb-6">
@@ -110,7 +110,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 
 // 반응형 데이터
-const nickname = ref('');
+const email = ref('');
 const password = ref('');
 const showPassword = ref(false);
 
@@ -130,12 +130,12 @@ const togglePassword = () => {
 };
 
 const handleLogin = async () => {
-  if (!nickname.value || !password.value) {
-    alert('닉네임과 비밀번호를 입력해주세요.');
+  if (!email.value || !password.value) {
+    alert('이메일과 비밀번호를 입력해주세요.');
     return;
   }
 
-  const success = await authStore.login(nickname.value, password.value);
+  const success = await authStore.login(email.value, password.value);
 
   if (success) {
     router.push('/');

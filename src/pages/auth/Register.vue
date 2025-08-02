@@ -86,10 +86,7 @@
             class="w-full"
           />
           <div class="h-1">
-            <span
-              v-if="showErrors && !email"
-              class="text-brand text-xs mt-1"
-            >
+            <span v-if="showErrors && !email" class="text-brand text-xs mt-1">
               * 필수 항목입니다
             </span>
             <span
@@ -304,14 +301,7 @@ const handleNext = async () => {
       agreeMarketing: agreeMarketing.value,
     });
 
-    // 회원가입 성공 후 자동 로그인 시도
-    const loginSuccess = await authStore.login(email.value, password.value);
-    if (loginSuccess) {
-      router.push('/'); // 로그인 성공 시 홈으로 이동
-    } else {
-      alert('회원가입은 성공했지만 자동 로그인에 실패했습니다. 직접 로그인해주세요.');
-      router.push('/login'); // 자동 로그인 실패 시 로그인 페이지로 이동
-    }
+    router.push('/'); // 홈으로 이동
   } catch (error) {
     console.error('회원가입 실패:', error);
     alert('회원가입에 실패했습니다. 다시 시도해주세요.');
