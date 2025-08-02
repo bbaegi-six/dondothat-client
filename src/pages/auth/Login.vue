@@ -4,7 +4,7 @@
     <div class="text-center my-5 mb-10">
       <div class="text-[60px] mb-4">💰</div>
       <h1
-        class="font-anton-sc text-2xl text-primary-red leading-[22px] m-0 font-normal"
+        class="font-anton-sc text-2xl text-brand leading-[22px] m-0 font-normal"
       >
         Don do<br />
         that
@@ -85,12 +85,12 @@
       <div class="flex justify-center gap-5 my-6">
         <router-link
           to="/register"
-          class="bg-transparent border-none text-white text-sm cursor-pointer font-pretendard no-underline hover:text-primary-red"
+          class="bg-transparent border-none text-white text-sm cursor-pointer font-pretendard no-underline hover:text-brand"
           >회원 가입</router-link
         >
         <router-link
           to="/forgot-password"
-          class="bg-transparent border-none text-white text-sm cursor-pointer font-pretendard no-underline hover:text-red-500"
+          class="bg-transparent border-none text-white text-sm cursor-pointer font-pretendard no-underline hover:text-brand"
         >
           아이디 / 비밀번호 찾기
         </router-link>
