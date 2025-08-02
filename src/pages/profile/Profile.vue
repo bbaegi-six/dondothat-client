@@ -78,19 +78,45 @@ import ConfirmModal from './ConfirmModal.vue';
 // import { onMounted } from "vue";
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useUserStore } from '../../stores/profile';
+import { useAuthStore } from '../../stores/auth'; // auth 스토어 임포트
 import { useRouter } from 'vue-router';
 
-const userStore = useUserStore();
-const { nickname, email, accounts, badges } = storeToRefs(userStore);
-const { resetStore } = userStore;
+// 이미지 임포트
+import kbLogo from '@/assets/logo/kb.svg';
+import eatBadge from '@/assets/badge/eat.svg';
+
+const authStore = useAuthStore(); // auth 스토어 사용
+const { user } = storeToRefs(authStore); // auth 스토어에서 user 정보 가져오기
 
 const router = useRouter();
 const showModal = ref(false);
 
-// onMounted(() => {
-//   fetchUserData();
-// });
+// user.value에서 직접 닉네임과 이메일 가져오기
+const nickname = user.value?.nickname || '게스트';
+const email = user.value?.email || 'guest@example.com';
+
+// accounts와 badges는 userStore에서 가져오지 않으므로 임시 데이터 유지
+const accounts = ref([
+  {
+    id: 1,
+    imageUrl: kbLogo,
+    name: 'KB 마이핏 통장',
+    balance: 1500000,
+  },
+  {
+    id: 2,
+    imageUrl: kbLogo,
+    name: '국민 저축 통장',
+    balance: 500000,
+  },
+]);
+const badges = ref([
+  { image: eatBadge },
+  { image: eatBadge },
+  { image: eatBadge },
+  { image: eatBadge },
+  { image: eatBadge },
+]);
 
 function handleChange() {
   showModal.value = true; // 모달 띄우기
@@ -101,10 +127,8 @@ function handleConfirm() {
   router.push('/account'); // 원하는 경로로 변경
 }
 
-function logout() {
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
-  resetStore();
+async function logout() {
+  await authStore.logout(); // auth 스토어의 logout 액션 호출
   router.push('/login');
 }
 </script>
