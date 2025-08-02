@@ -160,14 +160,19 @@ router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
 
-  // 인증 상태를 항상 최신으로 유지
-  if (!authStore.isLoggedIn && requiresAuth) {
+  if (requiresAuth) {
+    // 인증이 필요한 라우트에 접근할 때마다 항상 최신 인증 상태를 백엔드로부터 확인
     await authStore.checkAuth();
-  }
 
-  if (requiresAuth && !authStore.isLoggedIn) {
-    next({ name: 'Login' });
+    if (!authStore.isLoggedIn) {
+      // checkAuth() 후에도 로그인되어 있지 않으면 로그인 페이지로 리다이렉트
+      next({ name: 'Login' });
+    } else {
+      // 로그인되어 있으면 다음으로 진행
+      next();
+    }
   } else {
+    // 인증이 필요 없는 라우트는 바로 진행
     next();
   }
 });
