@@ -53,14 +53,18 @@ api.interceptors.response.use(
 // API 메서드들
 export const authAPI = {
   // 이메일 중복 확인
-  checkEmail: (email) =>
-    api.get("/user/check-email", { params: { email } }),
+  checkEmail: (email) => api.get('/user/check-email', { params: { email } }),
   // 회원가입
   signUp: (userData) => api.post('/user/signup', userData),
   // 로그인
   login: (credentials) => api.post('/user/login', credentials),
   // 로그아웃
   logout: () => api.post('/user/logout'),
+  // 사용자 정보 업데이트
+  updateProfile: (userData) =>
+    api.put('/user/update-nickname', null, {
+      params: { nickname: userData.nickname },
+    }),
   // 사용자 정보 조회
   fetchMe: () => api.get('/user/me'),
 };
