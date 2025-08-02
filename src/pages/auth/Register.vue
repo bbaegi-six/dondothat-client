@@ -21,35 +21,15 @@
         </div>
 
         <div class="w-[328px] mx-auto">
-          <InputWithButton
-            v-model="nickname"
-            placeholder="닉네임"
-            button-label="중복확인"
-            @buttonClick="handleNicknameCheck"
-            class="w-full"
-          />
+          <Input v-model="nickname" placeholder="닉네임" class="w-full" />
           <div class="h-1">
             <span
-              v-if="showErrors && !nickname"
-              class="text-brand text-xs mt-1"
+              :class="{
+                'text-brand text-xs mt-1': showErrors && !nickname,
+                invisible: !(showErrors && !nickname),
+              }"
             >
               * 필수 항목입니다
-            </span>
-            <span
-              v-else-if="nicknameAvailable"
-              class="text-xs mt-1"
-              :style="{ color: '#C9C9C9' }"
-            >
-              사용 가능한 닉네임입니다
-            </span>
-            <span v-else-if="nicknameDuplicate" class="text-brand text-xs mt-1">
-              * 이미 사용중인 닉네임입니다
-            </span>
-            <span
-              v-else-if="showNicknameCheckError"
-              class="text-brand text-xs mt-1"
-            >
-              * 닉네임 중복 확인을 해주세요
             </span>
           </div>
         </div>
@@ -98,13 +78,35 @@
         </div>
 
         <div class="w-[328px] mx-auto">
-          <Input v-model="email" placeholder="이메일" class="w-full" />
+          <InputWithButton
+            v-model="email"
+            placeholder="이메일"
+            button-label="중복확인"
+            @buttonClick="handleEmailCheck"
+            class="w-full"
+          />
           <div class="h-1">
-            <span v-if="showErrors && !email" class="text-brand text-xs mt-1">
+            <span
+              v-if="showErrors && !email"
+              class="text-brand text-xs mt-1"
+            >
               * 필수 항목입니다
             </span>
-            <span v-else-if="emailError" class="text-brand text-xs mt-1">
-              {{ emailError }}
+            <span
+              v-else-if="emailAvailable"
+              class="text-xs mt-1"
+              :style="{ color: '#C9C9C9' }"
+            >
+              * 사용 가능한 이메일입니다
+            </span>
+            <span v-else-if="emailDuplicate" class="text-brand text-xs mt-1">
+              * 이미 사용중인 이메일입니다
+            </span>
+            <span
+              v-else-if="showEmailCheckError"
+              class="text-brand text-xs mt-1"
+            >
+              * 이메일 중복 확인을 해주세요
             </span>
           </div>
         </div>
@@ -178,8 +180,10 @@ import Button from '../../components/Button.vue';
 import { authAPI } from '../../utils/api.js';
 
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../stores/auth';
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 const name = ref('');
 const nickname = ref('');
@@ -190,9 +194,10 @@ const agreeTerms = ref(false);
 const agreePrivacy = ref(false);
 const agreeMarketing = ref(false);
 const showErrors = ref(false);
-const nicknameAvailable = ref(false);
-const nicknameDuplicate = ref(false);
-const showNicknameCheckError = ref(false);
+
+const emailAvailable = ref(false);
+const emailDuplicate = ref(false);
+const showEmailCheckError = ref(false);
 
 const passwordError = ref('');
 const confirmPasswordError = ref('');
@@ -232,32 +237,31 @@ watch(password, () => {
 
 watch(confirmPassword, validateConfirmPassword);
 
-watch(email, validateEmail);
-
-watch(nickname, () => {
-  nicknameAvailable.value = false;
-  nicknameDuplicate.value = false;
-  showNicknameCheckError.value = false; // 닉네임 변경 시 오류 메시지 초기화
+watch(email, () => {
+  validateEmail();
+  emailAvailable.value = false;
+  emailDuplicate.value = false;
+  showEmailCheckError.value = false; // 이메일 변경 시 오류 메시지 초기화
 });
 
-const handleNicknameCheck = async () => {
-  if (nickname.value) {
+const handleEmailCheck = async () => {
+  if (email.value && !emailError.value) {
     try {
-      const isAvailable = await authAPI.checkNickname(nickname.value);
+      const isAvailable = await authAPI.checkEmail(email.value);
       if (isAvailable === false) {
-        nicknameAvailable.value = true;
-        nicknameDuplicate.value = false;
-        showNicknameCheckError.value = false; // 중복 확인 성공 시 오류 메시지 초기화
+        emailAvailable.value = true;
+        emailDuplicate.value = false;
+        showEmailCheckError.value = false; // 중복 확인 성공 시 오류 메시지 초기화
       } else {
-        nicknameAvailable.value = false;
-        nicknameDuplicate.value = true;
-        showNicknameCheckError.value = false; // 중복 확인 실패 시 오류 메시지 초기화
+        emailAvailable.value = false;
+        emailDuplicate.value = true;
+        showEmailCheckError.value = false; // 중복 확인 실패 시 오류 메시지 초기화
       }
     } catch (error) {
-      console.error('닉네임 중복 확인 실패:', error);
-      nicknameAvailable.value = false;
-      nicknameDuplicate.value = false;
-      showNicknameCheckError.value = false; // API 호출 실패 시 오류 메시지 초기화
+      console.error('이메일 중복 확인 실패:', error);
+      emailAvailable.value = false;
+      emailDuplicate.value = false;
+      showEmailCheckError.value = false; // API 호출 실패 시 오류 메시지 초기화
     }
   }
 };
@@ -283,9 +287,9 @@ const handleNext = async () => {
     return;
   }
 
-  // 닉네임 중복 확인 여부 체크
-  if (!nicknameAvailable.value) {
-    showNicknameCheckError.value = true;
+  // 이메일 중복 확인 여부 체크
+  if (!emailAvailable.value) {
+    showEmailCheckError.value = true;
     return;
   }
 
@@ -299,7 +303,15 @@ const handleNext = async () => {
       agreePrivacy: agreePrivacy.value,
       agreeMarketing: agreeMarketing.value,
     });
-    router.push('/login');
+
+    // 회원가입 성공 후 자동 로그인 시도
+    const loginSuccess = await authStore.login(email.value, password.value);
+    if (loginSuccess) {
+      router.push('/'); // 로그인 성공 시 홈으로 이동
+    } else {
+      alert('회원가입은 성공했지만 자동 로그인에 실패했습니다. 직접 로그인해주세요.');
+      router.push('/login'); // 자동 로그인 실패 시 로그인 페이지로 이동
+    }
   } catch (error) {
     console.error('회원가입 실패:', error);
     alert('회원가입에 실패했습니다. 다시 시도해주세요.');
