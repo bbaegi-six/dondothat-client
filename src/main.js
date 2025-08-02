@@ -10,10 +10,14 @@ const pinia = createPinia();
 
 app.use(pinia);
 
-// 앱 시작 시 인증 상태 확인
-const authStore = useAuthStore();
-await authStore.checkAuth(); // 비동기 작업이 완료될 때까지 기다립니다.
+// Define an async function for app initialization
+async function initializeApp() {
+  const authStore = useAuthStore();
+  await authStore.checkAuth(); // Wait for auth check to complete
 
-app.use(router);
+  app.use(router);
+  app.mount('#app');
+}
 
-app.mount('#app');
+// Call the async initialization function
+initializeApp();
