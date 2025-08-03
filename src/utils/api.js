@@ -2,20 +2,22 @@ import axios from 'axios';
 
 // API 기본 설정
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:8080/api'),
+  baseURL: '/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // 모든 요청에 쿠키 포함
 });
 
 // 요청 인터셉터 - 모든 요청에 인증 토큰 자동 추가
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // JWT 토큰은 쿠키에 저장되므로, Authorization 헤더는 필요 없음
+    // const token = localStorage.getItem('token');
+    // if (token) {
+    //   config.headers.Authorization = `Bearer ${token}`;
+    // }
     return config;
   },
   (error) => {
@@ -31,8 +33,8 @@ api.interceptors.response.use(
   (error) => {
     // 401 에러 시 자동 로그아웃 (배포 환경에서 Mixed Content 에러 방지)
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      // localStorage.removeItem('token'); // JWT가 쿠키에 저장되므로 필요 없음
+      // localStorage.removeItem('user'); // 사용자 정보도 서버에서 관리
       // 현재 도메인 기준으로 로그인 페이지로 이동
       if (typeof window !== 'undefined' && window.location) {
         window.location.href = `${window.location.origin}/login`;
@@ -50,22 +52,21 @@ api.interceptors.response.use(
 
 // API 메서드들
 export const authAPI = {
-  // 현재 구현된 API
-  // 이메일 인증 코드
-  sendVerification: (email) => api.post('/user/send-verification', { email }),
+  // 이메일 중복 확인
+  checkEmail: (email) => api.get('/user/check-email', { params: { email } }),
   // 회원가입
   signUp: (userData) => api.post('/user/signup', userData),
+  // 로그인
+  login: (credentials) => api.post('/user/login', credentials),
+  // 로그아웃
+  logout: () => api.post('/user/logout'),
+  // 사용자 정보 업데이트
+  updateProfile: (userData) =>
+    api.put('/user/update-nickname', null, {
+      params: { nickname: userData.nickname },
+    }),
   // 사용자 정보 조회
   fetchMe: () => api.get('/user/me'),
-  
-  // 미래에 구현될 API (구현 후 주석 해제)
-  // login: (credentials) => api.post('/auth/login', credentials),
-  // register: (userData) => api.post('/auth/register', userData),
-  // logout: () => api.post('/auth/logout'),
-  // forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
-  // resetPassword: (token, password) => api.post('/auth/reset-password', { token, password }),
-  // refreshToken: () => api.post('/auth/refresh'),
-  // updateProfile: (userData) => api.put('/auth/profile', userData),
 };
 
 export const expensesAPI = {

@@ -11,7 +11,7 @@
           <div class="h-1">
             <span
               :class="{
-                'text-primary-red text-xs mt-1': showErrors && !name,
+                'text-brand text-xs mt-1': showErrors && !name,
                 invisible: !(showErrors && !name),
               }"
             >
@@ -21,26 +21,15 @@
         </div>
 
         <div class="w-[328px] mx-auto">
-          <InputWithButton
-            v-model="nickname"
-            placeholder="닉네임"
-            button-label="중복확인"
-            @buttonClick="handleNicknameCheck"
-            class="w-full"
-          />
+          <Input v-model="nickname" placeholder="닉네임" class="w-full" />
           <div class="h-1">
             <span
-              v-if="showErrors && !nickname"
-              class="text-primary-red text-xs mt-1"
+              :class="{
+                'text-brand text-xs mt-1': showErrors && !nickname,
+                invisible: !(showErrors && !nickname),
+              }"
             >
               * 필수 항목입니다
-            </span>
-            <span
-              v-else-if="nicknameAvailable"
-              class="text-xs mt-1"
-              :style="{ color: '#C9C9C9' }"
-            >
-              사용 가능한 닉네임입니다.
             </span>
           </div>
         </div>
@@ -55,14 +44,11 @@
           <div class="h-1">
             <span
               v-if="showErrors && !password"
-              class="text-primary-red text-xs mt-1"
+              class="text-brand text-xs mt-1"
             >
               * 필수 항목입니다
             </span>
-            <span
-              v-else-if="passwordError"
-              class="text-primary-red text-xs mt-1"
-            >
+            <span v-else-if="passwordError" class="text-brand text-xs mt-1">
               {{ passwordError }}
             </span>
           </div>
@@ -78,13 +64,13 @@
           <div class="h-1">
             <span
               v-if="showErrors && !confirmPassword"
-              class="text-primary-red text-xs mt-1"
+              class="text-brand text-xs mt-1"
             >
               * 필수 항목입니다
             </span>
             <span
               v-else-if="confirmPasswordError"
-              class="text-primary-red text-xs mt-1"
+              class="text-brand text-xs mt-1"
             >
               {{ confirmPasswordError }}
             </span>
@@ -95,46 +81,34 @@
           <InputWithButton
             v-model="email"
             placeholder="이메일"
-            button-label="전송"
-            @buttonClick="handleEmailSend"
+            button-label="중복확인"
+            @buttonClick="handleEmailCheck"
             class="w-full"
           />
           <div class="h-1">
-            <span
-              v-if="showErrors && !email"
-              class="text-primary-red text-xs mt-1"
-            >
+            <span v-if="showErrors && !email" class="text-brand text-xs mt-1">
               * 필수 항목입니다
             </span>
             <span
-              v-else-if="showEmailError && emailError"
-              class="text-primary-red text-xs mt-1"
+              v-else-if="emailAvailable"
+              class="text-xs mt-1"
+              :style="{ color: '#C9C9C9' }"
             >
-              {{ emailError }}
+              * 사용 가능한 이메일입니다
+            </span>
+            <span v-else-if="emailDuplicate" class="text-brand text-xs mt-1">
+              * 이미 사용중인 이메일입니다
+            </span>
+            <span
+              v-else-if="showEmailCheckError"
+              class="text-brand text-xs mt-1"
+            >
+              * 이메일 중복 확인을 해주세요
             </span>
           </div>
         </div>
 
-        <div class="w-[328px] mx-auto">
-          <Input
-            v-model="verificationCode"
-            placeholder="인증코드"
-            class="w-full"
-          />
-          <div class="h-16">
-            <span
-              :class="{
-                'text-primary-red text-xs mt-1':
-                  showErrors && !verificationCode,
-                invisible: !(showErrors && !verificationCode),
-              }"
-            >
-              * 필수 항목입니다
-            </span>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-3 w-[328px] mx-auto">
+        <div class="flex flex-col gap-3 w-[328px] mx-auto pt-12">
           <label
             class="flex items-center justify-between gap-2 text-white text-sm"
           >
@@ -148,7 +122,7 @@
             </div>
             <span
               :class="{
-                'text-primary-red text-xs': showErrors && !agreeTerms,
+                'text-brand text-xs': showErrors && !agreeTerms,
                 invisible: !(showErrors && !agreeTerms),
               }"
             >
@@ -168,7 +142,7 @@
             </div>
             <span
               :class="{
-                'text-primary-red text-xs': showErrors && !agreePrivacy,
+                'text-brand text-xs': showErrors && !agreePrivacy,
                 invisible: !(showErrors && !agreePrivacy),
               }"
             >
@@ -186,7 +160,7 @@
         </div>
 
         <div class="w-[328px] mx-auto">
-          <Button @click="handleNext" label="다음" class="w-full" />
+          <Button @click="handleNext" label="다음" class="w-full" :disabled="isSubmitting" />
         </div>
       </div>
     </div>
@@ -200,18 +174,28 @@ import Input from '../../components/Input.vue';
 import InputWithButton from '../../components/InputWithButton.vue';
 import Button from '../../components/Button.vue';
 
+import { authAPI } from '../../utils/api.js';
+
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../stores/auth';
+
+const router = useRouter();
+const authStore = useAuthStore();
+
 const name = ref('');
 const nickname = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const email = ref('');
-const verificationCode = ref('');
 const agreeTerms = ref(false);
 const agreePrivacy = ref(false);
 const agreeMarketing = ref(false);
 const showErrors = ref(false);
-const showEmailError = ref(false);
-const nicknameAvailable = ref(false);
+const isSubmitting = ref(false); // 새로운 상태 변수
+
+const emailAvailable = ref(false);
+const emailDuplicate = ref(false);
+const showEmailCheckError = ref(false);
 
 const passwordError = ref('');
 const confirmPasswordError = ref('');
@@ -229,7 +213,7 @@ const validatePassword = () => {
 
 const validateConfirmPassword = () => {
   if (confirmPassword.value && password.value !== confirmPassword.value) {
-    confirmPasswordError.value = '* 비밀번호가 일치하지 않습니다.';
+    confirmPasswordError.value = '* 비밀번호가 일치하지 않습니다';
   } else {
     confirmPasswordError.value = '';
   }
@@ -238,7 +222,7 @@ const validateConfirmPassword = () => {
 const validateEmail = () => {
   const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,}$/;
   if (email.value && !emailRegex.test(email.value)) {
-    emailError.value = '* 올바른 이메일 양식을 입력해주세요.';
+    emailError.value = '* 올바른 이메일 양식을 입력해주세요';
   } else {
     emailError.value = '';
   }
@@ -252,28 +236,36 @@ watch(password, () => {
 watch(confirmPassword, validateConfirmPassword);
 
 watch(email, () => {
-  if (showEmailError.value) {
-    showEmailError.value = false;
-  }
+  validateEmail();
+  emailAvailable.value = false;
+  emailDuplicate.value = false;
+  showEmailCheckError.value = false; // 이메일 변경 시 오류 메시지 초기화
 });
 
-const handleNicknameCheck = () => {
-  if (nickname.value) {
-    nicknameAvailable.value = true;
+const handleEmailCheck = async () => {
+  if (email.value && !emailError.value) {
+    try {
+      const isAvailable = await authAPI.checkEmail(email.value);
+      if (isAvailable === false) {
+        emailAvailable.value = true;
+        emailDuplicate.value = false;
+        showEmailCheckError.value = false; // 중복 확인 성공 시 오류 메시지 초기화
+      } else {
+        emailAvailable.value = false;
+        emailDuplicate.value = true;
+        showEmailCheckError.value = false; // 중복 확인 실패 시 오류 메시지 초기화
+      }
+    } catch (error) {
+      console.error('이메일 중복 확인 실패:', error);
+      emailAvailable.value = false;
+      emailDuplicate.value = false;
+      showEmailCheckError.value = false; // API 호출 실패 시 오류 메시지 초기화
+    }
   }
 };
 
-const handleEmailSend = () => {
-  showEmailError.value = true;
-  validateEmail();
-  if (!emailError.value && email.value) {
-    console.log('이메일 인증코드 전송', email.value);
-  }
-};
-
-const handleNext = () => {
+const handleNext = async () => {
   showErrors.value = true;
-  showEmailError.value = true;
   validatePassword();
   validateConfirmPassword();
   validateEmail();
@@ -284,7 +276,6 @@ const handleNext = () => {
     !password.value ||
     !confirmPassword.value ||
     !email.value ||
-    !verificationCode.value ||
     passwordError.value ||
     confirmPasswordError.value ||
     emailError.value ||
@@ -294,6 +285,39 @@ const handleNext = () => {
     return;
   }
 
-  console.log('다음 버튼 클릭 - 모든 값 입력됨');
+  // 이메일 중복 확인 여부 체크
+  if (!emailAvailable.value) {
+    showEmailCheckError.value = true;
+    return;
+  }
+
+  if (isSubmitting.value) return; // 이미 제출 중이면 중복 호출 방지
+  isSubmitting.value = true; // 제출 시작
+
+  try {
+    await authAPI.signUp({
+      name: name.value,
+      nickname: nickname.value,
+      password: password.value,
+      email: email.value,
+      agreeTerms: agreeTerms.value,
+      agreePrivacy: agreePrivacy.value,
+      agreeMarketing: agreeMarketing.value,
+    });
+
+    // 회원가입 성공 후 자동 로그인 시도
+    const loginSuccess = await authStore.login(email.value, password.value);
+    if (loginSuccess) {
+      router.push('/'); // 로그인 성공 시 홈으로 이동
+    } else {
+      alert('회원가입은 성공했지만 자동 로그인에 실패했습니다. 직접 로그인해주세요.');
+      router.push('/login'); // 자동 로그인 실패 시 로그인 페이지로 이동
+    }
+  } catch (error) {
+    console.error('회원가입 실패:', error);
+    alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+  } finally {
+    isSubmitting.value = false; // 제출 완료 (성공 또는 실패)
+  }
 };
 </script>

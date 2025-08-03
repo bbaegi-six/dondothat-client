@@ -1,19 +1,23 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import App from './App.vue'
-import router from './router'
-import './assets/styles/global.css'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import App from './App.vue';
+import router from './router';
+import './assets/styles/global.css';
 import { useAuthStore } from './stores/auth';
 
-const app = createApp(App)
-const pinia = createPinia()
+const app = createApp(App);
+const pinia = createPinia();
 
-app.use(pinia)
+app.use(pinia);
 
-// 앱 시작 시 인증 상태 확인
-const authStore = useAuthStore();
-authStore.checkAuth();
+// Define an async function for app initialization
+async function initializeApp() {
+  const authStore = useAuthStore();
+  await authStore.checkAuth(); // Wait for auth check to complete
 
-app.use(router)
+  app.use(router);
+  app.mount('#app');
+}
 
-app.mount('#app')
+// Call the async initialization function
+initializeApp();
