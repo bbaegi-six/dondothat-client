@@ -69,17 +69,8 @@ const routes = [
     path: '/challenge/days-input',
     name: 'ChallengeDaysInput',
     component: () => import('../pages/challenge/ChallengeDaysInput.vue'),
-    meta: { requiresAuth: true },
+    // meta: { requiresAuth: true }, //로그인 해결되면 주석해제 
   },
-<<<<<<< Updated upstream
-=======
-{
-  path: '/challenge/days-input',
-  name: 'ChallengeDaysInput', 
-  component: () => import('../pages/challenge/ChallengeDaysInput.vue'),
-  // meta: { requiresAuth: true }, //로그인 해결되면 주석 해제
-},
->>>>>>> Stashed changes
   {
     path: '/no-chat',
     name: 'NoChat',
