@@ -55,11 +55,7 @@
         </button>
       </div>
 
-      <Button
-        @click="handleLogin"
-        :disabled="!email || !password"
-        label="로그인"
-      />
+      <Button type="submit" @click="handleLogin" class="text-white">로그인</Button>
 
       <!-- 간편 로그인 -->
       <div class="relative text-center my-6 text-white text-sm">
@@ -97,6 +93,7 @@
       </div>
     </div>
   </div>
+  <ErrorModal v-if="showErrorModal" :message="errorMessage" @close="showErrorModal = false" />
 </template>
 
 <script setup>
@@ -105,6 +102,7 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 import Input from '../../components/Input.vue';
 import Button from '../../components/Button.vue';
+import ErrorModal from '../../components/common/ErrorModal.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -113,6 +111,8 @@ const authStore = useAuthStore();
 const email = ref('');
 const password = ref('');
 const showPassword = ref(false);
+const showErrorModal = ref(false);
+const errorMessage = ref('');
 
 // API 기본 URL 설정
 const getApiBaseUrl = () => {
@@ -131,7 +131,8 @@ const togglePassword = () => {
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
-    alert('이메일과 비밀번호를 입력해주세요.');
+    errorMessage.value = '이메일과 비밀번호를 입력해주세요.';
+    showErrorModal.value = true;
     return;
   }
 
@@ -140,7 +141,8 @@ const handleLogin = async () => {
   if (success) {
     router.push('/');
   } else {
-    alert('로그인에 실패했습니다.');
+    errorMessage.value = '아이디 또는 비밀번호가 일치하지 않습니다.';
+    showErrorModal.value = true;
   }
 };
 
