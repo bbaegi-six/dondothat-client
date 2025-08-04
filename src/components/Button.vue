@@ -7,7 +7,7 @@
     }"
     :disabled="props.disabled"
   >
-    {{ props.label }}
+    <slot></slot>
   </button>
 </template>
 

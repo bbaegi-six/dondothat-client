@@ -92,7 +92,17 @@ const props = defineProps({
 });
 
 // 내가 보낸 메시지인지 확인 - userId로 판단
-const isMyMessage = computed(() => props.userId === props.currentUserId);
+const isMyMessage = computed(() => {
+  const result = props.userId === props.currentUserId;
+  console.log('🔍 메시지 소유자 확인:', {
+    messageUserId: props.userId,
+    currentUserId: props.currentUserId,
+    isMyMessage: result,
+    username: props.username,
+    content: props.content,
+  });
+  return result;
+});
 </script>
 
 <style scoped>
