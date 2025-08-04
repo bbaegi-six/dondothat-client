@@ -108,7 +108,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 
 // 반응형 데이터
-const email = ref('');
+
 const password = ref('');
 const showPassword = ref(false);
 const showErrorModal = ref(false);
