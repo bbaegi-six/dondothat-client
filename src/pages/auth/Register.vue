@@ -108,6 +108,21 @@
           </div>
         </div>
 
+        <div class="w-[328px] mx-auto">
+          <Input v-model="age" type="number" placeholder="나이" class="w-full" />
+          <div class="h-1">
+            <span
+              v-if="showErrors && !age"
+              class="text-brand text-xs mt-1"
+            >
+              * 필수 항목입니다
+            </span>
+            <span v-else-if="ageError" class="text-brand text-xs mt-1">
+              {{ ageError }}
+            </span>
+          </div>
+        </div>
+
         <div class="flex flex-col gap-3 w-[328px] mx-auto pt-12">
           <label
             class="flex items-center justify-between gap-2 text-white text-sm"
@@ -160,7 +175,7 @@
         </div>
 
         <div class="w-[328px] mx-auto">
-          <Button @click="handleNext" label="다음" class="w-full" :disabled="isSubmitting" />
+          <Button @click="handleNext" class="w-full" :disabled="isSubmitting">다음</Button>
         </div>
       </div>
     </div>
@@ -187,6 +202,7 @@ const nickname = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const email = ref('');
+const age = ref(null);
 const agreeTerms = ref(false);
 const agreePrivacy = ref(false);
 const agreeMarketing = ref(false);
@@ -200,12 +216,12 @@ const showEmailCheckError = ref(false);
 const passwordError = ref('');
 const confirmPasswordError = ref('');
 const emailError = ref('');
+const ageError = ref('');
 
 const validatePassword = () => {
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,30}$/;
+  const passwordRegex = /^.{4,}$/;
   if (password.value && !passwordRegex.test(password.value)) {
-    passwordError.value = '* 8~30자리 영대·소문자, 숫자, 특수문자 조합';
+    passwordError.value = '* 비밀번호는 4자리 이상이어야 합니다.';
   } else {
     passwordError.value = '';
   }
@@ -228,6 +244,14 @@ const validateEmail = () => {
   }
 };
 
+const validateAge = () => {
+  if (age.value && (isNaN(age.value) || age.value <= 0)) {
+    ageError.value = '* 유효한 나이를 입력해주세요.';
+  } else {
+    ageError.value = '';
+  }
+};
+
 watch(password, () => {
   validatePassword();
   validateConfirmPassword();
@@ -241,6 +265,8 @@ watch(email, () => {
   emailDuplicate.value = false;
   showEmailCheckError.value = false; // 이메일 변경 시 오류 메시지 초기화
 });
+
+watch(age, validateAge);
 
 const handleEmailCheck = async () => {
   if (email.value && !emailError.value) {
@@ -276,9 +302,11 @@ const handleNext = async () => {
     !password.value ||
     !confirmPassword.value ||
     !email.value ||
+    !age.value ||
     passwordError.value ||
     confirmPasswordError.value ||
     emailError.value ||
+    ageError.value ||
     !agreeTerms.value ||
     !agreePrivacy.value
   ) {
@@ -300,6 +328,7 @@ const handleNext = async () => {
       nickname: nickname.value,
       password: password.value,
       email: email.value,
+      age: age.value,
       agreeTerms: agreeTerms.value,
       agreePrivacy: agreePrivacy.value,
       agreeMarketing: agreeMarketing.value,
