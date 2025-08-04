@@ -56,14 +56,14 @@ const routes = [
   },
   {
     path: '/challenge/flow',
-    component: () => import('@/pages/challenge/ChallengeFlow.vue')
+    component: () => import('@/pages/challenge/ChallengeFlow.vue'),
   },
-{
-  path: '/challenge/days-input',
-  name: 'ChallengeDaysInput', 
-  component: () => import('../pages/challenge/ChallengeDaysInput.vue'),
-  meta: { requiresAuth: true },
-},
+  {
+    path: '/challenge/days-input',
+    name: 'ChallengeDaysInput',
+    component: () => import('../pages/challenge/ChallengeDaysInput.vue'),
+    meta: { requiresAuth: true },
+  },
   {
     path: '/no-chat',
     name: 'NoChat',
@@ -74,7 +74,7 @@ const routes = [
     path: '/chat',
     name: 'Chat',
     component: () => import('@/pages/chat/Chat.vue'),
-    // meta: { requiresAuth: true },
+    meta: { requiresAuth: true },
   },
   {
     path: '/expenses',
