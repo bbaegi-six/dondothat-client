@@ -57,7 +57,7 @@
             width: 80px;
           "
         >
-          {{ formatAmount(transaction.amount, transaction.type) }}
+          {{ formatAmount(transaction.amount) }}
         </div>
       </div>
       <div style="display: flex; justify-content: space-between">
@@ -128,7 +128,11 @@ const getCategoryBackgroundColor = () => {
 
 // 카테고리 메타데이터에서 아이콘 가져오기
 const getCategoryIcon = (category) => {
-  return expensesStore.getCategoryMetadata(category).icon;
+  const metadata = expensesStore.getCategoryMetadata(category);
+  console.log(
+    `🎨 [DEBUG] Category "${category}" -> Icon: ${metadata.icon}, Color: ${metadata.color}`
+  );
+  return metadata.icon;
 };
 
 // 카테고리 메타데이터에서 색상 가져오기
@@ -139,9 +143,9 @@ const getIconStyle = (category) => {
   };
 };
 
-// 스토어의 공통 포맷팅 메서드 사용
-const formatAmount = (amount, type) => {
-  return expensesStore.formatAmount(amount, type);
+// 스토어의 공통 포맷팅 메서드 사용 (type 파라미터 제거)
+const formatAmount = (amount) => {
+  return expensesStore.formatAmount(amount);
 };
 </script>
 

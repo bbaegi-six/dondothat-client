@@ -3,7 +3,9 @@
     <!-- 로고 -->
     <div class="text-center my-5 mb-10">
       <div class="text-[60px] mb-4">💰</div>
-      <h1 class="font-anton-sc text-2xl text-primary-red leading-[22px] m-0 font-normal">
+      <h1
+        class="font-anton-sc text-2xl text-brand leading-[22px] m-0 font-normal"
+      >
         Don do<br />
         that
       </h1>
@@ -12,11 +14,7 @@
     <!-- 로그인 폼 -->
     <div class="flex flex-col mb-5 w-82 mx-auto">
       <div class="relative mb-6">
-        <Input
-          v-model="email"
-          type="email"
-          placeholder="이메일을 입력하세요"
-        />
+        <Input v-model="email" type="email" placeholder="이메일을 입력하세요" />
       </div>
 
       <div class="relative mb-6">
@@ -25,7 +23,11 @@
           :type="showPassword ? 'text' : 'password'"
           placeholder="비밀번호를 입력하세요"
         />
-        <button @click="togglePassword" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-transparent border-none cursor-pointer text-base" type="button">
+        <button
+          @click="togglePassword"
+          class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-transparent border-none cursor-pointer text-base"
+          type="button"
+        >
           <svg
             v-if="showPassword"
             xmlns="http://www.w3.org/2000/svg"
@@ -53,35 +55,45 @@
         </button>
       </div>
 
-      <Button
-        @click="handleLogin"
-        :disabled="!email || !password"
-        label="로그인"
-      />
+      <Button type="submit" @click="handleLogin" class="text-white">로그인</Button>
 
       <!-- 간편 로그인 -->
-      <div class="relative text-center my-6 text-gray-c9 text-sm">
+      <div class="relative text-center my-6 text-white text-sm">
         <span class="bg-dark-bg px-4">간편 로그인</span>
       </div>
 
       <div class="flex justify-center gap-8 mb-10">
-        <button @click="handleKakaoLogin" class="w-[42px] h-[42px] rounded-full border-none cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-kakao-yellow text-black">
-          <div class="kakao-icon">K</div>
+        <button
+          @click="handleNaverLogin"
+          class="w-[42px] h-[42px] rounded-full border-none cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-[#03C75A] text-white"
+        >
+          <div class="naver-icon">N</div>
         </button>
-        <button @click="handleGoogleLogin" class="w-[42px] h-[42px] rounded-full border border-light-gray-db cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-white text-dark-gray">
+        <button
+          @click="handleGoogleLogin"
+          class="w-[42px] h-[42px] rounded-full border border-light-gray-db cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-white text-dark-gray"
+        >
           <div class="google-icon">G</div>
         </button>
       </div>
 
       <!-- 하단 링크 -->
       <div class="flex justify-center gap-5 my-6">
-        <router-link to="/register" class="bg-transparent border-none text-gray-c9 text-sm cursor-pointer font-pretendard no-underline hover:text-primary-red">회원 가입</router-link>
-        <router-link to="/forgot-password" class="bg-transparent border-none text-gray-c9 text-sm cursor-pointer font-pretendard no-underline hover:text-red-500">
+        <router-link
+          to="/register"
+          class="bg-transparent border-none text-white text-sm cursor-pointer font-pretendard no-underline hover:text-brand"
+          >회원 가입</router-link
+        >
+        <router-link
+          to="/forgot-password"
+          class="bg-transparent border-none text-white text-sm cursor-pointer font-pretendard no-underline hover:text-brand"
+        >
           아이디 / 비밀번호 찾기
         </router-link>
       </div>
     </div>
   </div>
+  <ErrorModal v-if="showErrorModal" :message="errorMessage" @close="showErrorModal = false" />
 </template>
 
 <script setup>
@@ -90,6 +102,7 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 import Input from '../../components/Input.vue';
 import Button from '../../components/Button.vue';
+import ErrorModal from '../../components/common/ErrorModal.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -98,6 +111,18 @@ const authStore = useAuthStore();
 const email = ref('');
 const password = ref('');
 const showPassword = ref(false);
+const showErrorModal = ref(false);
+const errorMessage = ref('');
+
+// API 기본 URL 설정
+const getApiBaseUrl = () => {
+  // 개발 환경에서는 프록시를 통해 요청하므로 현재 origin 사용
+  if (import.meta.env.DEV) {
+    return window.location.origin;
+  }
+  // 프로덕션 환경에서는 실제 API 서버 URL 사용
+  return 'http://dondothat.duckdns.org:8080';
+};
 
 // 메서드들
 const togglePassword = () => {
@@ -106,7 +131,8 @@ const togglePassword = () => {
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
-    alert('이메일과 비밀번호를 입력해주세요.');
+    errorMessage.value = '이메일과 비밀번호를 입력해주세요.';
+    showErrorModal.value = true;
     return;
   }
 
@@ -115,18 +141,45 @@ const handleLogin = async () => {
   if (success) {
     router.push('/');
   } else {
-    alert('로그인에 실패했습니다.');
+    errorMessage.value = '아이디 또는 비밀번호가 일치하지 않습니다.';
+    showErrorModal.value = true;
   }
 };
 
-const handleKakaoLogin = () => {
-  console.log('카카오 로그인');
-  // 카카오 로그인 로직
+const handleNaverLogin = () => {
+  const currentOrigin = window.location.origin;
+  const redirectUrl = `${currentOrigin}/oauth-redirect`;
+  const apiBaseUrl = getApiBaseUrl();
+
+  console.log('=== Naver Login Debug Info ===');
+  console.log('Current Origin:', currentOrigin);
+  console.log('Redirect URL:', redirectUrl);
+  console.log('API Base URL:', apiBaseUrl);
+  console.log('Environment:', import.meta.env.MODE);
+
+  // 수정된 경로 사용 (/oauth/naver)
+  const oauthUrl = `${apiBaseUrl}/oauth/naver?redirect_uri=${encodeURIComponent(redirectUrl)}`;
+  console.log('Final OAuth URL:', oauthUrl);
+
+  window.location.href = oauthUrl;
 };
 
 const handleGoogleLogin = () => {
-  console.log('구글 로그인');
-  // 구글 로그인 로직
+  const currentOrigin = window.location.origin;
+  const redirectUrl = `${currentOrigin}/oauth-redirect`;
+  const apiBaseUrl = getApiBaseUrl();
+
+  console.log('=== Google Login Debug Info ===');
+  console.log('Current Origin:', currentOrigin);
+  console.log('Redirect URL:', redirectUrl);
+  console.log('API Base URL:', apiBaseUrl);
+  console.log('Environment:', import.meta.env.MODE);
+
+  // 수정된 경로 사용 (/oauth/google)
+  const oauthUrl = `http://localhost:8080/oauth2/authorization/google?redirect_uri=${encodeURIComponent(redirectUrl)}`;
+  console.log('Final OAuth URL:', oauthUrl);
+
+  window.location.href = oauthUrl;
 };
 </script>
 
@@ -137,21 +190,21 @@ const handleGoogleLogin = () => {
 }
 
 /* 간편 로그인 구분선 (Tailwind CSS로 직접 변환 불가) */
-.relative.text-center.my-6.text-gray-c9.text-sm::before,
-.relative.text-center.my-6.text-gray-c9.text-sm::after {
+.relative.text-center.my-6.text-white.text-sm::before,
+.relative.text-center.my-6.text-white.text-sm::after {
   content: '';
   position: absolute;
   top: 50%;
   width: 120px;
   height: 1px;
-  background-color: #c9c9c9;
+  background-color: white;
 }
 
-.relative.text-center.my-6.text-gray-c9.text-sm::before {
+.relative.text-center.my-6.text-white.text-sm::before {
   left: 0;
 }
 
-.relative.text-center.my-6.text-gray-c9.text-sm::after {
+.relative.text-center.my-6.text-white.text-sm::after {
   right: 0;
 }
 </style>

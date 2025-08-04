@@ -1,14 +1,16 @@
 // /stores/useUserStore.js
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-//import axios from "axios";
+import { useAuthStore } from './auth'; // auth 스토어 임포트
 
 import kbLogo from '@/assets/logo/kb.svg';
 import eatBadge from '@/assets/badge/eat.svg';
 
 export const useUserStore = defineStore('user', () => {
-  const nickname = ref('홍길동');
-  const email = ref('hong@example.com');
+  const authStore = useAuthStore(); // auth 스토어 사용
+
+  const nickname = ref(authStore.user?.nickname || ''); // auth 스토어에서 닉네임 가져오기
+  const email = ref(authStore.user?.email || ''); // auth 스토어에서 이메일 가져오기
   const accounts = ref([
     {
       id: 1,
@@ -66,9 +68,6 @@ export const useUserStore = defineStore('user', () => {
       category: 'delivery',
     },
   ]);
-  function setNickname(newNickname) {
-    nickname.value = newNickname;
-  }
 
   function resetStore() {
     nickname.value = '';
@@ -77,6 +76,8 @@ export const useUserStore = defineStore('user', () => {
     badges.value = [];
     successChallenges.value = [];
     failedChallenges.value = [];
+    authStore.user = null; // auth 스토어의 사용자 정보도 초기화
+    authStore.isAuthenticated = false; // auth 스토어의 인증 상태도 초기화
   }
 
   return {
@@ -87,6 +88,5 @@ export const useUserStore = defineStore('user', () => {
     successChallenges,
     failedChallenges,
     resetStore,
-    setNickname,
   };
 });

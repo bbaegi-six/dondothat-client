@@ -20,7 +20,14 @@ import Terms from '../pages/profile/Terms.vue';
 import Policy from '../pages/profile/Policy.vue';
 import MyChallenge from '../pages/profile/MyChallenge.vue';
 
+import OAuthRedirect from '../pages/auth/OAuthRedirect.vue';
+
 const routes = [
+  {
+    path: '/oauth-redirect',
+    name: 'OAuthRedirect',
+    component: OAuthRedirect,
+  },
   {
     path: '/',
     name: 'Home',
@@ -80,7 +87,7 @@ const routes = [
     path: '/expenses',
     name: 'Expenses',
     component: Expenses,
-    meta: { requiresAuth: true },
+    // meta: { requiresAuth: true },
   },
   {
     path: '/expenses/:id',
@@ -149,13 +156,23 @@ const router = createRouter({
 });
 
 // 인증 필요 라우트 처리
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
 
-  if (requiresAuth && !authStore.isLoggedIn) {
-    next({ name: 'Login' });
+  if (requiresAuth) {
+    // 인증이 필요한 라우트에 접근할 때마다 항상 최신 인증 상태를 백엔드로부터 확인
+    await authStore.checkAuth();
+
+    if (!authStore.isLoggedIn) {
+      // checkAuth() 후에도 로그인되어 있지 않으면 로그인 페이지로 리다이렉트
+      next({ name: 'Login' });
+    } else {
+      // 로그인되어 있으면 다음으로 진행
+      next();
+    }
   } else {
+    // 인증이 필요 없는 라우트는 바로 진행
     next();
   }
 });

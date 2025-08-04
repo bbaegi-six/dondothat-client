@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
+import { authAPI } from '../utils/api';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    isAuthenticated: false,
+    isAuthenticated: false, // 초기 상태는 false로 설정
     user: null,
     loading: false,
     error: null,
@@ -11,28 +12,50 @@ export const useAuthStore = defineStore('auth', {
     isLoggedIn: (state) => state.isAuthenticated,
   },
   actions: {
+    async checkAuth() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const userData = await authAPI.fetchMe();
+        this.user = userData;
+        this.isAuthenticated = true;
+      } catch (error) {
+        this.error = error;
+        this.isAuthenticated = false;
+        this.user = null;
+      } finally {
+        this.loading = false;
+      }
+    },
     async login(email, password) {
       this.loading = true;
       this.error = null;
       try {
-        // 백엔드 API 연동 전 임시 로그인 처리
-        if (email && password) {
-          this.isAuthenticated = true;
-          this.user = { email };
-          return true;
-        } else {
-          throw new Error('이메일과 비밀번호를 입력해주세요.');
-        }
+        const response = await authAPI.login({ email, password });
+        // 로그인 성공 시 fetchMe를 호출하여 사용자 정보 및 인증 상태 업데이트
+        await this.checkAuth();
+        return true;
       } catch (error) {
         this.error = error;
+        this.isAuthenticated = false;
+        this.user = null;
         return false;
       } finally {
         this.loading = false;
       }
     },
-    logout() {
-      this.isAuthenticated = false;
-      this.user = null;
+    async logout() {
+      this.loading = true;
+      this.error = null;
+      try {
+        await authAPI.logout();
+        // 로그아웃 후 인증 상태 재확인
+        await this.checkAuth(); // /me 요청으로 실제 상태 확인
+      } catch (error) {
+        this.error = error;
+      } finally {
+        this.loading = false;
+      }
     },
   },
 });
