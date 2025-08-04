@@ -79,7 +79,7 @@
             </div>
           </button>
   
-          <!-- 배달 음식 금지 챌린지 -->
+          <!-- 배달음식 금지 챌린지 -->
           <button 
             @click="selectChallenge('delivery')"
             :class="[

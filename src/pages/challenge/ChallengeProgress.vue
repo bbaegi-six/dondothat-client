@@ -1,126 +1,139 @@
 <template>
-    <div class="flex flex-col h-screen bg-default">
-      <!-- Header -->
-      <Header 
-        :show-logo="true" 
-        :show-points="true" 
-        :points="1250" 
+    <div>
+      <!-- 실패한 경우 실패 화면 표시 -->
+      <ChallengeFailed 
+        v-if="isFailed"
+        :selected-challenge="selectedChallenge"
+        :challenge-days="challengeDays"
+        :failed-day="currentDay"
+        :failed-transaction-id="failedTransactionId"
       />
-  
-      <!-- 저금 완료 상태 -->
-      <div v-if="isSavingCompleted" class="flex flex-col items-center justify-center flex-1">
-        <!-- Success Icon -->
-        <div class="w-12 h-12 rounded-full flex items-center justify-center mb-8" 
-             style="background-color: #FF5555;">
-          <i class="fas fa-check text-xl text-white"></i>
-        </div>
-        
-        <!-- Amount -->
-        <p class="text-white text-3xl font-bold text-center mb-2 font-pretendard">
-          {{ savedAmount.toLocaleString() }}원
-        </p>
-        
-        <!-- Status Text -->
-        <p class="text-white text-xl font-medium text-center font-pretendard">
-          저금 완료
-        </p>
-      </div>
       
-      <!-- Next Button - 네비게이션 바로 위 -->
-      <div v-if="isSavingCompleted" class="mx-8 mb-6" style="width: 328px;">
-        <button class="w-full bg-brand text-white text-lg font-medium py-4 rounded-2xl font-pretendard"
-                @click="handleNext">
-          다음
-        </button>
-      </div>
-  
-      <!-- 기존 챌린지 화면 -->
-      <div v-else>
-        <!-- Challenge Icon & Title -->
-        <div class="flex items-center justify-center mt-[70px] mb-4">
-          <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4" 
-               :class="isCompleted ? '' : 'bg-gray-1'"
-               :style="isCompleted ? { backgroundColor: '#FF5555' } : {}">
-            <i v-if="isCompleted" class="fas fa-check text-xl text-white"></i>
-            <i v-else :class="challengeIcon" class="text-xl" :style="{ color: challengeIconColor }"></i>
+      <!-- 성공 또는 진행 중인 경우 기존 화면 표시 -->
+      <div v-else class="flex flex-col h-screen bg-default">
+        <!-- Header -->
+        <Header 
+          :show-logo="true" 
+          :show-points="true" 
+          :points="1250" 
+        />
+    
+        <!-- 저금 완료 상태 -->
+        <div v-if="isSavingCompleted" class="flex flex-col items-center justify-center flex-1">
+          <!-- Success Icon -->
+          <div class="w-12 h-12 rounded-full flex items-center justify-center mb-8" 
+               style="background-color: #FF5555;">
+            <i class="fas fa-check text-xl text-white"></i>
           </div>
+          
+          <!-- Amount -->
+          <p class="text-white text-3xl font-bold text-center mb-2 font-pretendard">
+            {{ savedAmount.toLocaleString() }}원
+          </p>
+          
+          <!-- Status Text -->
+          <p class="text-white text-xl font-medium text-center font-pretendard">
+            저금 완료
+          </p>
+        </div>
+        
+        <!-- Next Button - 네비게이션 바로 위 -->
+        <div v-if="isSavingCompleted" class="mx-8 mb-6" style="width: 328px;">
+          <button class="w-full bg-brand text-white text-lg font-medium py-4 rounded-2xl font-pretendard"
+                  @click="handleNext">
+            다음
+          </button>
         </div>
     
-        <!-- Challenge Title -->
-        <h1 class="text-white text-2xl font-bold text-center mb-2 font-pretendard">
-          {{ challengeTitle }}
-        </h1>
-    
-        <!-- Progress Status -->
-        <p class="text-white text-sm text-center mb-8 font-pretendard">
-          {{ isCompleted ? '도전 성공' : `${currentDay}일차 도전 중` }}
-        </p>
-    
-        <!-- Daily Progress Section - 328px 고정, 높이 동적 -->
-        <div class="mx-8 mb-6">
-          <h3 class="text-white text-base font-semibold mb-4 font-pretendard">일일 성공 여부</h3>
-          
-          <!-- Progress Grid - 너비 고정, 높이 동적 -->
-          <div class="bg-gray-1 rounded-2xl p-4" style="width: 328px;">
-            <!-- Grid Container - 동적 행 수, 한 줄 296x32 -->
-            <div class="grid grid-cols-7" style="width: 296px; height: auto; gap: 12px;">
-              <div 
-                v-for="day in totalDays" 
-                :key="day"
-                :class="getDayBoxClass(day)"
-                :style="getDayBoxStyle(day)"
-                class="rounded-lg flex items-center justify-center transition-colors"
-                style="width: 32px; height: 32px;"
-              >
-                <span class="text-white text-sm font-bold font-pretendard">{{ day }}</span>
+        <!-- 기존 챌린지 화면 -->
+        <div v-else>
+          <!-- Challenge Icon & Title -->
+          <div class="flex items-center justify-center mt-[70px] mb-4">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4" 
+                 :class="isCompleted ? '' : 'bg-gray-1'"
+                 :style="isCompleted ? { backgroundColor: '#FF5555' } : {}">
+              <i v-if="isCompleted" class="fas fa-check text-xl text-white"></i>
+              <i v-else :class="challengeIcon" class="text-xl" :style="{ color: challengeIconColor }"></i>
+            </div>
+          </div>
+      
+          <!-- Challenge Title -->
+          <h1 class="text-white text-2xl font-bold text-center mb-2 font-pretendard">
+            {{ challengeTitle }}
+          </h1>
+      
+          <!-- Progress Status -->
+          <p class="text-white text-sm text-center mb-8 font-pretendard">
+            {{ isCompleted ? '도전 성공' : `${currentDay}일차 도전 중` }}
+          </p>
+      
+          <!-- Daily Progress Section - 328px 고정, 높이 동적 -->
+          <div class="mx-8 mb-6">
+            <h3 class="text-white text-base font-semibold mb-4 font-pretendard">일일 성공 여부</h3>
+            
+            <!-- Progress Grid - 너비 고정, 높이 동적 -->
+            <div class="bg-gray-1 rounded-2xl p-4" style="width: 328px;">
+              <!-- Grid Container - 동적 행 수, 한 줄 296x32 -->
+              <div class="grid grid-cols-7" style="width: 296px; height: auto; gap: 12px;">
+                <div 
+                  v-for="day in totalDays" 
+                  :key="day"
+                  :class="getDayBoxClass(day)"
+                  :style="getDayBoxStyle(day)"
+                  class="rounded-lg flex items-center justify-center transition-colors"
+                  style="width: 32px; height: 32px;"
+                >
+                  <span class="text-white text-sm font-bold font-pretendard">{{ day }}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-    
-        <!-- Saved Amount Box - 328 x 112 -->
-        <div class="mx-8 mb-6 bg-gray-1 rounded-2xl p-6 relative" style="width: 328px; height: 112px;">
-          <p class="text-white text-base font-medium text-center mb-2 font-pretendard">
-            지금까지 아낀 금액
-          </p>
-          <p class="text-white text-4xl font-bold text-center font-pretendard">
-            {{ savedAmount.toLocaleString() }}원
-          </p>
-          <!-- Info Icon -->
-          <div class="absolute top-4 right-4">
-            <i class="fas fa-info-circle text-gray-3 text-sm"></i>
+      
+          <!-- Saved Amount Box - 328 x 112 -->
+          <div class="mx-8 mb-6 bg-gray-1 rounded-2xl p-6 relative" style="width: 328px; height: 112px;">
+            <p class="text-white text-base font-medium text-center mb-2 font-pretendard">
+              지금까지 아낀 금액
+            </p>
+            <p class="text-white text-4xl font-bold text-center font-pretendard">
+              {{ savedAmount.toLocaleString() }}원
+            </p>
+            <!-- Info Icon -->
+            <div class="absolute top-4 right-4">
+              <i class="fas fa-info-circle text-gray-3 text-sm"></i>
+            </div>
+          </div>
+      
+          <!-- Spacer -->
+          <div class="flex-1"></div>
+      
+          <!-- Challenge Info Text or Success Button -->
+          <div v-if="isCompleted" class="mx-8 mb-6" style="width: 328px;">
+            <!-- Success Button -->
+            <button class="w-full bg-brand text-white text-lg font-semibold py-4 rounded-2xl font-pretendard"
+                    @click="handleSaving">
+              저금 하기
+            </button>
+          </div>
+          <div v-else class="mx-8 mb-6 text-center" style="width: 328px; height: 86px;">
+            <p class="text-brand text-xl font-semibold mb-2 font-pretendard">
+              {{ challengeStatusText }}
+            </p>
+            <p class="text-white text-base font-pretendard">
+              {{ challengeDescriptionText }}
+            </p>
           </div>
         </div>
     
-        <!-- Spacer -->
-        <div class="flex-1"></div>
-    
-        <!-- Challenge Info Text or Success Button -->
-        <div v-if="isCompleted" class="mx-8 mb-6" style="width: 328px;">
-          <!-- Success Button -->
-          <button class="w-full bg-brand text-white text-lg font-semibold py-4 rounded-2xl font-pretendard"
-                  @click="handleSaving">
-            저금 하기
-          </button>
-        </div>
-        <div v-else class="mx-8 mb-6 text-center" style="width: 328px; height: 86px;">
-          <p class="text-brand text-xl font-semibold mb-2 font-pretendard">
-            {{ challengeStatusText }}
-          </p>
-          <p class="text-white text-base font-pretendard">
-            {{ challengeDescriptionText }}
-          </p>
-        </div>
+        <!-- Navigation Space -->
+        <div class="pb-[90px]"></div>
       </div>
-  
-      <!-- Navigation Space -->
-      <div class="pb-[90px]"></div>
     </div>
   </template>
   
   <script setup>
   import { ref, computed, onMounted } from 'vue';
   import Header from '@/components/layout/Header.vue';
+  import ChallengeFailed from './ChallengeFailed.vue';
   
   // Props
   const props = defineProps({
@@ -131,18 +144,30 @@
     challengeDays: {
       type: Number,
       required: true
+    },
+    // 실패 여부와 실패 시점을 외부에서 제어할 수 있도록 추가
+    isChallengeFailedProp: {
+      type: Boolean,
+      default: false
+    },
+    failedTransactionId: {
+      type: String,
+      default: null
     }
   });
   
   // Reactive data
-  const currentDay = ref(36) // 36일차로 설정하여 완료 상태 확인 (35일 챌린지 완료)
+  const currentDay = ref(1); // 시작은 1일차부터
   const savedAmount = ref(0);
   const dailyProgress = ref({}); // { 1: 'success', 2: 'fail', 3: 'pending' }
   const isSavingCompleted = ref(false); // 저금 완료 상태
   
+  // 실패 여부 확인 - 실제로는 API에서 거래 내역을 체크해서 판단
+  const isFailed = ref(props.isChallengeFailedProp);
+  
   // Computed properties
   const isCompleted = computed(() => {
-    return currentDay.value > props.challengeDays;
+    return currentDay.value > props.challengeDays && !isFailed.value;
   });
   
   // Challenge metadata
@@ -154,7 +179,7 @@
       categoryText: '카페'
     },
     delivery: {
-      title: '배달 음식 금지 챌린지',
+      title: '배달음식 금지 챌린지',
       icon: 'fas fa-motorcycle',
       color: '#FF7376', 
       categoryText: '배달음식'
@@ -182,7 +207,7 @@
   const challengeCategoryText = computed(() => {
     return challengeData[props.selectedChallenge]?.categoryText || '해당 카테고리';
   });
-
+  
   const challengeStatusText = computed(() => {
     if (currentDay.value === 1) {
       return '지금부터 챌린지를 시작합니다';
@@ -191,7 +216,7 @@
       return `${successDays}일까지 성공`;
     }
   });
-
+  
   const challengeDescriptionText = computed(() => {
     if (currentDay.value === 1) {
       return `매일 ${challengeCategoryText.value} 결제내역을 체크합니다`;
@@ -239,13 +264,30 @@
     console.log('다음 단계로 이동');
   };
   
-  const getCurrentDate = () => {
-    const today = new Date();
-    const month = today.getMonth() + 1;
-    const date = today.getDate();
-    const dayNames = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-    const dayName = dayNames[today.getDay()];
-    return `${month}월 ${date}일 ${dayName}`;
+  // 실제 구현에서는 API로 거래 내역을 체크하는 함수
+  const checkChallengeStatus = async () => {
+    try {
+      // API 호출로 현재 챌린지 상태 확인
+      // const response = await api.checkChallengeStatus(challengeId);
+      // 
+      // if (response.data.hasFailedTransaction) {
+      //   isFailed.value = true;
+      //   currentDay.value = response.data.failedDay;
+      //   return;
+      // }
+      // 
+      // currentDay.value = response.data.currentDay;
+      
+      // 임시로 상태 시뮬레이션 - 실제로는 위의 API 호출로 대체
+      // 30일차에 실패한 것으로 가정 (테스트용)
+      if (props.isChallengeFailedProp) {
+        isFailed.value = true;
+        currentDay.value = 30; // 실패한 날짜
+      }
+      
+    } catch (error) {
+      console.error('챌린지 상태 확인 실패:', error);
+    }
   };
   
   const simulateDailyProgress = () => {
@@ -273,8 +315,11 @@
     return categoryAverages[props.selectedChallenge] || 5000;
   };
   
-  onMounted(() => {
-    simulateDailyProgress();
+  onMounted(async () => {
+    await checkChallengeStatus();
+    if (!isFailed.value) {
+      simulateDailyProgress();
+    }
   });
   </script>
   
