@@ -72,6 +72,12 @@ const routes = [
     // meta: { requiresAuth: true }, //로그인 해결되면 주석해제 
   },
   {
+    path: '/challenge/connectsub',
+    name: 'ConnectSub',
+    component: () => import('@/pages/challenge/ConnectSub.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/no-chat',
     name: 'NoChat',
     component: () => import('@/pages/chat/NoChat.vue'),
