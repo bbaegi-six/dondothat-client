@@ -84,18 +84,6 @@
         class="flex-1 px-[31px] py-4 overflow-y-auto space-y-2"
         ref="chatContainer"
       >
-        <!-- 디버그 정보 (임시) -->
-        <div class="bg-gray-800 text-white text-xs p-2 mb-2 rounded">
-          <p>연결 상태: {{ chatStore.isConnected }}</p>
-          <p>메시지 개수: {{ chatStore.messages.length }}</p>
-          <p>
-            현재 사용자: {{ chatStore.currentUser.userId }} ({{
-              chatStore.currentUser.userName
-            }})
-          </p>
-          <p>챌린지 ID: {{ challengeId }}</p>
-        </div>
-
         <!-- 이전 메시지 안내 (이력이 있을 때만) -->
         <div
           v-if="chatStore.messages.length > 0 && hasHistoryMessages"
