@@ -171,7 +171,9 @@
 
       <!-- 연결하기 버튼 -->
       <div class="w-[328px]">
-        <Button label="연결하기" :disabled="!isFormValid" @click="nextStep" />
+        <Button :disabled="!isFormValid" class="font-normal" @click="nextStep">
+          연결하기
+        </Button>
       </div>
     </div>
   </div>

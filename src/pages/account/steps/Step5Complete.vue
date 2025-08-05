@@ -37,7 +37,7 @@
       <div class="pb-10">
         <div class="flex flex-col items-center space-y-4">
           <!-- Account Info Card -->
-          <div class="bg-white rounded-xl p-4 w-[328px]">
+          <div class="bg-white rounded-16 p-4 w-[328px]">
             <h3 class="text-gray-900 font-medium mb-3 text-[14px]">
               연결 계좌 정보
             </h3>
@@ -67,14 +67,16 @@
           <div class="space-y-3 w-[328px]">
             <div class="w-full">
               <Button
-                label="챌린지 바로가기"
                 :disabled="false"
+                class="font-normal"
                 @click="goToChallenge"
-              />
+              >
+                챌린지 바로가기
+              </Button>
             </div>
             <div class="w-full">
               <button
-                class="w-full h-14 py-3 rounded-xl font-bold transition bg-white text-gray-900 hover:bg-gray-100"
+                class="w-full h-14 py-3 rounded-16 font-normal transition bg-white text-gray-900 hover:bg-gray-100"
                 @click="goToHome"
               >
                 홈으로 이동하기
@@ -118,10 +120,12 @@
         <div class="flex flex-col items-center">
           <div class="w-[328px]">
             <Button
-              label="다시 연결하기"
               :disabled="false"
+              class="font-normal"
               @click="retryConnection"
-            />
+            >
+              다시 연결하기
+            </Button>
           </div>
         </div>
       </div>
