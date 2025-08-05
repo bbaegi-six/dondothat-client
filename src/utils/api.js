@@ -13,11 +13,11 @@ const api = axios.create({
 // 요청 인터셉터 - 모든 요청에 인증 토큰 자동 추가
 api.interceptors.request.use(
   (config) => {
-    // JWT 토큰은 쿠키에 저장되므로, Authorization 헤더는 필요 없음
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // JWT 토큰을 Authorization 헤더에 추가 (쿠키와 함께 이중 지원)
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
