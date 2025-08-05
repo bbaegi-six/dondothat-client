@@ -107,7 +107,7 @@
           :time="message.time || formatTime(message.sentAt)"
           :messageType="message.messageType || 'MESSAGE'"
           :userId="message.userId"
-          :currentUserId="chatStore.currentUser.userId"
+          :currentUserId="chatStore.currentUser?.userId"
         />
 
         <!-- 메시지가 없을 때 -->
@@ -205,15 +205,6 @@ const isCheckingStatus = ref(false);
 const hasHistoryMessages = ref(false);
 const challengeId = ref(null);
 
-// 디버깅: 현재 사용자 정보 로깅
-console.log('👤 현재 사용자 정보:', {
-  authStoreUser: authStore.user,
-  routeQueryUserId: route.query.userId,
-  routeQueryUserName: route.query.userName,
-  currentUserId: currentUserId.value,
-  currentUserName: currentUserName.value,
-});
-
 // Methods
 const connectToChat = async () => {
   try {
@@ -234,9 +225,6 @@ const connectToChat = async () => {
 
     // JWT 기반으로 채팅방 연결 (사용자 정보는 자동으로 백엔드에서 추출)
     await chatStore.connectToChat(challengeId.value);
-
-    // 이력 메시지가 있는지 확인
-    hasHistoryMessages.value = chatStore.messages.length > 0;
 
     // 이력 메시지가 있는지 확인
     hasHistoryMessages.value = chatStore.messages.length > 0;
