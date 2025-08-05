@@ -36,10 +36,7 @@
           <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
           <p>챌린지 상태 확인 중...</p>
           <p class="text-xs text-gray-400 mt-2">
-            디버그: {{ isCheckingStatus }}
-          </p>
-          <p class="text-xs text-gray-400">
-            사용자: {{ currentUserId }} ({{ currentUserName }})
+            현재 로그인한 사용자의 챌린지 상태를 확인하고 있습니다.
           </p>
         </div>
       </div>
@@ -91,9 +88,14 @@
         <div class="bg-gray-800 text-white text-xs p-2 mb-2 rounded">
           <p>연결 상태: {{ chatStore.isConnected }}</p>
           <p>메시지 개수: {{ chatStore.messages.length }}</p>
-          <p>정렬된 메시지: {{ chatStore.sortedMessages.length }}</p>
-          <p>현재 사용자: {{ currentUserId }}</p>
+          <p>
+            현재 사용자: {{ chatStore.currentUser.userId }} ({{
+              chatStore.currentUser.userName
+            }})
+          </p>
+          <p>챌린지 ID: {{ challengeId }}</p>
         </div>
+
         <!-- 이전 메시지 안내 (이력이 있을 때만) -->
         <div
           v-if="chatStore.messages.length > 0 && hasHistoryMessages"
@@ -117,7 +119,7 @@
           :time="message.time || formatTime(message.sentAt)"
           :messageType="message.messageType || 'MESSAGE'"
           :userId="message.userId"
-          :currentUserId="currentUserId"
+          :currentUserId="chatStore.currentUser.userId"
         />
 
         <!-- 메시지가 없을 때 -->
@@ -212,15 +214,8 @@ const newMessage = ref('');
 const chatContainer = ref(null);
 const challengeName = ref('챌린지 채팅방');
 const isCheckingStatus = ref(false);
-const hasHistoryMessages = ref(false); // 이력 메시지 존재 여부
-
-// 사용자 정보 - 인증된 사용자 정보 우선 사용
-const currentUserId = ref(
-  authStore.user?.id || parseInt(route.query.userId) || 1
-);
-const currentUserName = ref(
-  authStore.user?.name || route.query.userName || '나'
-);
+const hasHistoryMessages = ref(false);
+const challengeId = ref(null);
 
 // 디버깅: 현재 사용자 정보 로깅
 console.log('👤 현재 사용자 정보:', {
@@ -234,11 +229,10 @@ console.log('👤 현재 사용자 정보:', {
 // Methods
 const connectToChat = async () => {
   try {
-    // 챌린지 상태 확인 완료
     isCheckingStatus.value = false;
 
-    // URL 쿼리에서 challengeId 가져오기
-    const challengeId =
+    // URL에서 challengeId 가져오기
+    challengeId.value =
       parseInt(route.query.challengeId) ||
       parseInt(route.params.challengeId) ||
       1;
@@ -248,13 +242,13 @@ const connectToChat = async () => {
       challengeName.value = route.query.challengeName;
     }
 
-    console.log(`🚀 채팅방 연결 시작: challengeId=${challengeId}`);
+    console.log(`🚀 채팅방 연결 시작: challengeId=${challengeId.value}`);
 
-    await chatStore.connectToChat(
-      challengeId,
-      currentUserId.value,
-      currentUserName.value
-    );
+    // JWT 기반으로 채팅방 연결 (사용자 정보는 자동으로 백엔드에서 추출)
+    await chatStore.connectToChat(challengeId.value);
+
+    // 이력 메시지가 있는지 확인
+    hasHistoryMessages.value = chatStore.messages.length > 0;
 
     // 이력 메시지가 있는지 확인
     hasHistoryMessages.value = chatStore.messages.length > 0;
@@ -304,7 +298,6 @@ const scrollToBottom = () => {
 };
 
 const goBack = () => {
-  // 홈 화면으로 이동
   router.push('/');
 };
 
@@ -331,7 +324,6 @@ watch(
   () => chatStore.messages.length,
   (newLength, oldLength) => {
     console.log('📊 메시지 개수 변화:', { oldLength, newLength });
-    console.log('📋 현재 메시지 목록:', chatStore.sortedMessages);
     nextTick(() => {
       scrollToBottom();
     });
@@ -350,28 +342,6 @@ watch(
   }
 );
 
-// 쿼리 파라미터 변화 감지 (사용자 정보 업데이트)
-watch(
-  () => route.query,
-  (newQuery) => {
-    if (newQuery.userId && parseInt(newQuery.userId) !== currentUserId.value) {
-      console.log('🔄 쿼리 파라미터에서 사용자 ID 업데이트:', {
-        old: currentUserId.value,
-        new: parseInt(newQuery.userId),
-      });
-      currentUserId.value = parseInt(newQuery.userId);
-    }
-    if (newQuery.userName && newQuery.userName !== currentUserName.value) {
-      console.log('🔄 쿼리 파라미터에서 사용자 이름 업데이트:', {
-        old: currentUserName.value,
-        new: newQuery.userName,
-      });
-      currentUserName.value = newQuery.userName;
-    }
-  },
-  { immediate: true }
-);
-
 // Lifecycle
 onMounted(async () => {
   console.log('🚀 Chat 컴포넌트 마운트됨');
@@ -379,11 +349,9 @@ onMounted(async () => {
   try {
     isCheckingStatus.value = true;
 
-    // 1. 먼저 사용자의 챌린지 상태 확인
+    // 1. 먼저 사용자의 챌린지 상태 확인 (JWT 기반)
     console.log('🔍 사용자 챌린지 상태 확인 중...');
-    const status = await chatStore.checkUserChallengeStatus(
-      currentUserId.value
-    );
+    const status = await chatStore.checkUserChallengeStatus();
 
     if (!status.hasActiveChallenge) {
       console.log('❌ 활성 챌린지가 없음, NoChat 페이지로 이동');
@@ -393,27 +361,19 @@ onMounted(async () => {
 
     console.log('✅ 활성 챌린지 확인:', status.challengeName);
 
-    // 2. 사용자 ID 업데이트 (백엔드에서 받은 정보로)
-    if (status.userId && status.userId !== currentUserId.value) {
-      console.log('🔄 사용자 ID 업데이트:', {
-        old: currentUserId.value,
-        new: status.userId,
-      });
-      currentUserId.value = status.userId;
-    }
-
-    // 3. 활성 챌린지가 있으면 해당 채팅방으로 연결
+    // 2. 활성 챌린지가 있으면 해당 채팅방으로 연결
     challengeName.value = status.challengeName || '챌린지 채팅방';
 
-    // 3. 쿼리 파라미터가 없으면 상태에서 가져온 정보로 업데이트
-    if (!route.query.challengeId) {
+    // 3. 쿼리 파라미터가 없거나 다르면 상태에서 가져온 정보로 업데이트
+    const routeChallengeId =
+      parseInt(route.query.challengeId) || parseInt(route.params.challengeId);
+
+    if (!routeChallengeId || routeChallengeId !== status.challengeId) {
       await router.replace({
         path: '/chat',
         query: {
           challengeId: status.challengeId,
           challengeName: status.challengeName,
-          userId: currentUserId.value,
-          userName: currentUserName.value,
         },
       });
       return; // replace 후 다시 마운트됨
