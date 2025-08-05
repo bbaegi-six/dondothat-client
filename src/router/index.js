@@ -72,6 +72,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/challenge/connectsub',
+    name: 'ConnectSub',
+    component: () => import('@/pages/challenge/ConnectSub.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/no-chat',
     name: 'NoChat',
     component: () => import('@/pages/chat/NoChat.vue'),
