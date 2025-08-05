@@ -56,7 +56,7 @@ import ChallengeFlow from './ChallengeFlow.vue';
 const showChallengeFlow = ref(false);
 
 const startChallenge = () => {
-  console.log('챌린지 시작하기 클릭됨');
+  //console.log('챌린지 시작하기 클릭됨');
   showChallengeFlow.value = true;
 };
 </script>
