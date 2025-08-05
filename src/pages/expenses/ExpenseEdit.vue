@@ -8,9 +8,6 @@
       :title="isNewTransaction ? '소비 내역 추가' : '소비 내역'"
     />
 
-    <!-- 선 구분 -->
-    <div class="border-t border-[#414141] mb-6"></div>
-
     <!-- 거래처명 -->
     <div class="mb-6">
       <input
