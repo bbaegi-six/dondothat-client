@@ -33,18 +33,6 @@
         class="flex-1 px-[31px] py-4 overflow-y-auto space-y-2"
         ref="chatContainer"
       >
-        <!-- 이전 메시지 안내 (이력이 있을 때만) -->
-        <div
-          v-if="chatStore.messages.length > 0 && hasHistoryMessages"
-          class="flex justify-center py-2 mb-4"
-        >
-          <div
-            class="bg-[#414141] text-[#C9C9C9] text-xs px-3 py-1 rounded-full"
-          >
-            챌린지 참여 이후의 채팅 내용입니다
-          </div>
-        </div>
-
         <!-- 메시지 목록 -->
         <ChatMessage
           v-for="message in chatStore.sortedMessages"
@@ -302,10 +290,6 @@ const initializeChat = async () => {
   }
 
   try {
-    // 🚨 핵심 추가: 초기화 시작 전에 이전 사용자 데이터 정리
-    console.log('🧹 새 사용자 세션 시작 - 이전 데이터 정리');
-    chatStore.resetForNewUser();
-
     // 🚀 즉시 기존 연결 상태부터 체크 (API 호출 전)
     const routeChallengeId =
       parseInt(route.query.challengeId) || parseInt(route.params.challengeId);
@@ -336,6 +320,18 @@ const initializeChat = async () => {
     // 1. 사용자의 챌린지 상태 확인 (JWT 기반)
     console.log('🔍 사용자 챌린지 상태 확인 중...');
     const status = await chatStore.checkUserChallengeStatus();
+
+    // 🚨 핵심: 사용자가 실제로 바뀌었는지 확인
+    if (
+      chatStore.currentUser?.userId &&
+      chatStore.currentUser.userId !== status.userId
+    ) {
+      console.log('👤 사용자 변경 감지 - Chat Store 초기화');
+      console.log(
+        `이전 사용자: ${chatStore.currentUser.userId}, 새 사용자: ${status.userId}`
+      );
+      chatStore.resetForNewUser();
+    }
 
     if (!status.hasActiveChallenge) {
       console.log('❌ 활성 챌린지가 없음, NoChat 페이지로 이동');
