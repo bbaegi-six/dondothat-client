@@ -140,7 +140,11 @@ const handleLogin = async () => {
   const success = await authStore.login(email.value, password.value);
 
   if (success) {
-    router.push('/');
+    if (authStore.user && !authStore.user.assetConnected) {
+      router.push('/account');
+    } else {
+      router.push('/');
+    }
   } else {
     errorMessage.value = '아이디 또는 비밀번호가 일치하지 않습니다.';
     showErrorModal.value = true;
