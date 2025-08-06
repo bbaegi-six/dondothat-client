@@ -139,7 +139,7 @@ async function logout() {
 }
 .page-container {
   padding: 31px;
-  padding-top: 70px;
+  padding-top: 86px;
   margin-bottom: 50px;
   display: flex;
   flex-direction: column;
