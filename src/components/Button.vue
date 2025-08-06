@@ -7,7 +7,7 @@
     }"
     :disabled="props.disabled"
   >
-    <slot></slot>
+    {{ label }}
   </button>
 </template>
 
