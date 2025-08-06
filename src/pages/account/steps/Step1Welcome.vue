@@ -15,9 +15,11 @@
       </div>
 
       <div class="text-center">
-        <h2 class="text-2xl font-medium mb-2 text-white">서비스 이용을 위해</h2>
-        <h2 class="text-2xl font-medium mb-0 text-white">
-          계좌 연결이 필요합니다
+        <!-- <h2 class="text-2xl font-medium mb-2 text-white">
+          지금부터 계좌 연결을 시작합니다
+        </h2> -->
+        <h2 class="text-xl font-medium mb-0 text-white">
+          지금부터 계좌 연결을 시작합니다
         </h2>
       </div>
     </div>
@@ -27,7 +29,7 @@
       <div class="flex justify-center">
         <div class="w-[328px]">
           <Button
-            label="계좌 연결하러 가기"
+            label="계좌 연결하기"
             :disabled="false"
             @click="$emit('next')"
           />
