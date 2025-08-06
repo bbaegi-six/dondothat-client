@@ -114,9 +114,9 @@
             text-align: center;
             color: #ffffff;
             position: absolute;
-            left: 154px;
+            left: 149px;
             top: 4px;
-            width: 22px;
+            width: 30px;
             height: 32px;
           "
         >
