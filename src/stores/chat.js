@@ -298,9 +298,6 @@ export const useChatStore = defineStore('chat', () => {
 
   const subscribeToUserCount = () => {
     if (!stompClient.value || !challengeId.value) return;
-
-    // 일반 메시지 채널에서 PARTICIPANT_COUNT 타입으로 처리되므로 별도 구독 불필요
-    console.log('👥 접속자 수는 메인 채널에서 처리됩니다.');
   };
 
   const joinChatRoom = () => {
@@ -340,14 +337,6 @@ export const useChatStore = defineStore('chat', () => {
 
       const destination = `/app/chat/${challengeId.value}/send`;
       console.log('📤 메시지 전송 시도:', { destination, message });
-
-      // 즉시 UI에 표시 (낙관적 업데이트)
-      // const optimisticMessage = {
-      //   ...message,
-      //   messageId: `temp_${Date.now()}`,
-      //   isOptimistic: true,
-      // };
-      // addMessage(optimisticMessage, false);
 
       stompClient.value.send(destination, {}, JSON.stringify(message));
 
@@ -478,6 +467,18 @@ export const useChatStore = defineStore('chat', () => {
   const reset = () => {
     disconnect();
     messages.value = [];
+    userCount.value = 0;
+    challengeId.value = null;
+    challengeInfo.value = {};
+    currentUser.value = { userId: null, userName: null };
+    clearError();
+    console.log('🧹 Chat Store 완전 초기화 완료');
+  };
+
+  // 사용자 변경 시 호출할 메서드
+  const resetForNewUser = () => {
+    console.log('👤 사용자 변경 감지 - Chat Store 초기화');
+    reset();
   };
 
   // 컴포넌트 언마운트 시 자동 정리
@@ -510,6 +511,7 @@ export const useChatStore = defineStore('chat', () => {
     isAlreadyConnectedTo,
     disconnect,
     reset,
+    resetForNewUser,
     setError,
     clearError,
     cleanup,

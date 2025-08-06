@@ -34,7 +34,7 @@
         ref="chatContainer"
       >
         <!-- 이전 메시지 안내 (이력이 있을 때만) -->
-        <!-- <div
+        <div
           v-if="chatStore.messages.length > 0 && hasHistoryMessages"
           class="flex justify-center py-2 mb-4"
         >
@@ -43,7 +43,7 @@
           >
             챌린지 참여 이후의 채팅 내용입니다
           </div>
-        </div> -->
+        </div>
 
         <!-- 메시지 목록 -->
         <ChatMessage
@@ -184,7 +184,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useChatStore } from '@/stores/chat';
 import { useAuthStore } from '@/stores/auth';
@@ -294,7 +294,7 @@ const formatTime = (timestamp) => {
   }
 };
 
-// 챌린지 상태 확인 및 초기화
+// 🚨 새로 추가: 사용자 변경 감지 로직
 const initializeChat = async () => {
   if (isInitialized.value) {
     console.log('🔄 이미 초기화됨, 스킵');
@@ -302,6 +302,10 @@ const initializeChat = async () => {
   }
 
   try {
+    // 🚨 핵심 추가: 초기화 시작 전에 이전 사용자 데이터 정리
+    console.log('🧹 새 사용자 세션 시작 - 이전 데이터 정리');
+    chatStore.resetForNewUser();
+
     // 🚀 즉시 기존 연결 상태부터 체크 (API 호출 전)
     const routeChallengeId =
       parseInt(route.query.challengeId) || parseInt(route.params.challengeId);
