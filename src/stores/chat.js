@@ -1,4 +1,3 @@
-// src/stores/chat.js
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import SockJS from 'sockjs-client';
@@ -55,6 +54,8 @@ export const useChatStore = defineStore('chat', () => {
   const checkUserChallengeStatus = async () => {
     try {
       console.log('🔍 사용자 챌린지 상태 확인 (JWT 기반)');
+      clearError(); // 이전 에러 클리어
+
       const status = await chatApi.getUserChallengeStatus();
       console.log('📊 챌린지 상태:', status);
 
@@ -77,18 +78,14 @@ export const useChatStore = defineStore('chat', () => {
   /**
    * 채팅방 이력 로드
    */
-  const loadChatHistory = async (chatChallengeId, userId, limit = 50) => {
+  const loadChatHistory = async (chatChallengeId, limit = 50) => {
     try {
       isLoading.value = true;
-      console.log(
-        `📚 채팅 이력 로드 시작: challengeId=${chatChallengeId}, userId=${userId}`
-      );
+      clearError(); // 이전 에러 클리어
 
-      const history = await chatApi.getChatHistory(
-        chatChallengeId,
-        userId,
-        limit
-      );
+      console.log(`📚 채팅 이력 로드 시작: challengeId=${chatChallengeId}`);
+
+      const history = await chatApi.getChatHistory(chatChallengeId, limit);
 
       // 기존 메시지 초기화 후 이력 로드
       messages.value = [];
@@ -102,9 +99,8 @@ export const useChatStore = defineStore('chat', () => {
       return history.length;
     } catch (error) {
       console.error('❌ 채팅 이력 로드 실패:', error);
-      setError(error.message);
-
-      // 이력 로드 실패해도 채팅은 계속 가능하도록 함
+      // 이력 로드 실패는 치명적이지 않으므로 에러를 store에 설정하지 않음
+      console.warn('⚠️ 이력 로드 실패했지만 채팅은 계속 진행합니다.');
       return 0;
     } finally {
       isLoading.value = false;
@@ -122,25 +118,15 @@ export const useChatStore = defineStore('chat', () => {
 
     try {
       isConnecting.value = true;
+      clearError(); // 연결 시도 전 에러 클리어
       challengeId.value = chatChallengeId;
 
       console.log(`🚀 채팅방 연결 시도: challengeId=${chatChallengeId}`);
 
-      // 1. 현재 사용자 챌린지 상태 확인 및 사용자 정보 가져오기
-      const status = await checkUserChallengeStatus();
-
-      // 해당 챌린지에 참여 중인지 확인
-      if (
-        !status.hasActiveChallenge ||
-        status.challengeId !== chatChallengeId
-      ) {
-        throw new Error('해당 챌린지에 참여하고 있지 않습니다.');
-      }
-
-      // 2. 채팅 이력 로드
+      // 1. 채팅 이력 로드 (현재 사용자 정보는 이미 확인됨)
       const historyCount = await loadChatHistory(chatChallengeId);
 
-      // 3. 채팅방 정보 로드
+      // 2. 채팅방 정보 로드
       try {
         challengeInfo.value = await chatApi.getChatRoomInfo(chatChallengeId);
         userCount.value = challengeInfo.value.participantCount || 0;
@@ -152,10 +138,10 @@ export const useChatStore = defineStore('chat', () => {
         );
       }
 
-      // 4. WebSocket 연결
+      // 3. WebSocket 연결
       await connectWebSocket();
 
-      // 5. 입장 메시지 처리 (이력이 없거나 최근 입장 메시지가 없을 때만)
+      // 4. 입장 메시지 처리 (이력이 없거나 최근 입장 메시지가 없을 때만)
       if (historyCount === 0 || !hasRecentJoinMessage()) {
         console.log('📝 입장 메시지 전송');
         joinChatRoom();
@@ -206,6 +192,7 @@ export const useChatStore = defineStore('chat', () => {
             console.log('🔌 WebSocket 연결 성공:', frame);
             isConnected.value = true;
             isConnecting.value = false;
+            clearError(); // 연결 성공 시 에러 클리어
 
             // 메시지 구독
             subscribeToMessages();
@@ -224,9 +211,12 @@ export const useChatStore = defineStore('chat', () => {
             let errorMessage = '채팅방 연결에 실패했습니다.';
 
             if (error.includes && error.includes('timeout')) {
-              errorMessage = '연결 시간이 초과되었습니다.';
-            } else if (error.includes && error.includes('refused')) {
-              errorMessage = '서버에 연결할 수 없습니다.';
+              const errorStr = error.toString();
+              if (errorStr.includes('timeout')) {
+                errorMessage = '연결 시간이 초과되었습니다.';
+              } else if (errorStr.includes('refused')) {
+                errorMessage = '서버에 연결할 수 없습니다.';
+              }
             }
 
             setError(errorMessage);
@@ -352,12 +342,12 @@ export const useChatStore = defineStore('chat', () => {
       console.log('📤 메시지 전송 시도:', { destination, message });
 
       // 즉시 UI에 표시 (낙관적 업데이트)
-      const optimisticMessage = {
-        ...message,
-        messageId: `temp_${Date.now()}`,
-        isOptimistic: true,
-      };
-      addMessage(optimisticMessage, false);
+      // const optimisticMessage = {
+      //   ...message,
+      //   messageId: `temp_${Date.now()}`,
+      //   isOptimistic: true,
+      // };
+      // addMessage(optimisticMessage, false);
 
       stompClient.value.send(destination, {}, JSON.stringify(message));
 

@@ -204,23 +204,11 @@ const challengeName = ref('챌린지 채팅방');
 const isCheckingStatus = ref(false);
 const hasHistoryMessages = ref(false);
 const challengeId = ref(null);
+const isInitialized = ref(false); // 초기화 완료 상태 추가
 
 // Methods
 const connectToChat = async () => {
   try {
-    isCheckingStatus.value = false;
-
-    // URL에서 challengeId 가져오기
-    challengeId.value =
-      parseInt(route.query.challengeId) ||
-      parseInt(route.params.challengeId) ||
-      1;
-
-    // 쿼리에서 챌린지 이름 가져오기
-    if (route.query.challengeName) {
-      challengeName.value = route.query.challengeName;
-    }
-
     console.log(`🚀 채팅방 연결 시작: challengeId=${challengeId.value}`);
 
     // JWT 기반으로 채팅방 연결 (사용자 정보는 자동으로 백엔드에서 추출)
@@ -237,18 +225,13 @@ const connectToChat = async () => {
     });
   } catch (error) {
     console.error('❌ 채팅방 연결 실패:', error);
-    isCheckingStatus.value = false;
-
-    // 연결 실패 시 3초 후 NoChat 페이지로 이동
-    setTimeout(() => {
-      router.push('/no-chat');
-    }, 3000);
+    // 에러는 store에서 처리되므로 여기서는 로그만 남김
   }
 };
 
 const reconnect = async () => {
+  console.log('🔄 재연결 시도');
   chatStore.clearError();
-  isCheckingStatus.value = false;
   await connectToChat();
 };
 
@@ -295,6 +278,72 @@ const formatTime = (timestamp) => {
   }
 };
 
+// 챌린지 상태 확인 및 초기화
+const initializeChat = async () => {
+  if (isInitialized.value) {
+    console.log('🔄 이미 초기화됨, 스킵');
+    return;
+  }
+
+  try {
+    isCheckingStatus.value = true;
+    console.log('🚀 Chat 컴포넌트 초기화 시작');
+
+    // URL에서 challengeId 가져오기
+    const routeChallengeId =
+      parseInt(route.query.challengeId) || parseInt(route.params.challengeId);
+
+    // 1. 사용자의 챌린지 상태 확인 (JWT 기반)
+    console.log('🔍 사용자 챌린지 상태 확인 중...');
+    const status = await chatStore.checkUserChallengeStatus();
+
+    if (!status.hasActiveChallenge) {
+      console.log('❌ 활성 챌린지가 없음, NoChat 페이지로 이동');
+      router.push('/no-chat');
+      return;
+    }
+
+    console.log('✅ 활성 챌린지 확인:', status.challengeName);
+
+    // 2. challengeId 설정
+    challengeId.value = status.challengeId;
+    challengeName.value = status.challengeName || '챌린지 채팅방';
+
+    // 3. URL 파라미터와 실제 챌린지 ID가 다른 경우에만 replace
+    if (routeChallengeId && routeChallengeId !== status.challengeId) {
+      console.log(
+        `🔄 URL 업데이트: ${routeChallengeId} -> ${status.challengeId}`
+      );
+      await router.replace({
+        path: '/chat',
+        query: {
+          challengeId: status.challengeId,
+          challengeName: status.challengeName,
+        },
+      });
+      // replace 후에는 컴포넌트가 재마운트되므로 여기서 return
+      return;
+    }
+
+    // 4. 초기화 완료 표시
+    isInitialized.value = true;
+    isCheckingStatus.value = false;
+
+    console.log('✅ 챌린지 상태 확인 완료, 채팅방 연결 시작');
+
+    // 5. 채팅방 연결
+    await connectToChat();
+  } catch (error) {
+    console.error('❌ 채팅방 초기화 실패:', error);
+    isCheckingStatus.value = false;
+
+    // 에러 발생 시 NoChat으로 이동
+    setTimeout(() => {
+      router.push('/no-chat');
+    }, 2000);
+  }
+};
+
 // 새 메시지가 추가될 때마다 자동 스크롤
 watch(
   () => chatStore.messages.length,
@@ -321,59 +370,14 @@ watch(
 // Lifecycle
 onMounted(async () => {
   console.log('🚀 Chat 컴포넌트 마운트됨');
-
-  try {
-    isCheckingStatus.value = true;
-
-    // 1. 먼저 사용자의 챌린지 상태 확인 (JWT 기반)
-    console.log('🔍 사용자 챌린지 상태 확인 중...');
-    const status = await chatStore.checkUserChallengeStatus();
-
-    if (!status.hasActiveChallenge) {
-      console.log('❌ 활성 챌린지가 없음, NoChat 페이지로 이동');
-      router.push('/no-chat');
-      return;
-    }
-
-    console.log('✅ 활성 챌린지 확인:', status.challengeName);
-
-    // 2. 활성 챌린지가 있으면 해당 채팅방으로 연결
-    challengeName.value = status.challengeName || '챌린지 채팅방';
-
-    // 3. 쿼리 파라미터가 없거나 다르면 상태에서 가져온 정보로 업데이트
-    const routeChallengeId =
-      parseInt(route.query.challengeId) || parseInt(route.params.challengeId);
-
-    if (!routeChallengeId || routeChallengeId !== status.challengeId) {
-      await router.replace({
-        path: '/chat',
-        query: {
-          challengeId: status.challengeId,
-          challengeName: status.challengeName,
-        },
-      });
-      return; // replace 후 다시 마운트됨
-    }
-
-    // 4. 챌린지 상태 확인 완료
-    isCheckingStatus.value = false;
-    console.log('✅ 챌린지 상태 확인 완료, 채팅방 연결 시작');
-
-    await connectToChat();
-  } catch (error) {
-    console.error('❌ 채팅방 초기화 실패:', error);
-    isCheckingStatus.value = false;
-
-    // 에러 메시지를 store에 설정하지 않고 직접 NoChat으로 이동
-    setTimeout(() => {
-      router.push('/no-chat');
-    }, 2000);
-  }
+  await initializeChat();
 });
 
 onUnmounted(() => {
   console.log('🔌 Chat 컴포넌트 언마운트됨');
   chatStore.cleanup();
+  // 초기화 상태 리셋
+  isInitialized.value = false;
 });
 
 // 페이지를 벗어날 때 연결 해제
