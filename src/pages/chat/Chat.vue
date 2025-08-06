@@ -33,19 +33,24 @@
         class="flex-1 px-[31px] py-4 overflow-y-auto space-y-2"
         ref="chatContainer"
       >
-        <!-- 메시지 목록 -->
-        <ChatMessage
-          v-for="message in chatStore.sortedMessages"
+        <!-- 메시지 목록 with 날짜 구분 -->
+        <template
+          v-for="(message, index) in chatStore.sortedMessages"
           :key="message.messageId || message.id || Math.random()"
-          :username="
-            message.userName || message.username || '사용자' + message.userId
-          "
-          :content="message.message || message.content"
-          :time="message.time || formatTime(message.sentAt)"
-          :messageType="message.messageType || 'MESSAGE'"
-          :userId="message.userId"
-          :currentUserId="chatStore.currentUser?.userId"
-        />
+        >
+          <ChatMessage
+            :username="
+              message.userName || message.username || '사용자' + message.userId
+            "
+            :content="message.message || message.content"
+            :time="message.time"
+            :sentAt="message.sentAt"
+            :messageType="message.messageType || 'MESSAGE'"
+            :userId="message.userId"
+            :currentUserId="chatStore.currentUser?.userId"
+            :showDateSeparator="shouldShowDateSeparator(message, index)"
+          />
+        </template>
 
         <!-- 메시지가 없을 때 -->
         <div
@@ -208,6 +213,59 @@ const shouldShowInputArea = computed(() => {
   );
 });
 
+// 날짜 구분선 표시 여부 결정
+const shouldShowDateSeparator = (message, index) => {
+  if (index === 0) return true; // 첫 번째 메시지는 항상 날짜 표시
+
+  const currentMessage = message;
+  const previousMessage = chatStore.sortedMessages[index - 1];
+
+  if (!previousMessage) return true;
+
+  // 현재 메시지와 이전 메시지의 날짜를 비교
+  const currentDate = getDateFromMessage(currentMessage);
+  const previousDate = getDateFromMessage(previousMessage);
+
+  // 다른 날짜면 날짜 구분선 표시
+  return !isSameDay(currentDate, previousDate);
+};
+
+// 메시지에서 날짜 추출
+const getDateFromMessage = (message) => {
+  const timestamp = message.sentAt || message.time;
+
+  if (!timestamp) return new Date();
+
+  try {
+    if (Array.isArray(timestamp)) {
+      return new Date(
+        timestamp[0], // year
+        timestamp[1] - 1, // month (0-based)
+        timestamp[2], // day
+        timestamp[3] || 0, // hour
+        timestamp[4] || 0, // minute
+        timestamp[5] || 0 // second
+      );
+    } else {
+      return new Date(timestamp);
+    }
+  } catch (error) {
+    console.error('날짜 추출 오류:', error);
+    return new Date();
+  }
+};
+
+// 같은 날인지 확인
+const isSameDay = (date1, date2) => {
+  if (!date1 || !date2) return false;
+
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+};
+
 // Methods
 const connectToChat = async () => {
   try {
@@ -262,24 +320,6 @@ const goBack = () => {
   // 🔑 핵심: 채팅방에서 나갈 때 연결을 끊지 않음
   console.log('🔙 채팅방에서 나가기 (연결 유지)');
   router.push('/');
-};
-
-// 시간 포맷팅 함수 (24시간 형식)
-const formatTime = (timestamp) => {
-  if (!timestamp) return '';
-
-  try {
-    const date = new Date(timestamp);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  } catch (error) {
-    console.error('시간 형식 변환 오류:', error);
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  }
 };
 
 // 🚨 새로 추가: 사용자 변경 감지 로직
@@ -433,26 +473,10 @@ window.addEventListener('beforeunload', () => {
   console.log('🌐 브라우저 종료/새로고침 - 연결 해제');
   chatStore.disconnect();
 });
-
-// 🔑 뒤로가기는 채팅 내에서의 이동이므로 연결 유지
-// (popstate 이벤트 리스너 제거)
 </script>
 
 <style scoped>
 /* Custom scrollbar styling */
-.overflow-y-auto::-webkit-scrollbar {
-  width: 4px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #414141;
-  border-radius: 2px;
-}
-
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
@@ -501,3 +525,6 @@ button:active {
   transform: translateY(0);
 }
 </style>
+bar { width: 4px; } .overflow-y-auto::-webkit-scrollbar-track { background:
+transparent; } .overflow-y-auto::-webkit-scrollbar-thumb { background: #414141;
+border-radius: 2px; } .overflow-y-auto::-webkit-scroll
