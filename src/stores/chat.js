@@ -390,6 +390,27 @@ export const useChatStore = defineStore('chat', () => {
     console.log('✅ 메시지 추가 완료, 총 메시지 수:', messages.value.length);
   };
 
+  /**
+   * 빠른 연결 상태 체크 (API 호출 없이)
+   */
+  const isAlreadyConnectedTo = (targetChallengeId) => {
+    const connected =
+      isConnected.value &&
+      challengeId.value === targetChallengeId &&
+      currentUser.value?.userId &&
+      stompClient.value?.connected;
+
+    console.log('⚡ 빠른 연결 체크:', {
+      isConnected: isConnected.value,
+      challengeMatch: challengeId.value === targetChallengeId,
+      hasUser: !!currentUser.value?.userId,
+      stompConnected: stompClient.value?.connected,
+      result: connected,
+    });
+
+    return connected;
+  };
+
   const formatTime = (timestamp) => {
     try {
       let date;
@@ -486,6 +507,7 @@ export const useChatStore = defineStore('chat', () => {
     loadChatHistory,
     connectToChat,
     sendMessage,
+    isAlreadyConnectedTo,
     disconnect,
     reset,
     setError,

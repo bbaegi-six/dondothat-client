@@ -27,9 +27,58 @@
 
     <!-- Body Content with proper top margin for fixed header -->
     <div class="flex flex-col flex-1 mt-[60px]">
+      <!-- 🚀 채팅 메인 화면 (우선순위 1 - 가장 먼저 체크) -->
+      <div
+        v-if="shouldShowChatUI"
+        class="flex-1 px-[31px] py-4 overflow-y-auto space-y-2"
+        ref="chatContainer"
+      >
+        <!-- 이전 메시지 안내 (이력이 있을 때만) -->
+        <!-- <div
+          v-if="chatStore.messages.length > 0 && hasHistoryMessages"
+          class="flex justify-center py-2 mb-4"
+        >
+          <div
+            class="bg-[#414141] text-[#C9C9C9] text-xs px-3 py-1 rounded-full"
+          >
+            챌린지 참여 이후의 채팅 내용입니다
+          </div>
+        </div> -->
+
+        <!-- 메시지 목록 -->
+        <ChatMessage
+          v-for="message in chatStore.sortedMessages"
+          :key="message.messageId || message.id || Math.random()"
+          :username="
+            message.userName || message.username || '사용자' + message.userId
+          "
+          :content="message.message || message.content"
+          :time="message.time || formatTime(message.sentAt)"
+          :messageType="message.messageType || 'MESSAGE'"
+          :userId="message.userId"
+          :currentUserId="chatStore.currentUser?.userId"
+        />
+
+        <!-- 메시지가 없을 때 -->
+        <div
+          v-if="
+            chatStore.messages.length === 0 &&
+            chatStore.isConnected &&
+            !chatStore.isLoading
+          "
+          class="flex justify-center py-8"
+        >
+          <div class="text-center">
+            <i class="fas fa-comments text-4xl text-[#414141] mb-4"></i>
+            <p class="text-[#C9C9C9] text-sm">첫 메시지를 보내보세요!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🚀 로딩 상태들 (우선순위 2 - 채팅 UI가 없을 때만) -->
       <!-- 챌린지 상태 확인 중 -->
       <div
-        v-if="isCheckingStatus"
+        v-else-if="isCheckingStatus"
         class="flex-1 flex items-center justify-center"
       >
         <div class="text-white text-center">
@@ -78,59 +127,30 @@
         </div>
       </div>
 
-      <!-- Chat Messages -->
+      <!-- Connection Status -->
       <div
-        v-else-if="chatStore.isConnected || chatStore.messages.length > 0"
-        class="flex-1 px-[31px] py-4 overflow-y-auto space-y-2"
-        ref="chatContainer"
+        v-else-if="
+          !chatStore.isConnected &&
+          !chatStore.isConnecting &&
+          !chatStore.error &&
+          !chatStore.isLoading
+        "
+        class="flex-1 flex items-center justify-center"
       >
-        <!-- 이전 메시지 안내 (이력이 있을 때만) -->
-        <div
-          v-if="chatStore.messages.length > 0 && hasHistoryMessages"
-          class="flex justify-center py-2 mb-4"
-        >
-          <div
-            class="bg-[#414141] text-[#C9C9C9] text-xs px-3 py-1 rounded-full"
+        <div class="text-center text-gray-400">
+          <i class="fas fa-wifi-slash text-xl mb-2"></i>
+          <p>연결이 끊어졌습니다</p>
+          <button
+            @click="reconnect"
+            class="mt-2 px-4 py-2 bg-[#FF5555] text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
           >
-            챌린지 참여 이후의 채팅 내용입니다
-          </div>
-        </div>
-
-        <!-- 메시지 목록 -->
-        <ChatMessage
-          v-for="message in chatStore.sortedMessages"
-          :key="message.messageId || message.id || Math.random()"
-          :username="
-            message.userName || message.username || '사용자' + message.userId
-          "
-          :content="message.message || message.content"
-          :time="message.time || formatTime(message.sentAt)"
-          :messageType="message.messageType || 'MESSAGE'"
-          :userId="message.userId"
-          :currentUserId="chatStore.currentUser?.userId"
-        />
-
-        <!-- 메시지가 없을 때 -->
-        <div
-          v-if="
-            chatStore.messages.length === 0 &&
-            chatStore.isConnected &&
-            !chatStore.isLoading
-          "
-          class="flex justify-center py-8"
-        >
-          <div class="text-center">
-            <i class="fas fa-comments text-4xl text-[#414141] mb-4"></i>
-            <p class="text-[#C9C9C9] text-sm">첫 메시지를 보내보세요!</p>
-          </div>
+            다시 연결
+          </button>
         </div>
       </div>
 
       <!-- Input Area -->
-      <div
-        v-if="chatStore.isConnected && !chatStore.isLoading"
-        class="px-6 pb-4"
-      >
+      <div v-if="shouldShowInputArea" class="px-6 pb-4">
         <div class="flex gap-2 items-center">
           <div class="flex-1 relative">
             <input
@@ -157,28 +177,6 @@
         </div>
       </div>
 
-      <!-- Connection Status -->
-      <div
-        v-if="
-          !chatStore.isConnected &&
-          !chatStore.isConnecting &&
-          !chatStore.error &&
-          !chatStore.isLoading
-        "
-        class="px-6 pb-4"
-      >
-        <div class="text-center text-gray-400">
-          <i class="fas fa-wifi-slash text-xl mb-2"></i>
-          <p>연결이 끊어졌습니다</p>
-          <button
-            @click="reconnect"
-            class="mt-2 px-4 py-2 bg-[#FF5555] text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
-          >
-            다시 연결
-          </button>
-        </div>
-      </div>
-
       <!-- Bottom Navigation Space -->
       <div class="h-20"></div>
     </div>
@@ -186,7 +184,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useChatStore } from '@/stores/chat';
 import { useAuthStore } from '@/stores/auth';
@@ -204,7 +202,23 @@ const challengeName = ref('챌린지 채팅방');
 const isCheckingStatus = ref(false);
 const hasHistoryMessages = ref(false);
 const challengeId = ref(null);
-const isInitialized = ref(false); // 초기화 완료 상태 추가
+const isInitialized = ref(false);
+
+// 🚀 핵심: 계산된 속성으로 UI 상태 결정
+const shouldShowChatUI = computed(() => {
+  // 기존 연결이 있거나, 연결되어 있거나, 메시지가 있으면 채팅 UI 표시
+  return (
+    chatStore.isConnected ||
+    chatStore.messages.length > 0 ||
+    (isInitialized.value && !isCheckingStatus.value && !chatStore.error)
+  );
+});
+
+const shouldShowInputArea = computed(() => {
+  return (
+    shouldShowChatUI.value && chatStore.isConnected && !chatStore.isLoading
+  );
+});
 
 // Methods
 const connectToChat = async () => {
@@ -257,6 +271,8 @@ const scrollToBottom = () => {
 };
 
 const goBack = () => {
+  // 🔑 핵심: 채팅방에서 나갈 때 연결을 끊지 않음
+  console.log('🔙 채팅방에서 나가기 (연결 유지)');
   router.push('/');
 };
 
@@ -286,12 +302,32 @@ const initializeChat = async () => {
   }
 
   try {
-    isCheckingStatus.value = true;
-    console.log('🚀 Chat 컴포넌트 초기화 시작');
-
-    // URL에서 challengeId 가져오기
+    // 🚀 즉시 기존 연결 상태부터 체크 (API 호출 전)
     const routeChallengeId =
       parseInt(route.query.challengeId) || parseInt(route.params.challengeId);
+
+    // Store의 빠른 체크 메서드 사용
+    if (
+      routeChallengeId &&
+      chatStore.isAlreadyConnectedTo &&
+      chatStore.isAlreadyConnectedTo(routeChallengeId)
+    ) {
+      console.log('⚡ 기존 연결 즉시 재사용 (0ms)');
+      challengeId.value = routeChallengeId;
+      challengeName.value = route.query.challengeName || '챌린지 채팅방';
+      hasHistoryMessages.value = chatStore.messages.length > 0;
+      isInitialized.value = true;
+      // isCheckingStatus는 건드리지 않음 (이미 false)
+
+      nextTick(() => {
+        scrollToBottom();
+      });
+      return;
+    }
+
+    // 기존 연결이 없거나 다른 채팅방일 때만 상태 확인
+    isCheckingStatus.value = true;
+    console.log('🚀 Chat 컴포넌트 초기화 시작');
 
     // 1. 사용자의 챌린지 상태 확인 (JWT 기반)
     console.log('🔍 사용자 챌린지 상태 확인 중...');
@@ -321,7 +357,6 @@ const initializeChat = async () => {
           challengeName: status.challengeName,
         },
       });
-      // replace 후에는 컴포넌트가 재마운트되므로 여기서 return
       return;
     }
 
@@ -329,9 +364,19 @@ const initializeChat = async () => {
     isInitialized.value = true;
     isCheckingStatus.value = false;
 
+    // 🔑 API 호출 후 다시 한번 기존 연결 상태 확인
+    if (chatStore.isConnected && chatStore.challengeId === status.challengeId) {
+      console.log('✅ API 확인 후 기존 연결 재사용');
+      hasHistoryMessages.value = chatStore.messages.length > 0;
+      nextTick(() => {
+        scrollToBottom();
+      });
+      return;
+    }
+
     console.log('✅ 챌린지 상태 확인 완료, 채팅방 연결 시작');
 
-    // 5. 채팅방 연결
+    // 5. 채팅방 연결 (기존 연결이 없거나 다른 채팅방인 경우에만)
     await connectToChat();
   } catch (error) {
     console.error('❌ 채팅방 초기화 실패:', error);
@@ -375,20 +420,22 @@ onMounted(async () => {
 
 onUnmounted(() => {
   console.log('🔌 Chat 컴포넌트 언마운트됨');
-  chatStore.cleanup();
-  // 초기화 상태 리셋
+  // 🔑 핵심: 언마운트 시에도 연결을 끊지 않음 (cleanup 호출하지 않음)
+  console.log('🔄 연결 유지됨 (cleanup 생략)');
+
+  // 초기화 상태만 리셋
   isInitialized.value = false;
 });
 
-// 페이지를 벗어날 때 연결 해제
+// 🔑 완전히 다른 페이지로 이동할 때만 연결 해제
+// 브라우저 탭 종료나 새로고침 시에만 해제
 window.addEventListener('beforeunload', () => {
+  console.log('🌐 브라우저 종료/새로고침 - 연결 해제');
   chatStore.disconnect();
 });
 
-// 브라우저 뒤로가기 감지
-window.addEventListener('popstate', () => {
-  chatStore.disconnect();
-});
+// 🔑 뒤로가기는 채팅 내에서의 이동이므로 연결 유지
+// (popstate 이벤트 리스너 제거)
 </script>
 
 <style scoped>
