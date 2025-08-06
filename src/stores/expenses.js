@@ -94,9 +94,8 @@ export const useExpensesStore = defineStore('expenses', () => {
   // 지출 내역 추가
   async function addTransaction(transactionData) {
     try {
-      const newTransaction =
-        await expensesService.createExpense(transactionData);
-      transactions.value.push(newTransaction);
+      await expensesService.createExpense(transactionData);
+      await fetchExpensesFromAPI(); // 데이터 변경 후 전체 내역 다시 로드
       return true;
     } catch (error) {
       console.error('거래내역 추가 실패:', error);
@@ -107,14 +106,8 @@ export const useExpensesStore = defineStore('expenses', () => {
   // 지출 내역 수정
   async function updateTransaction(id, updatedData) {
     try {
-      const updatedTransaction = await expensesService.updateExpense(
-        id,
-        updatedData
-      );
-      const index = transactions.value.findIndex((t) => t.id === id);
-      if (index !== -1) {
-        transactions.value[index] = updatedTransaction;
-      }
+      await expensesService.updateExpense(id, updatedData);
+      await fetchExpensesFromAPI(); // 데이터 변경 후 전체 내역 다시 로드
       return true;
     } catch (error) {
       console.error('거래내역 수정 실패:', error);
@@ -126,7 +119,7 @@ export const useExpensesStore = defineStore('expenses', () => {
   async function deleteTransaction(id) {
     try {
       await expensesService.deleteExpense(id);
-      transactions.value = transactions.value.filter((t) => t.id !== id);
+      await fetchExpensesFromAPI(); // 데이터 변경 후 전체 내역 다시 로드
       return true;
     } catch (error) {
       console.error('거래내역 삭제 실패:', error);
@@ -137,7 +130,6 @@ export const useExpensesStore = defineStore('expenses', () => {
   function setCurrentMonth(month) {
     if (month >= 1 && month <= 12) {
       currentMonth.value = month;
-      fetchExpensesFromAPI();
     }
   }
 
