@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { authAPI } from '../utils/api';
+import { useExpensesStore } from './expenses'; // expenses 스토어 import
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -45,6 +46,14 @@ export const useAuthStore = defineStore('auth', {
         console.log('login: authAPI.login successful. Response:', response);
         // 로그인 성공 시 fetchMe를 호출하여 사용자 정보 및 인증 상태 업데이트 (강제 호출)
         await this.checkAuth(true);
+
+        // 로그인 성공 후 지출 내역 미리 로드
+        if (this.isAuthenticated) {
+          const expensesStore = useExpensesStore();
+          await expensesStore.fetchExpensesFromAPI();
+          console.log('login: Expenses pre-fetched.');
+        }
+
         console.log('login: checkAuth completed.');
         return true;
       } catch (error) {
