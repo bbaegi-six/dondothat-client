@@ -5,7 +5,7 @@
   >
     <Header
       :showBack="true"
-      :title="isNewTransaction ? '소비 내역 추가' : '소비 내역'"
+      :title="isNewTransaction ? '내역 추가' : '내역 수정'"
     />
 
     <!-- 거래처명 -->
@@ -179,7 +179,9 @@ const expensesStore = useExpensesStore();
 
 // 라우트 파라미터로 거래 ID를 받음
 const transactionId = computed(() => route.params.id);
-const isNewTransaction = computed(() => !transactionId.value || transactionId.value === 'new');
+const isNewTransaction = computed(
+  () => !transactionId.value || transactionId.value === 'new'
+);
 
 // 스토어에서 거래내역 데이터 가져오기
 const transactionData = computed(() => {
@@ -277,7 +279,10 @@ const saveTransaction = () => {
   if (isNewTransaction.value) {
     success = expensesStore.addTransaction(transactionData);
   } else {
-    success = expensesStore.updateTransaction(transactionId.value, transactionData);
+    success = expensesStore.updateTransaction(
+      transactionId.value,
+      transactionData
+    );
   }
 
   if (success) {
