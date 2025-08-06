@@ -26,8 +26,15 @@
 
     <!-- 하단 버튼 -->
     <div class="absolute bottom-10 left-5 right-5 z-10">
-      <div class="flex justify-center">
-        <div class="w-[328px]">
+      <div class="flex justify-center gap-4">
+        <div class="w-[156px]">
+          <Button
+            label="돌아가기"
+            variant="tertiary"
+            @click="router.back()"
+          />
+        </div>
+        <div class="w-[156px]">
           <Button
             label="계좌 연결하기"
             :disabled="false"
@@ -41,5 +48,8 @@
 <script setup>
 import Button from '../../../components/Button.vue';
 import accountstr from '@/assets/accountstr.svg';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 defineEmits(['next']);
 </script>
