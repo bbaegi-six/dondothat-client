@@ -3,7 +3,7 @@ import axios from 'axios';
 // API 기본 설정
 const api = axios.create({
   baseURL: '/api',
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -78,11 +78,11 @@ export const expensesAPI = {
   getCategories: () => api.get('/expenses/categories'),
 };
 
-// 필요시 나중에 추가
-// export const assetsAPI = {
-//   connect: (userId) => api.post(`/assets/connect?userId=${userId}`),
-//   delete: (userId) => api.delete(`/assets?userId=${userId}`),
-// };
+export const accountAPI = {
+  connectMain: (data) => api.post('/assets/connect', data),
+  connectSub: (data) => api.post('/assets/connect/sub', data),
+  delete: (status) => api.delete('/assets', { params: { status } }),
+};
 
 // export const challengesAPI = {
 //   getById: (id) => api.get(`/challenges/${id}`),

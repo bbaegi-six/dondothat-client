@@ -13,7 +13,7 @@
       <!-- 은행 아이디 입력 -->
       <div class="w-[328px]">
         <input
-          v-model="formData.onlineId"
+          v-model="formData.bankId"
           type="text"
           placeholder="은행아이디를 입력해주세요"
           @input="handleBankIdInput"
@@ -24,7 +24,7 @@
       <!-- 비밀번호 입력 -->
       <div class="relative w-[328px]">
         <input
-          v-model="formData.password"
+          v-model="formData.bankpw"
           :type="showPassword ? 'text' : 'password'"
           placeholder="비밀번호를 입력해주세요"
           @input="handlePasswordInput"
@@ -55,12 +55,21 @@
       <!-- 계좌번호 입력 -->
       <div class="w-[328px]">
         <input
-          v-model="formData.accountNumber"
+          v-model="formData.bankAccount"
           type="text"
           placeholder="계좌번호를 입력해주세요"
           @input="handleAccountNumberInput"
           class="w-full h-12 px-4 bg-white rounded-lg border-none text-gray-900 placeholder-gray-500 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#FF5555]"
         />
+      </div>
+
+      <!-- 에러 메시지 표시 -->
+      <div v-if="errorMessage" class="w-[328px]">
+        <div
+          class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm"
+        >
+          {{ errorMessage }}
+        </div>
       </div>
     </div>
 
@@ -171,7 +180,11 @@
 
       <!-- 연결하기 버튼 -->
       <div class="w-[328px]">
-        <Button :disabled="!isFormValid" class="font-normal" @click="nextStep">
+        <Button
+          :disabled="!isFormValid"
+          class="font-normal"
+          @click="goToNextStep"
+        >
           연결하기
         </Button>
       </div>
@@ -180,7 +193,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useAccountStore } from '../../../stores/account';
 import Button from '../../../components/Button.vue';
 
 const props = defineProps({
@@ -192,12 +206,14 @@ const props = defineProps({
 
 const emit = defineEmits(['next']);
 
+const accountStore = useAccountStore();
 const showPassword = ref(false);
+const errorMessage = ref('');
 
 const formData = ref({
-  onlineId: '',
-  password: '',
-  accountNumber: '',
+  bankId: '',
+  bankpw: '',
+  bankAccount: '',
 });
 
 const agreements = ref({
@@ -207,6 +223,50 @@ const agreements = ref({
   financial: false,
   marketing: false,
 });
+
+// 컴포넌트 마운트 시 기존 데이터 복원
+onMounted(() => {
+  console.log('Step3 마운트 - flowData:', props.flowData);
+
+  // 기존에 입력했던 데이터가 있으면 복원
+  if (props.flowData?.accountInfo) {
+    const accountInfo = props.flowData.accountInfo;
+    formData.value = {
+      bankId: accountInfo.bankId || '',
+      bankpw: accountInfo.bankpw || '',
+      bankAccount: accountInfo.bankAccount || '',
+    };
+
+    // 동의 항목도 복원 (이전에 동의했다면)
+    if (accountInfo.bankId || accountInfo.bankpw || accountInfo.bankAccount) {
+      agreements.value = {
+        all: true,
+        service: true,
+        privacy: true,
+        financial: true,
+        marketing: true,
+      };
+    }
+
+    console.log('기존 데이터 복원:', formData.value);
+  }
+});
+
+// flowData 변화 감지하여 데이터 복원
+watch(
+  () => props.flowData,
+  (newFlowData) => {
+    if (newFlowData?.accountInfo) {
+      const accountInfo = newFlowData.accountInfo;
+      formData.value = {
+        bankId: accountInfo.bankId || formData.value.bankId,
+        bankpw: accountInfo.bankpw || formData.value.bankpw,
+        bankAccount: accountInfo.bankAccount || formData.value.bankAccount,
+      };
+    }
+  },
+  { deep: true, immediate: true }
+);
 
 // 선택된 은행명 계산
 const selectedBankName = computed(() => {
@@ -220,15 +280,23 @@ const togglePassword = () => {
 // 은행아이디 한글 입력 방지 (영문, 숫자만 허용)
 const handleBankIdInput = (event) => {
   const value = event.target.value.replace(/[^a-zA-Z0-9]/g, '');
-  formData.value.onlineId = value;
+  formData.value.bankId = value;
   event.target.value = value;
+  // 에러 메시지 초기화
+  if (errorMessage.value) {
+    errorMessage.value = '';
+  }
 };
 
 // 비밀번호 한글 입력 방지 (영문, 숫자, 특수문자만 허용)
 const handlePasswordInput = (event) => {
   const value = event.target.value.replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g, '');
-  formData.value.password = value;
+  formData.value.bankpw = value;
   event.target.value = value;
+  // 에러 메시지 초기화
+  if (errorMessage.value) {
+    errorMessage.value = '';
+  }
 };
 
 // 계좌번호 숫자만 입력 허용 및 은행별 자릿수 제한
@@ -266,23 +334,18 @@ const handleAccountNumberInput = (event) => {
     value = value.slice(0, maxLength);
   }
 
-  formData.value.accountNumber = value;
+  formData.value.bankAccount = value;
   event.target.value = value;
+  // 에러 메시지 초기화
+  if (errorMessage.value) {
+    errorMessage.value = '';
+  }
 };
 
 const isFormValid = computed(() => {
   // 계좌번호에서 숫자만 추출
-  const numbersOnly = formData.value.accountNumber.replace(/[^0-9]/g, '');
+  const numbersOnly = formData.value.bankAccount.replace(/[^0-9]/g, '');
   const bankName = props.flowData?.selectedBank?.name || '';
-
-  console.log(
-    '선택된 은행:',
-    bankName,
-    '계좌번호 길이:',
-    numbersOnly.length,
-    '계좌번호:',
-    numbersOnly
-  );
 
   // 은행별 유효성 검사
   let isAccountNumberValid = false;
@@ -309,28 +372,15 @@ const isFormValid = computed(() => {
         numbersOnly.length >= 11 && numbersOnly.length <= 15;
   }
 
-  const isValid =
-    formData.value.onlineId.length > 0 &&
-    formData.value.password.length > 0 &&
-    formData.value.accountNumber.length > 0 &&
+  return (
+    formData.value.bankId.length > 0 &&
+    formData.value.bankpw.length > 0 &&
+    formData.value.bankAccount.length > 0 &&
     isAccountNumberValid &&
     agreements.value.service &&
     agreements.value.privacy &&
-    agreements.value.financial;
-
-  console.log('폼 유효성:', {
-    은행: bankName,
-    아이디: formData.value.onlineId.length > 0,
-    비밀번호: formData.value.password.length > 0,
-    계좌번호: formData.value.accountNumber.length > 0,
-    계좌번호유효성: isAccountNumberValid,
-    서비스동의: agreements.value.service,
-    개인정보동의: agreements.value.privacy,
-    금융정보동의: agreements.value.financial,
-    최종결과: isValid,
-  });
-
-  return isValid;
+    agreements.value.financial
+  );
 });
 
 const toggleAllAgreements = () => {
@@ -351,15 +401,21 @@ const updateAgreements = () => {
   agreements.value.all = requiredAgreements.every(Boolean);
 };
 
-const nextStep = () => {
-  if (isFormValid.value) {
-    emit('next', {
-      accountInfo: {
-        onlineId: formData.value.onlineId,
-        accountNumber: formData.value.accountNumber,
-        agreements: agreements.value,
-      },
-    });
-  }
+// 다음 단계로 이동 (폼 검증만)
+const goToNextStep = () => {
+  if (!isFormValid.value) return;
+
+  // Step4로 데이터 전달 (API 호출은 Step4에서)
+  emit('next', {
+    // Step2 + Step3 데이터 통합
+    selectedBank: props.flowData?.selectedBank, // Step2에서 선택한 은행 정보
+    accountInfo: {
+      bankName: props.flowData?.selectedBank?.name, // Step2: 은행명
+      bankId: formData.value.bankId, // Step3: 은행 아이디
+      bankpw: formData.value.bankpw, // Step3: 비밀번호
+      bankAccount: formData.value.bankAccount, // Step3: 계좌번호
+    },
+    // API 호출은 Step4에서 수행하므로 connectionResult는 없음
+  });
 };
 </script>
