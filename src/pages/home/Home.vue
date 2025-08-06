@@ -84,7 +84,7 @@
 
 <script setup>
 import Header from '@/components/layout/Header.vue';
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Chart from 'chart.js/auto';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -94,8 +94,11 @@ import {
   faAngleRight,
 } from '@fortawesome/free-solid-svg-icons';
 
+import { useExpensesStore } from '@/stores/expenses';
+
 const router = useRouter();
 const chartCanvas = ref(null);
+const expensesStore = useExpensesStore();
 const categoryData = ref([]);
 const chartInstance = ref(null);
 
@@ -121,50 +124,7 @@ const getCategoryColor = (categoryName) => {
   return categoryColorMap[categoryName] || categoryColorMap['그외'];
 };
 
-// API에서 지출 데이터 가져오기
-const fetchExpensesData = async () => {
-  try {
-    const response = await fetch('/api/expenses');
-    const expenses = await response.json();
 
-    // 현재 월의 데이터만 필터링
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1;
-    const currentYear = currentDate.getFullYear();
-
-    const currentMonthExpenses = expenses.filter((expense) => {
-      const expenseDate = new Date(expense.date || expense.createdAt);
-      return (
-        expenseDate.getMonth() + 1 === currentMonth &&
-        expenseDate.getFullYear() === currentYear
-      );
-    });
-
-    // 카테고리별 합계 계산
-    const categoryMap = new Map();
-
-    currentMonthExpenses.forEach((expense) => {
-      const categoryName = expense.categoryName || '기타';
-      const amount = expense.amount || 0;
-
-      if (categoryMap.has(categoryName)) {
-        categoryMap.set(categoryName, categoryMap.get(categoryName) + amount);
-      } else {
-        categoryMap.set(categoryName, amount);
-      }
-    });
-
-    // 배열로 변환하고 금액순으로 정렬
-    categoryData.value = Array.from(categoryMap.entries())
-      .map(([name, amount]) => ({ name, amount }))
-      .sort((a, b) => b.amount - a.amount);
-
-    console.log('카테고리별 데이터:', categoryData.value);
-  } catch (error) {
-    console.error('지출 데이터를 가져오는 중 오류 발생:', error);
-    categoryData.value = [];
-  }
-};
 
 // 차트 생성
 const createChart = () => {
@@ -228,9 +188,39 @@ const goToChallenges = () => {
   router.push('/challenges');
 };
 
-// 컴포넌트 마운트 시 실행
 onMounted(async () => {
-  await fetchExpensesData();
+  // 스토어의 데이터가 로드될 때까지 기다립니다.
+  if (expensesStore.loading) {
+    await new Promise((resolve) => {
+      const unwatch = watch(
+        () => expensesStore.loading,
+        (loading) => {
+          if (!loading) {
+            unwatch();
+            resolve();
+          }
+        },
+      );
+    });
+  }
+
+  // 카테고리별 데이터 계산
+  const categoryMap = new Map();
+  expensesStore.currentMonthTransactions.forEach((transaction) => {
+    const categoryName = transaction.category || '기타';
+    const amount = transaction.amount || 0;
+
+    if (categoryMap.has(categoryName)) {
+      categoryMap.set(categoryName, categoryMap.get(categoryName) + amount);
+    } else {
+      categoryMap.set(categoryName, amount);
+    }
+  });
+
+  categoryData.value = Array.from(categoryMap.entries())
+    .map(([name, amount]) => ({ name, amount }))
+    .sort((a, b) => b.amount - a.amount);
+
   await nextTick(); // DOM 업데이트 완료 대기
   createChart();
 });
