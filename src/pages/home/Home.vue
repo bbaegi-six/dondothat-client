@@ -6,7 +6,7 @@
     <!-- 저금통 연결 섹션 -->
     <div
       class="w-[328px] h-[56px] bg-[#414141] rounded-2xl flex items-center px-6 cursor-pointer"
-      @click="goToExpensesList"
+      @click="goToAccountStep2"
     >
       <div class="font-pretendard font-medium text-base text-white">저금통</div>
       <FontAwesomeIcon
@@ -179,12 +179,12 @@ const createChart = () => {
 };
 
 // 페이지 이동 함수들
-const goToExpensesList = () => {
-  router.push('/expenses');
+const goToAccountStep2 = () => {
+  router.push('/account');
 };
 
 const goToChallenges = () => {
-  router.push('/challenges');
+  router.push('/challenge');
 };
 
 onMounted(async () => {
