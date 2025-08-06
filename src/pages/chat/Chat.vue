@@ -215,30 +215,56 @@ const shouldShowInputArea = computed(() => {
 
 // 날짜 구분선 표시 여부 결정
 const shouldShowDateSeparator = (message, index) => {
-  if (index === 0) return true; // 첫 번째 메시지는 항상 날짜 표시
+  // 시스템 메시지는 날짜 구분선 표시하지 않음
+  if (message.messageType === 'SYSTEM' || message.messageType === 'JOIN') {
+    return false;
+  }
 
-  const currentMessage = message;
-  const previousMessage = chatStore.sortedMessages[index - 1];
+  // 첫 번째 메시지는 항상 날짜 표시
+  if (index === 0) {
+    return true;
+  }
 
-  if (!previousMessage) return true;
+  // 현재 메시지의 날짜
+  const currentDate = getDateFromMessage(message);
 
-  // 현재 메시지와 이전 메시지의 날짜를 비교
-  const currentDate = getDateFromMessage(currentMessage);
-  const previousDate = getDateFromMessage(previousMessage);
+  // 이전 메시지들을 역순으로 확인하면서 첫 번째 일반 메시지와 비교
+  for (let i = index - 1; i >= 0; i--) {
+    const prevMsg = chatStore.sortedMessages[i];
 
-  // 다른 날짜면 날짜 구분선 표시
-  return !isSameDay(currentDate, previousDate);
+    // 시스템 메시지가 아닌 첫 번째 메시지와 비교
+    if (prevMsg.messageType !== 'SYSTEM' && prevMsg.messageType !== 'JOIN') {
+      const prevDate = getDateFromMessage(prevMsg);
+
+      // 날짜가 다르면 구분선 표시, 같으면 표시하지 않음
+      const result = !isSameDay(currentDate, prevDate);
+      return result;
+    }
+  }
+
+  // 이전에 일반 메시지가 없으면 날짜 표시
+  return true;
 };
 
-// 메시지에서 날짜 추출
+// 메시지에서 날짜 추출 (디버깅 로그 포함)
 const getDateFromMessage = (message) => {
   const timestamp = message.sentAt || message.time;
 
-  if (!timestamp) return new Date();
+  console.log('🕐 날짜 추출 시도:', {
+    timestamp,
+    messageContent: message.content || message.message,
+    messageType: message.messageType,
+  });
+
+  if (!timestamp) {
+    console.log('⚠️ 타임스탬프 없음 - 현재 날짜 사용');
+    return new Date();
+  }
 
   try {
+    let date;
     if (Array.isArray(timestamp)) {
-      return new Date(
+      date = new Date(
         timestamp[0], // year
         timestamp[1] - 1, // month (0-based)
         timestamp[2], // day
@@ -246,11 +272,26 @@ const getDateFromMessage = (message) => {
         timestamp[4] || 0, // minute
         timestamp[5] || 0 // second
       );
+      console.log('📅 배열 형태 날짜 변환:', {
+        array: timestamp,
+        result: date.toDateString(),
+      });
     } else {
-      return new Date(timestamp);
+      date = new Date(timestamp);
+      console.log('📅 문자열 형태 날짜 변환:', {
+        string: timestamp,
+        result: date.toDateString(),
+      });
     }
+
+    if (isNaN(date.getTime())) {
+      console.error('❌ 유효하지 않은 날짜:', timestamp);
+      return new Date();
+    }
+
+    return date;
   } catch (error) {
-    console.error('날짜 추출 오류:', error);
+    console.error('❌ 날짜 추출 오류:', error, 'timestamp:', timestamp);
     return new Date();
   }
 };
@@ -477,6 +518,19 @@ window.addEventListener('beforeunload', () => {
 
 <style scoped>
 /* Custom scrollbar styling */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #414141;
+  border-radius: 2px;
+}
+
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
@@ -525,6 +579,3 @@ button:active {
   transform: translateY(0);
 }
 </style>
-bar { width: 4px; } .overflow-y-auto::-webkit-scrollbar-track { background:
-transparent; } .overflow-y-auto::-webkit-scrollbar-thumb { background: #414141;
-border-radius: 2px; } .overflow-y-auto::-webkit-scroll
