@@ -117,14 +117,13 @@ const categoryColorMap = {
   생활: '#CF8FEC',
   식비: '#F680DB',
   그외: '#C9C9C9',
+  수입: '#FFFFFF',
 };
 
 // 카테고리에 따른 색상 가져오기 함수
 const getCategoryColor = (categoryName) => {
   return categoryColorMap[categoryName] || categoryColorMap['그외'];
 };
-
-
 
 // 차트 생성
 const createChart = () => {
@@ -199,23 +198,25 @@ onMounted(async () => {
             unwatch();
             resolve();
           }
-        },
+        }
       );
     });
   }
 
   // 카테고리별 데이터 계산
   const categoryMap = new Map();
-  expensesStore.currentMonthTransactions.forEach((transaction) => {
-    const categoryName = transaction.category || '기타';
-    const amount = transaction.amount || 0;
+  expensesStore.currentMonthTransactions
+    .filter((transaction) => transaction.category !== '수입')
+    .forEach((transaction) => {
+      const categoryName = transaction.category || '기타';
+      const amount = transaction.amount || 0;
 
-    if (categoryMap.has(categoryName)) {
-      categoryMap.set(categoryName, categoryMap.get(categoryName) + amount);
-    } else {
-      categoryMap.set(categoryName, amount);
-    }
-  });
+      if (categoryMap.has(categoryName)) {
+        categoryMap.set(categoryName, categoryMap.get(categoryName) + amount);
+      } else {
+        categoryMap.set(categoryName, amount);
+      }
+    });
 
   categoryData.value = Array.from(categoryMap.entries())
     .map(([name, amount]) => ({ name, amount }))
