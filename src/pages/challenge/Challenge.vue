@@ -35,10 +35,12 @@
       <!-- Start Challenge Button - 컨테이너 밖으로 분리 -->
       <div class="px-8 pb-[90px]">
         <Button 
-          label="챌린지 시작하기" 
           :disabled="false"
           @click="startChallenge"
-        />
+          class="font-normal"
+        >
+          챌린지 시작하기
+        </Button>
       </div>
     </div>
 
@@ -56,7 +58,7 @@ import ChallengeFlow from './ChallengeFlow.vue';
 const showChallengeFlow = ref(false);
 
 const startChallenge = () => {
-  console.log('챌린지 시작하기 클릭됨');
+  //console.log('챌린지 시작하기 클릭됨');
   showChallengeFlow.value = true;
 };
 </script>

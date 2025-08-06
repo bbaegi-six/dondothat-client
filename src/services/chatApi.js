@@ -1,9 +1,8 @@
-// src/services/chatApi.js
-
 import axios from 'axios';
+import api from '@/utils/api'; // 기존의 api 인스턴스 재사용
 
 // ✅ 백엔드 API URL (REST)
-const BASE_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api`;
+const BASE_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}`;
 
 // ✅ axios 인스턴스
 const apiClient = axios.create({
@@ -40,13 +39,13 @@ apiClient.interceptors.response.use(
 );
 
 export const chatApi = {
-  /** 사용자 챌린지 상태 확인 */
-  async getUserChallengeStatus(userId) {
+  /** 현재 로그인한 사용자의 챌린지 상태 확인 (JWT 기반) */
+  async getUserChallengeStatus() {
     try {
-      console.log(`🔍 사용자 챌린지 상태 조회: userId=${userId}`);
-      const response = await apiClient.get(`/chat/status/${userId}`);
-      console.log('✅ 챌린지 상태 조회 성공:', response.data);
-      return response.data;
+      console.log('🔍 사용자 챌린지 상태 조회 (JWT 기반)');
+      const response = await api.get('/chat/status/me');
+      console.log('✅ 챌린지 상태 조회 성공:', response);
+      return response;
     } catch (error) {
       console.error('❌ 챌린지 상태 조회 실패:', error);
       throw new Error(
@@ -55,17 +54,17 @@ export const chatApi = {
     }
   },
 
-  /** 채팅 메시지 이력 조회 */
-  async getChatHistory(challengeId, userId, limit = 50) {
+  /** 채팅 메시지 이력 조회 (JWT 기반) */
+  async getChatHistory(challengeId, limit = 50) {
     try {
       console.log(
-        `🔍 채팅 이력 조회: challengeId=${challengeId}, userId=${userId}, limit=${limit}`
+        `🔍 채팅 이력 조회: challengeId=${challengeId}, limit=${limit}`
       );
-      const response = await apiClient.get(`/chat/${challengeId}/messages`, {
-        params: { userId, limit },
+      const response = await api.get(`/chat/${challengeId}/messages`, {
+        params: { limit }, // userId는 JWT에서 자동 추출
       });
-      console.log(`✅ 채팅 이력 조회 성공: ${response.data.length}개 메시지`);
-      return response.data;
+      console.log(`✅ 채팅 이력 조회 성공: ${response.length}개 메시지`);
+      return response;
     } catch (error) {
       console.error('❌ 채팅 이력 조회 실패:', error);
       if (error.response?.status === 403) {
@@ -77,13 +76,28 @@ export const chatApi = {
     }
   },
 
+  /** 현재 로그인한 사용자가 참여중인 채팅방 조회 (JWT 기반) */
+  async getUserChatRoom() {
+    try {
+      console.log('🔍 사용자 채팅방 조회 (JWT 기반)');
+      const response = await api.get('/chat/user/me');
+      console.log('✅ 사용자 채팅방 조회 성공:', response);
+      return response;
+    } catch (error) {
+      console.error('❌ 사용자 채팅방 조회 실패:', error);
+      throw new Error(
+        error.response?.data?.message || '채팅방 정보를 불러올 수 없습니다.'
+      );
+    }
+  },
+
   /** 채팅방 정보 조회 */
   async getChatRoomInfo(challengeId) {
     try {
       console.log(`🔍 채팅방 정보 조회: challengeId=${challengeId}`);
-      const response = await apiClient.get(`/chat/${challengeId}/info`);
-      console.log('✅ 채팅방 정보 조회 성공:', response.data);
-      return response.data;
+      const response = await api.get(`/chat/${challengeId}/info`);
+      console.log('✅ 채팅방 정보 조회 성공:', response);
+      return response;
     } catch (error) {
       console.error('❌ 채팅방 정보 조회 실패:', error);
       throw new Error(
@@ -95,13 +109,22 @@ export const chatApi = {
   /** 현재 접속자 수 조회 */
   async getParticipantCount(challengeId) {
     try {
-      const response = await apiClient.get(
-        `/chat/${challengeId}/participants/count`
-      );
-      return response.data;
+      const response = await api.get(`/chat/${challengeId}/participants/count`);
+      return response;
     } catch (error) {
       console.error('접속자 수 조회 실패:', error);
       return { challengeId, participantCount: 0 };
+    }
+  },
+
+  /** 채팅방 참여자 목록 조회 */
+  async getParticipants(challengeId) {
+    try {
+      const response = await api.get(`/chat/${challengeId}/participants`);
+      return response;
+    } catch (error) {
+      console.error('참여자 목록 조회 실패:', error);
+      return [];
     }
   },
 };

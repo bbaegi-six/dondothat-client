@@ -48,7 +48,7 @@
             </div>
           </div>
   
-          <!-- 배달 음식 금지 챌린지 -->
+          <!-- 배달음식 금지 챌린지 -->
           <div class="w-[328px] h-[98px] bg-default border-2 border-gray-1 rounded-2xl p-4 flex items-center gap-4">
             <div class="w-12 h-12 bg-gray-1 rounded-full flex items-center justify-center">
               <svg class="w-6 h-6 text-delivery" viewBox="0 0 24 24" fill="currentColor">
@@ -107,8 +107,8 @@
       iconColor: 'text-cafe'
     },
     delivery: {
-      title: '배달 음식 금지 챌린지', 
-      description: '배달 음식 시키지 않기',
+      title: '배달음식 금지 챌린지', 
+      description: '배달음식 시키지 않기',
       icon: 'DeliveryIcon',
       iconColor: 'text-delivery'
     },

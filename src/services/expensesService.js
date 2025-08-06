@@ -5,9 +5,6 @@ export const expensesService = {
   async fetchExpenses(filters = {}) {
     try {
       const params = {
-        userId: 1, // 하드코딩된 userId 사용 (실제로는 인증된 사용자 ID 사용해야 함)
-        page: filters.page || 1,
-        limit: filters.limit || 50,
         categoryId: filters.categoryId,
         startDate: filters.dateRange?.start,
         endDate: filters.dateRange?.end,

@@ -114,9 +114,9 @@
             text-align: center;
             color: #ffffff;
             position: absolute;
-            left: 154px;
+            left: 149px;
             top: 4px;
-            width: 22px;
+            width: 30px;
             height: 32px;
           "
         >
@@ -396,7 +396,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useExpensesStore } from '../../stores/expenses.js';
 import Header from '../../components/layout/Header.vue';
@@ -404,11 +404,6 @@ import TransactionCard from '../../components/expenses/TransactionCard.vue';
 
 const router = useRouter();
 const expensesStore = useExpensesStore();
-
-// 컴포넌트가 처음 로드될 때 API를 호출하여 데이터를 가져옴
-onMounted(() => {
-  expensesStore.fetchExpensesFromAPI();
-});
 
 // 탭 상태 관리
 const activeTab = ref('account'); // 'account' 또는 'savings'

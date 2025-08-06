@@ -27,19 +27,53 @@
 
     <!-- Body Content with proper top margin for fixed header -->
     <div class="flex flex-col flex-1 mt-[60px]">
+      <!-- 🚀 채팅 메인 화면 (우선순위 1 - 가장 먼저 체크) -->
+      <div
+        v-if="shouldShowChatUI"
+        class="flex-1 px-[31px] py-4 overflow-y-auto space-y-2"
+        ref="chatContainer"
+      >
+        <!-- 메시지 목록 -->
+        <ChatMessage
+          v-for="message in chatStore.sortedMessages"
+          :key="message.messageId || message.id || Math.random()"
+          :username="
+            message.userName || message.username || '사용자' + message.userId
+          "
+          :content="message.message || message.content"
+          :time="message.time || formatTime(message.sentAt)"
+          :messageType="message.messageType || 'MESSAGE'"
+          :userId="message.userId"
+          :currentUserId="chatStore.currentUser?.userId"
+        />
+
+        <!-- 메시지가 없을 때 -->
+        <div
+          v-if="
+            chatStore.messages.length === 0 &&
+            chatStore.isConnected &&
+            !chatStore.isLoading
+          "
+          class="flex justify-center py-8"
+        >
+          <div class="text-center">
+            <i class="fas fa-comments text-4xl text-[#414141] mb-4"></i>
+            <p class="text-[#C9C9C9] text-sm">첫 메시지를 보내보세요!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🚀 로딩 상태들 (우선순위 2 - 채팅 UI가 없을 때만) -->
       <!-- 챌린지 상태 확인 중 -->
       <div
-        v-if="isCheckingStatus"
+        v-else-if="isCheckingStatus"
         class="flex-1 flex items-center justify-center"
       >
         <div class="text-white text-center">
           <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
           <p>챌린지 상태 확인 중...</p>
           <p class="text-xs text-gray-400 mt-2">
-            디버그: {{ isCheckingStatus }}
-          </p>
-          <p class="text-xs text-gray-400">
-            사용자: {{ currentUserId }} ({{ currentUserName }})
+            현재 로그인한 사용자의 챌린지 상태를 확인하고 있습니다.
           </p>
         </div>
       </div>
@@ -81,66 +115,30 @@
         </div>
       </div>
 
-      <!-- Chat Messages -->
+      <!-- Connection Status -->
       <div
-        v-else-if="chatStore.isConnected || chatStore.messages.length > 0"
-        class="flex-1 px-[31px] py-4 overflow-y-auto space-y-2"
-        ref="chatContainer"
+        v-else-if="
+          !chatStore.isConnected &&
+          !chatStore.isConnecting &&
+          !chatStore.error &&
+          !chatStore.isLoading
+        "
+        class="flex-1 flex items-center justify-center"
       >
-        <!-- 디버그 정보 (임시) -->
-        <div class="bg-gray-800 text-white text-xs p-2 mb-2 rounded">
-          <p>연결 상태: {{ chatStore.isConnected }}</p>
-          <p>메시지 개수: {{ chatStore.messages.length }}</p>
-          <p>정렬된 메시지: {{ chatStore.sortedMessages.length }}</p>
-          <p>현재 사용자: {{ currentUserId }}</p>
-        </div>
-        <!-- 이전 메시지 안내 (이력이 있을 때만) -->
-        <div
-          v-if="chatStore.messages.length > 0 && hasHistoryMessages"
-          class="flex justify-center py-2 mb-4"
-        >
-          <div
-            class="bg-[#414141] text-[#C9C9C9] text-xs px-3 py-1 rounded-full"
+        <div class="text-center text-gray-400">
+          <i class="fas fa-wifi-slash text-xl mb-2"></i>
+          <p>연결이 끊어졌습니다</p>
+          <button
+            @click="reconnect"
+            class="mt-2 px-4 py-2 bg-[#FF5555] text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
           >
-            챌린지 참여 이후의 채팅 내용입니다
-          </div>
-        </div>
-
-        <!-- 메시지 목록 -->
-        <ChatMessage
-          v-for="message in chatStore.sortedMessages"
-          :key="message.messageId || message.id || Math.random()"
-          :username="
-            message.userName || message.username || '사용자' + message.userId
-          "
-          :content="message.message || message.content"
-          :time="message.time || formatTime(message.sentAt)"
-          :messageType="message.messageType || 'MESSAGE'"
-          :userId="message.userId"
-          :currentUserId="currentUserId"
-        />
-
-        <!-- 메시지가 없을 때 -->
-        <div
-          v-if="
-            chatStore.messages.length === 0 &&
-            chatStore.isConnected &&
-            !chatStore.isLoading
-          "
-          class="flex justify-center py-8"
-        >
-          <div class="text-center">
-            <i class="fas fa-comments text-4xl text-[#414141] mb-4"></i>
-            <p class="text-[#C9C9C9] text-sm">첫 메시지를 보내보세요!</p>
-          </div>
+            다시 연결
+          </button>
         </div>
       </div>
 
       <!-- Input Area -->
-      <div
-        v-if="chatStore.isConnected && !chatStore.isLoading"
-        class="px-6 pb-4"
-      >
+      <div v-if="shouldShowInputArea" class="px-6 pb-4">
         <div class="flex gap-2 items-center">
           <div class="flex-1 relative">
             <input
@@ -167,28 +165,6 @@
         </div>
       </div>
 
-      <!-- Connection Status -->
-      <div
-        v-if="
-          !chatStore.isConnected &&
-          !chatStore.isConnecting &&
-          !chatStore.error &&
-          !chatStore.isLoading
-        "
-        class="px-6 pb-4"
-      >
-        <div class="text-center text-gray-400">
-          <i class="fas fa-wifi-slash text-xl mb-2"></i>
-          <p>연결이 끊어졌습니다</p>
-          <button
-            @click="reconnect"
-            class="mt-2 px-4 py-2 bg-[#FF5555] text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
-          >
-            다시 연결
-          </button>
-        </div>
-      </div>
-
       <!-- Bottom Navigation Space -->
       <div class="h-20"></div>
     </div>
@@ -196,7 +172,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useChatStore } from '@/stores/chat';
 import { useAuthStore } from '@/stores/auth';
@@ -212,49 +188,33 @@ const newMessage = ref('');
 const chatContainer = ref(null);
 const challengeName = ref('챌린지 채팅방');
 const isCheckingStatus = ref(false);
-const hasHistoryMessages = ref(false); // 이력 메시지 존재 여부
+const hasHistoryMessages = ref(false);
+const challengeId = ref(null);
+const isInitialized = ref(false);
 
-// 사용자 정보 - 인증된 사용자 정보 우선 사용
-const currentUserId = ref(
-  authStore.user?.id || parseInt(route.query.userId) || 1
-);
-const currentUserName = ref(
-  authStore.user?.name || route.query.userName || '나'
-);
+// 🚀 핵심: 계산된 속성으로 UI 상태 결정
+const shouldShowChatUI = computed(() => {
+  // 기존 연결이 있거나, 연결되어 있거나, 메시지가 있으면 채팅 UI 표시
+  return (
+    chatStore.isConnected ||
+    chatStore.messages.length > 0 ||
+    (isInitialized.value && !isCheckingStatus.value && !chatStore.error)
+  );
+});
 
-// 디버깅: 현재 사용자 정보 로깅
-console.log('👤 현재 사용자 정보:', {
-  authStoreUser: authStore.user,
-  routeQueryUserId: route.query.userId,
-  routeQueryUserName: route.query.userName,
-  currentUserId: currentUserId.value,
-  currentUserName: currentUserName.value,
+const shouldShowInputArea = computed(() => {
+  return (
+    shouldShowChatUI.value && chatStore.isConnected && !chatStore.isLoading
+  );
 });
 
 // Methods
 const connectToChat = async () => {
   try {
-    // 챌린지 상태 확인 완료
-    isCheckingStatus.value = false;
+    console.log(`🚀 채팅방 연결 시작: challengeId=${challengeId.value}`);
 
-    // URL 쿼리에서 challengeId 가져오기
-    const challengeId =
-      parseInt(route.query.challengeId) ||
-      parseInt(route.params.challengeId) ||
-      1;
-
-    // 쿼리에서 챌린지 이름 가져오기
-    if (route.query.challengeName) {
-      challengeName.value = route.query.challengeName;
-    }
-
-    console.log(`🚀 채팅방 연결 시작: challengeId=${challengeId}`);
-
-    await chatStore.connectToChat(
-      challengeId,
-      currentUserId.value,
-      currentUserName.value
-    );
+    // JWT 기반으로 채팅방 연결 (사용자 정보는 자동으로 백엔드에서 추출)
+    await chatStore.connectToChat(challengeId.value);
 
     // 이력 메시지가 있는지 확인
     hasHistoryMessages.value = chatStore.messages.length > 0;
@@ -267,18 +227,13 @@ const connectToChat = async () => {
     });
   } catch (error) {
     console.error('❌ 채팅방 연결 실패:', error);
-    isCheckingStatus.value = false;
-
-    // 연결 실패 시 3초 후 NoChat 페이지로 이동
-    setTimeout(() => {
-      router.push('/no-chat');
-    }, 3000);
+    // 에러는 store에서 처리되므로 여기서는 로그만 남김
   }
 };
 
 const reconnect = async () => {
+  console.log('🔄 재연결 시도');
   chatStore.clearError();
-  isCheckingStatus.value = false;
   await connectToChat();
 };
 
@@ -304,7 +259,8 @@ const scrollToBottom = () => {
 };
 
 const goBack = () => {
-  // 홈 화면으로 이동
+  // 🔑 핵심: 채팅방에서 나갈 때 연결을 끊지 않음
+  console.log('🔙 채팅방에서 나가기 (연결 유지)');
   router.push('/');
 };
 
@@ -326,12 +282,118 @@ const formatTime = (timestamp) => {
   }
 };
 
+// 🚨 새로 추가: 사용자 변경 감지 로직
+const initializeChat = async () => {
+  if (isInitialized.value) {
+    console.log('🔄 이미 초기화됨, 스킵');
+    return;
+  }
+
+  try {
+    // 🚀 즉시 기존 연결 상태부터 체크 (API 호출 전)
+    const routeChallengeId =
+      parseInt(route.query.challengeId) || parseInt(route.params.challengeId);
+
+    // Store의 빠른 체크 메서드 사용
+    if (
+      routeChallengeId &&
+      chatStore.isAlreadyConnectedTo &&
+      chatStore.isAlreadyConnectedTo(routeChallengeId)
+    ) {
+      console.log('⚡ 기존 연결 즉시 재사용 (0ms)');
+      challengeId.value = routeChallengeId;
+      challengeName.value = route.query.challengeName || '챌린지 채팅방';
+      hasHistoryMessages.value = chatStore.messages.length > 0;
+      isInitialized.value = true;
+      // isCheckingStatus는 건드리지 않음 (이미 false)
+
+      nextTick(() => {
+        scrollToBottom();
+      });
+      return;
+    }
+
+    // 기존 연결이 없거나 다른 채팅방일 때만 상태 확인
+    isCheckingStatus.value = true;
+    console.log('🚀 Chat 컴포넌트 초기화 시작');
+
+    // 1. 사용자의 챌린지 상태 확인 (JWT 기반)
+    console.log('🔍 사용자 챌린지 상태 확인 중...');
+    const status = await chatStore.checkUserChallengeStatus();
+
+    // 🚨 핵심: 사용자가 실제로 바뀌었는지 확인
+    if (
+      chatStore.currentUser?.userId &&
+      chatStore.currentUser.userId !== status.userId
+    ) {
+      console.log('👤 사용자 변경 감지 - Chat Store 초기화');
+      console.log(
+        `이전 사용자: ${chatStore.currentUser.userId}, 새 사용자: ${status.userId}`
+      );
+      chatStore.resetForNewUser();
+    }
+
+    if (!status.hasActiveChallenge) {
+      console.log('❌ 활성 챌린지가 없음, NoChat 페이지로 이동');
+      router.push('/no-chat');
+      return;
+    }
+
+    console.log('✅ 활성 챌린지 확인:', status.challengeName);
+
+    // 2. challengeId 설정
+    challengeId.value = status.challengeId;
+    challengeName.value = status.challengeName || '챌린지 채팅방';
+
+    // 3. URL 파라미터와 실제 챌린지 ID가 다른 경우에만 replace
+    if (routeChallengeId && routeChallengeId !== status.challengeId) {
+      console.log(
+        `🔄 URL 업데이트: ${routeChallengeId} -> ${status.challengeId}`
+      );
+      await router.replace({
+        path: '/chat',
+        query: {
+          challengeId: status.challengeId,
+          challengeName: status.challengeName,
+        },
+      });
+      return;
+    }
+
+    // 4. 초기화 완료 표시
+    isInitialized.value = true;
+    isCheckingStatus.value = false;
+
+    // 🔑 API 호출 후 다시 한번 기존 연결 상태 확인
+    if (chatStore.isConnected && chatStore.challengeId === status.challengeId) {
+      console.log('✅ API 확인 후 기존 연결 재사용');
+      hasHistoryMessages.value = chatStore.messages.length > 0;
+      nextTick(() => {
+        scrollToBottom();
+      });
+      return;
+    }
+
+    console.log('✅ 챌린지 상태 확인 완료, 채팅방 연결 시작');
+
+    // 5. 채팅방 연결 (기존 연결이 없거나 다른 채팅방인 경우에만)
+    await connectToChat();
+  } catch (error) {
+    console.error('❌ 채팅방 초기화 실패:', error);
+    isCheckingStatus.value = false;
+
+    // 에러 발생 시 NoChat으로 이동
+    setTimeout(() => {
+      router.push('/no-chat');
+    }, 2000);
+  }
+};
+
 // 새 메시지가 추가될 때마다 자동 스크롤
 watch(
   () => chatStore.messages.length,
   (newLength, oldLength) => {
     console.log('📊 메시지 개수 변화:', { oldLength, newLength });
-    console.log('📋 현재 메시지 목록:', chatStore.sortedMessages);
     nextTick(() => {
       scrollToBottom();
     });
@@ -350,105 +412,30 @@ watch(
   }
 );
 
-// 쿼리 파라미터 변화 감지 (사용자 정보 업데이트)
-watch(
-  () => route.query,
-  (newQuery) => {
-    if (newQuery.userId && parseInt(newQuery.userId) !== currentUserId.value) {
-      console.log('🔄 쿼리 파라미터에서 사용자 ID 업데이트:', {
-        old: currentUserId.value,
-        new: parseInt(newQuery.userId),
-      });
-      currentUserId.value = parseInt(newQuery.userId);
-    }
-    if (newQuery.userName && newQuery.userName !== currentUserName.value) {
-      console.log('🔄 쿼리 파라미터에서 사용자 이름 업데이트:', {
-        old: currentUserName.value,
-        new: newQuery.userName,
-      });
-      currentUserName.value = newQuery.userName;
-    }
-  },
-  { immediate: true }
-);
-
 // Lifecycle
 onMounted(async () => {
   console.log('🚀 Chat 컴포넌트 마운트됨');
-
-  try {
-    isCheckingStatus.value = true;
-
-    // 1. 먼저 사용자의 챌린지 상태 확인
-    console.log('🔍 사용자 챌린지 상태 확인 중...');
-    const status = await chatStore.checkUserChallengeStatus(
-      currentUserId.value
-    );
-
-    if (!status.hasActiveChallenge) {
-      console.log('❌ 활성 챌린지가 없음, NoChat 페이지로 이동');
-      router.push('/no-chat');
-      return;
-    }
-
-    console.log('✅ 활성 챌린지 확인:', status.challengeName);
-
-    // 2. 사용자 ID 업데이트 (백엔드에서 받은 정보로)
-    if (status.userId && status.userId !== currentUserId.value) {
-      console.log('🔄 사용자 ID 업데이트:', {
-        old: currentUserId.value,
-        new: status.userId,
-      });
-      currentUserId.value = status.userId;
-    }
-
-    // 3. 활성 챌린지가 있으면 해당 채팅방으로 연결
-    challengeName.value = status.challengeName || '챌린지 채팅방';
-
-    // 3. 쿼리 파라미터가 없으면 상태에서 가져온 정보로 업데이트
-    if (!route.query.challengeId) {
-      await router.replace({
-        path: '/chat',
-        query: {
-          challengeId: status.challengeId,
-          challengeName: status.challengeName,
-          userId: currentUserId.value,
-          userName: currentUserName.value,
-        },
-      });
-      return; // replace 후 다시 마운트됨
-    }
-
-    // 4. 챌린지 상태 확인 완료
-    isCheckingStatus.value = false;
-    console.log('✅ 챌린지 상태 확인 완료, 채팅방 연결 시작');
-
-    await connectToChat();
-  } catch (error) {
-    console.error('❌ 채팅방 초기화 실패:', error);
-    isCheckingStatus.value = false;
-
-    // 에러 메시지를 store에 설정하지 않고 직접 NoChat으로 이동
-    setTimeout(() => {
-      router.push('/no-chat');
-    }, 2000);
-  }
+  await initializeChat();
 });
 
 onUnmounted(() => {
   console.log('🔌 Chat 컴포넌트 언마운트됨');
-  chatStore.cleanup();
+  // 🔑 핵심: 언마운트 시에도 연결을 끊지 않음 (cleanup 호출하지 않음)
+  console.log('🔄 연결 유지됨 (cleanup 생략)');
+
+  // 초기화 상태만 리셋
+  isInitialized.value = false;
 });
 
-// 페이지를 벗어날 때 연결 해제
+// 🔑 완전히 다른 페이지로 이동할 때만 연결 해제
+// 브라우저 탭 종료나 새로고침 시에만 해제
 window.addEventListener('beforeunload', () => {
+  console.log('🌐 브라우저 종료/새로고침 - 연결 해제');
   chatStore.disconnect();
 });
 
-// 브라우저 뒤로가기 감지
-window.addEventListener('popstate', () => {
-  chatStore.disconnect();
-});
+// 🔑 뒤로가기는 채팅 내에서의 이동이므로 연결 유지
+// (popstate 이벤트 리스너 제거)
 </script>
 
 <style scoped>

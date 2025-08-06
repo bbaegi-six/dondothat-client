@@ -1,9 +1,8 @@
-// src/stores/chat.js
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
-import { chatApi } from '@/services/chatApi'; // 새로 추가
+import { chatApi } from '@/services/chatApi';
 
 // WebSocket URL 설정 통일
 const getWebSocketUrl = () => {
@@ -50,13 +49,24 @@ export const useChatStore = defineStore('chat', () => {
   };
 
   /**
-   * 사용자의 현재 챌린지 상태 확인
+   * 현재 로그인한 사용자의 챌린지 상태 확인 (JWT 기반)
    */
-  const checkUserChallengeStatus = async (userId) => {
+  const checkUserChallengeStatus = async () => {
     try {
-      console.log(`🔍 사용자 챌린지 상태 확인: userId=${userId}`);
-      const status = await chatApi.getUserChallengeStatus(userId);
+      console.log('🔍 사용자 챌린지 상태 확인 (JWT 기반)');
+      clearError(); // 이전 에러 클리어
+
+      const status = await chatApi.getUserChallengeStatus();
       console.log('📊 챌린지 상태:', status);
+
+      // 현재 사용자 정보 업데이트
+      if (status.userId) {
+        setCurrentUser(
+          status.userId,
+          status.userName || `사용자${status.userId}`
+        );
+      }
+
       return status;
     } catch (error) {
       console.error('❌ 챌린지 상태 확인 실패:', error);
@@ -68,18 +78,14 @@ export const useChatStore = defineStore('chat', () => {
   /**
    * 채팅방 이력 로드
    */
-  const loadChatHistory = async (chatChallengeId, userId, limit = 50) => {
+  const loadChatHistory = async (chatChallengeId, limit = 50) => {
     try {
       isLoading.value = true;
-      console.log(
-        `📚 채팅 이력 로드 시작: challengeId=${chatChallengeId}, userId=${userId}`
-      );
+      clearError(); // 이전 에러 클리어
 
-      const history = await chatApi.getChatHistory(
-        chatChallengeId,
-        userId,
-        limit
-      );
+      console.log(`📚 채팅 이력 로드 시작: challengeId=${chatChallengeId}`);
+
+      const history = await chatApi.getChatHistory(chatChallengeId, limit);
 
       // 기존 메시지 초기화 후 이력 로드
       messages.value = [];
@@ -93,8 +99,8 @@ export const useChatStore = defineStore('chat', () => {
       return history.length;
     } catch (error) {
       console.error('❌ 채팅 이력 로드 실패:', error);
-      setError(error.message);
-      // 이력 로드 실패해도 채팅은 계속 가능하도록 함
+      // 이력 로드 실패는 치명적이지 않으므로 에러를 store에 설정하지 않음
+      console.warn('⚠️ 이력 로드 실패했지만 채팅은 계속 진행합니다.');
       return 0;
     } finally {
       isLoading.value = false;
@@ -102,9 +108,9 @@ export const useChatStore = defineStore('chat', () => {
   };
 
   /**
-   * 채팅방 연결 (메인 메서드)
+   * 채팅방 연결 (메인 메서드) - 자동으로 현재 사용자 정보 가져옴
    */
-  const connectToChat = async (chatChallengeId, userId, userName = null) => {
+  const connectToChat = async (chatChallengeId) => {
     if (isConnected.value || isConnecting.value) {
       console.log('🔄 이미 연결되어 있거나 연결 중입니다.');
       return;
@@ -112,15 +118,13 @@ export const useChatStore = defineStore('chat', () => {
 
     try {
       isConnecting.value = true;
+      clearError(); // 연결 시도 전 에러 클리어
       challengeId.value = chatChallengeId;
-      setCurrentUser(userId, userName);
 
-      console.log(
-        `🚀 채팅방 연결 시도: challengeId=${chatChallengeId}, userId=${userId}`
-      );
+      console.log(`🚀 채팅방 연결 시도: challengeId=${chatChallengeId}`);
 
-      // 1. 먼저 채팅 이력 로드
-      const historyCount = await loadChatHistory(chatChallengeId, userId);
+      // 1. 채팅 이력 로드 (현재 사용자 정보는 이미 확인됨)
+      const historyCount = await loadChatHistory(chatChallengeId);
 
       // 2. 채팅방 정보 로드
       try {
@@ -178,7 +182,7 @@ export const useChatStore = defineStore('chat', () => {
             setError('채팅방 연결 시간이 초과되었습니다.');
             reject(new Error('Connection timeout'));
           }
-        }, 10000); // 10초 타임아웃
+        }, 10000);
 
         stompClient.value.connect(
           {},
@@ -188,6 +192,7 @@ export const useChatStore = defineStore('chat', () => {
             console.log('🔌 WebSocket 연결 성공:', frame);
             isConnected.value = true;
             isConnecting.value = false;
+            clearError(); // 연결 성공 시 에러 클리어
 
             // 메시지 구독
             subscribeToMessages();
@@ -204,10 +209,14 @@ export const useChatStore = defineStore('chat', () => {
             isConnecting.value = false;
 
             let errorMessage = '채팅방 연결에 실패했습니다.';
-            if (error.includes('timeout')) {
-              errorMessage = '연결 시간이 초과되었습니다.';
-            } else if (error.includes('refused')) {
-              errorMessage = '서버에 연결할 수 없습니다.';
+
+            if (error.includes && error.includes('timeout')) {
+              const errorStr = error.toString();
+              if (errorStr.includes('timeout')) {
+                errorMessage = '연결 시간이 초과되었습니다.';
+              } else if (errorStr.includes('refused')) {
+                errorMessage = '서버에 연결할 수 없습니다.';
+              }
             }
 
             setError(errorMessage);
@@ -228,7 +237,7 @@ export const useChatStore = defineStore('chat', () => {
    * 최근에 입장 메시지가 있는지 확인 (중복 입장 메시지 방지)
    */
   const hasRecentJoinMessage = () => {
-    const recentMessages = messages.value.slice(-5); // 최근 5개 메시지만 확인
+    const recentMessages = messages.value.slice(-5);
     return recentMessages.some(
       (msg) =>
         msg.messageType === 'SYSTEM' &&
@@ -267,14 +276,6 @@ export const useChatStore = defineStore('chat', () => {
 
             // 일반 채팅 메시지 처리
             console.log('💬 새 메시지 수신:', data);
-            console.log('📝 메시지 상세 정보:', {
-              messageId: data.messageId,
-              userId: data.userId,
-              userName: data.userName,
-              message: data.message,
-              messageType: data.messageType,
-              sentAt: data.sentAt,
-            });
             addMessage(data, true); // true = 중복 체크 함 (실시간 메시지)
           } catch (err) {
             console.error(
@@ -297,19 +298,6 @@ export const useChatStore = defineStore('chat', () => {
 
   const subscribeToUserCount = () => {
     if (!stompClient.value || !challengeId.value) return;
-
-    stompClient.value.subscribe(
-      `/topic/userCount/${challengeId.value}`,
-      (message) => {
-        try {
-          const count = parseInt(message.body);
-          console.log('👥 접속자 수 업데이트:', count);
-          userCount.value = count;
-        } catch (err) {
-          console.error('접속자 수 파싱 오류:', err);
-        }
-      }
-    );
   };
 
   const joinChatRoom = () => {
@@ -334,13 +322,6 @@ export const useChatStore = defineStore('chat', () => {
   const sendMessage = (content) => {
     if (!stompClient.value || !isConnected.value || !content.trim()) {
       console.warn('⚠️ 메시지 전송 불가: 연결되지 않았거나 내용이 비어있음');
-      console.log('상태 확인:', {
-        stompClient: !!stompClient.value,
-        isConnected: isConnected.value,
-        content: content.trim(),
-        challengeId: challengeId.value,
-        userId: currentUser.value.userId,
-      });
       return false;
     }
 
@@ -351,23 +332,11 @@ export const useChatStore = defineStore('chat', () => {
         userName: currentUser.value.userName,
         message: content.trim(),
         messageType: 'MESSAGE',
-        sentAt: new Date().toISOString(), // 클라이언트 시간 추가
+        sentAt: new Date().toISOString(),
       };
 
       const destination = `/app/chat/${challengeId.value}/send`;
-      console.log('📤 메시지 전송 시도:', {
-        destination,
-        message,
-        stompConnected: stompClient.value.connected,
-      });
-
-      // 즉시 UI에 표시 (낙관적 업데이트)
-      const optimisticMessage = {
-        ...message,
-        messageId: `temp_${Date.now()}`, // 임시 ID
-        isOptimistic: true, // 낙관적 업데이트 표시
-      };
-      addMessage(optimisticMessage, false); // 중복 체크 안함
+      console.log('📤 메시지 전송 시도:', { destination, message });
 
       stompClient.value.send(destination, {}, JSON.stringify(message));
 
@@ -384,11 +353,7 @@ export const useChatStore = defineStore('chat', () => {
    * 메시지 추가 (중복 체크 옵션)
    */
   const addMessage = (message, checkDuplicate = true) => {
-    console.log('📥 addMessage 호출:', {
-      message,
-      checkDuplicate,
-      currentMessageCount: messages.value.length,
-    });
+    console.log('📥 addMessage 호출:', { message, checkDuplicate });
 
     // 중복 메시지 방지 (실시간 메시지만)
     if (
@@ -414,14 +379,33 @@ export const useChatStore = defineStore('chat', () => {
     console.log('✅ 메시지 추가 완료, 총 메시지 수:', messages.value.length);
   };
 
+  /**
+   * 빠른 연결 상태 체크 (API 호출 없이)
+   */
+  const isAlreadyConnectedTo = (targetChallengeId) => {
+    const connected =
+      isConnected.value &&
+      challengeId.value === targetChallengeId &&
+      currentUser.value?.userId &&
+      stompClient.value?.connected;
+
+    console.log('⚡ 빠른 연결 체크:', {
+      isConnected: isConnected.value,
+      challengeMatch: challengeId.value === targetChallengeId,
+      hasUser: !!currentUser.value?.userId,
+      stompConnected: stompClient.value?.connected,
+      result: connected,
+    });
+
+    return connected;
+  };
+
   const formatTime = (timestamp) => {
     try {
       let date;
 
       // 백엔드에서 배열 형태로 오는 경우 처리
       if (Array.isArray(timestamp)) {
-        console.log('📅 배열 형태의 timestamp 처리:', timestamp);
-        // 배열을 Date 객체로 변환
         date = new Date(
           timestamp[0],
           timestamp[1] - 1,
@@ -430,24 +414,15 @@ export const useChatStore = defineStore('chat', () => {
           timestamp[4],
           timestamp[5]
         );
-      } else if (
-        typeof timestamp === 'string' ||
-        typeof timestamp === 'number'
-      ) {
-        date = new Date(timestamp);
       } else {
-        console.warn('⚠️ 알 수 없는 timestamp 형식:', timestamp);
-        date = new Date();
+        date = new Date(timestamp);
       }
-
-      console.log('📅 변환된 날짜:', date);
 
       const hours = date.getHours().toString().padStart(2, '0');
       const minutes = date.getMinutes().toString().padStart(2, '0');
-
-      return `${hours}:${minutes}`; // 24시간 형식: 20:30
+      return `${hours}:${minutes}`;
     } catch (err) {
-      console.error('❌ 시간 형식 변환 오류:', err, 'timestamp:', timestamp);
+      console.error('❌ 시간 형식 변환 오류:', err);
       const now = new Date();
       const hours = now.getHours().toString().padStart(2, '0');
       const minutes = now.getMinutes().toString().padStart(2, '0');
@@ -469,6 +444,7 @@ export const useChatStore = defineStore('chat', () => {
       isConnecting.value = false;
       stompClient.value = null;
       socket.value = null;
+
       // messages는 초기화하지 않음 (이력 유지)
       userCount.value = 0;
       challengeId.value = null;
@@ -491,6 +467,18 @@ export const useChatStore = defineStore('chat', () => {
   const reset = () => {
     disconnect();
     messages.value = [];
+    userCount.value = 0;
+    challengeId.value = null;
+    challengeInfo.value = {};
+    currentUser.value = { userId: null, userName: null };
+    clearError();
+    console.log('🧹 Chat Store 완전 초기화 완료');
+  };
+
+  // 사용자 변경 시 호출할 메서드
+  const resetForNewUser = () => {
+    console.log('👤 사용자 변경 감지 - Chat Store 초기화');
+    reset();
   };
 
   // 컴포넌트 언마운트 시 자동 정리
@@ -516,12 +504,14 @@ export const useChatStore = defineStore('chat', () => {
 
     // Actions
     setCurrentUser,
-    checkUserChallengeStatus, // 새로 추가
-    loadChatHistory, // 새로 추가
+    checkUserChallengeStatus,
+    loadChatHistory,
     connectToChat,
     sendMessage,
+    isAlreadyConnectedTo,
     disconnect,
     reset,
+    resetForNewUser,
     setError,
     clearError,
     cleanup,

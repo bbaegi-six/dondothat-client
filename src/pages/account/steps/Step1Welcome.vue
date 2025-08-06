@@ -15,21 +15,20 @@
       </div>
 
       <div class="text-center">
-        <h2 class="text-2xl font-medium mb-2 text-white">
-          서비스 이용을 위해<br />
-          {{ accountTypeText }} 연결이 필요합니다
+        <h2 class="text-xl font-medium mb-0 text-white">
+          지금부터 {{ accountTypeText }} 연결을 시작합니다
         </h2>
-        <!-- // status main -> 계좌 sub -> 저금통 계좌 -->
       </div>
     </div>
 
     <!-- 하단 버튼 -->
     <div class="absolute bottom-10 left-5 right-5 z-10">
-      <div class="flex justify-center">
-        <div class="w-[328px]">
-          <Button :disabled="false" @click="$emit('next')" class="font-normal">
-            계좌 연결하러 가기
-          </Button>
+      <div class="flex justify-center gap-4">
+        <div class="w-[156px]">
+          <Button label="돌아가기" variant="tertiary" @click="router.back()" />
+        </div>
+        <div class="w-[156px]">
+          <Button label="연결하기" :disabled="false" @click="$emit('next')" />
         </div>
       </div>
     </div>
@@ -41,6 +40,9 @@ import accountstr from '@/assets/accountstr.svg';
 import { computed } from 'vue';
 import { useAccountStore } from '../../../stores/account';
 
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 defineEmits(['next']);
 
 const accountStore = useAccountStore();

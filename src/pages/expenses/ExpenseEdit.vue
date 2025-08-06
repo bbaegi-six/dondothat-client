@@ -5,11 +5,8 @@
   >
     <Header
       :showBack="true"
-      :title="isNewTransaction ? '소비 내역 추가' : '소비 내역'"
+      :title="isNewTransaction ? '내역 추가' : '내역 수정'"
     />
-
-    <!-- 선 구분 -->
-    <div class="border-t border-[#414141] mb-6"></div>
 
     <!-- 거래처명 -->
     <div class="mb-6">
@@ -120,7 +117,7 @@
     <!-- 버튼들 -->
     <div class="flex gap-3 mt-12 mb-16">
       <button
-        @click="isNewTransaction ? cancelAdd : deleteTransaction"
+        @click="handleButtonClick"
         class="flex-shrink-0 w-24 h-14 bg-[#c9c9c9] text-[#414141] rounded-16 font-medium transition-colors duration-200 hover:bg-[#b5b5b5]"
       >
         {{ isNewTransaction ? '취소' : '삭제' }}
@@ -181,12 +178,14 @@ const route = useRoute();
 const expensesStore = useExpensesStore();
 
 // 라우트 파라미터로 거래 ID를 받음
-const transactionId = route.params.id;
-const isNewTransaction = !transactionId || transactionId === 'new';
+const transactionId = computed(() => route.params.id);
+const isNewTransaction = computed(
+  () => !transactionId.value || transactionId.value === 'new'
+);
 
 // 스토어에서 거래내역 데이터 가져오기
 const transactionData = computed(() => {
-  if (isNewTransaction) {
+  if (isNewTransaction.value) {
     // 새 거래 추가 모드
     const now = new Date();
     const year = now.getFullYear();
@@ -206,10 +205,10 @@ const transactionData = computed(() => {
     };
   }
 
-  const transaction = expensesStore.getTransactionById(transactionId);
+  const transaction = expensesStore.getTransactionById(transactionId.value);
   return (
     transaction || {
-      id: transactionId,
+      id: transactionId.value,
       name: '알 수 없는 거래',
       type: 'expense',
       amount: 0,
@@ -277,22 +276,34 @@ const saveTransaction = () => {
   const transactionData = createTransactionData();
   let success = false;
 
-  if (isNewTransaction) {
+  if (isNewTransaction.value) {
     success = expensesStore.addTransaction(transactionData);
   } else {
-    success = expensesStore.updateTransaction(transactionId, transactionData);
+    success = expensesStore.updateTransaction(
+      transactionId.value,
+      transactionData
+    );
   }
 
   if (success) {
     console.log('저장할 데이터:', transactionData);
     alert(
-      isNewTransaction
+      isNewTransaction.value
         ? '거래내역이 추가되었습니다.'
         : '거래내역이 수정되었습니다.'
     );
     router.back();
   } else {
     alert('저장에 실패했습니다. 다시 시도해주세요.');
+  }
+};
+
+// 버튼 클릭 핸들러
+const handleButtonClick = () => {
+  if (isNewTransaction.value) {
+    cancelAdd();
+  } else {
+    deleteTransaction();
   }
 };
 
@@ -304,9 +315,9 @@ const cancelAdd = () => {
 // 거래내역 삭제
 const deleteTransaction = () => {
   if (confirm('정말로 삭제하시겠습니까?')) {
-    const success = expensesStore.deleteTransaction(transactionId);
+    const success = expensesStore.deleteTransaction(transactionId.value);
     if (success) {
-      console.log('삭제할 거래내역 ID:', transactionId);
+      console.log('삭제할 거래내역 ID:', transactionId.value);
       alert('거래내역이 삭제되었습니다.');
       router.back();
     } else {
@@ -316,11 +327,11 @@ const deleteTransaction = () => {
 };
 
 onMounted(() => {
-  console.log('거래내역 수정 페이지 로드, ID:', transactionId);
+  console.log('거래내역 수정 페이지 로드, ID:', transactionId.value);
   console.log('거래내역 데이터:', transactionData.value);
 
   // 기존 거래 수정 시에만 데이터 초기화
-  if (!isNewTransaction) {
+  if (!isNewTransaction.value) {
     const data = transactionData.value;
     editableData.name = data.name;
     editableData.type = data.type;
