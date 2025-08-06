@@ -1,4 +1,5 @@
 <template>
+  <Header showLogo />
   <div
     class="min-h-screen w-[390px] mx-auto bg-[#2f2f2f] pt-[88px] px-[31px] pb-[90px]"
   >
@@ -82,6 +83,7 @@
 </template>
 
 <script setup>
+import Header from '@/components/layout/Header.vue';
 import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import Chart from 'chart.js/auto';
