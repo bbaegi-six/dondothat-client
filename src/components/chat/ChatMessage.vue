@@ -2,16 +2,16 @@
   <!-- 날짜 구분선 (새로운 날짜일 때만 표시) -->
   <div v-if="showDateSeparator" class="flex justify-center py-2 mt-4 mb-2">
     <div class="bg-[#414141] text-[#C9C9C9] text-xs px-3 py-1 rounded-full">
-      {{ formatDateSeparator(time || sentAt) }}
+      {{ formatDateSeparator(sentAt) }}
     </div>
   </div>
 
-  <!-- 시스템 메시지 (입장/퇴장 등) -->
+  <!-- 시스템 메시지 (입장/퇴장 등) - 날짜가 아닌 시스템 메시지만 표시 -->
   <div
-    v-if="messageType === 'SYSTEM'"
-    class="flex justify-center py-2 mt-4 mb-2"
+    v-if="messageType === 'SYSTEM' || messageType === 'JOIN'"
+    class="flex justify-center py-1 my-1"
   >
-    <div class="bg-[#414141] text-[#C9C9C9] text-xs px-3 py-1 rounded-full">
+    <div class="bg-[#555555] text-[#C9C9C9] text-xs px-3 py-1 rounded-full">
       {{ content }}
     </div>
   </div>
@@ -126,10 +126,8 @@ const isMyMessage = computed(() => {
 // 시간만 표시하는 함수 (HH:MM 형식)
 const formatTimeOnly = (timestamp) => {
   if (!timestamp) return '';
-
   try {
     let date;
-
     // 백엔드에서 배열 형태로 오는 경우 처리
     if (Array.isArray(timestamp)) {
       // [year, month, day, hour, minute, second] 형태
@@ -144,13 +142,11 @@ const formatTimeOnly = (timestamp) => {
     } else {
       date = new Date(timestamp);
     }
-
     // 유효한 날짜인지 확인
     if (isNaN(date.getTime())) {
       console.error('Invalid date:', timestamp);
       return getCurrentTime();
     }
-
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
@@ -206,6 +202,11 @@ const formatDateSeparator = (timestamp) => {
       const month = date.getMonth() + 1;
       const day = date.getDate();
       const weekDay = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
+
+      console.log('month', month);
+      console.log('day', day);
+      console.log('weekDay', weekDay);
+
       return `${month}월 ${day}일 ${weekDay}요일`;
     } else {
       // 다른 년도
