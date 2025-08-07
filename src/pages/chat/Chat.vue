@@ -1,29 +1,15 @@
 <template>
   <div class="flex flex-col h-screen bg-default max-w-[390px] mx-auto">
-    <!-- Custom Header -->
-    <header
-      class="flex items-center px-5 py-4 bg-default text-white h-[60px] box-border w-full fixed top-0 left-1/2 transform -translate-x-1/2 max-w-[390px] z-50"
-    >
-      <!-- 뒤로가기 버튼 -->
-      <button @click="goBack" class="mr-3 p-1">
-        <i class="fas fa-arrow-left text-white text-lg"></i>
-      </button>
-
-      <!-- 채팅방 제목 (헤더 전체 중앙) -->
-      <h2
-        class="font-pretendard text-xl font-semibold m-0 absolute left-1/2 transform -translate-x-1/2"
-      >
-        {{ challengeName }}
-      </h2>
-
-      <!-- 접속자 수 (우측 정렬) -->
-      <div class="flex items-center gap-1 ml-auto">
-        <i class="fas fa-user-group text-[#C9C9C9] text-base"></i>
-        <span class="text-[#C9C9C9] text-base font-medium">{{
-          chatStore.userCount
-        }}</span>
-      </div>
-    </header>
+    <!-- 공통 헤더 컴포넌트 사용 -->
+    <Header
+      :title="challengeName"
+      :show-back="false"
+      :show-logo="false"
+      :show-points="false"
+      :show-add-button="false"
+      :show-user-count="true"
+      :user-count="chatStore.userCount"
+    />
 
     <!-- Body Content with proper top margin for fixed header -->
     <div class="flex flex-col flex-1 mt-[60px]">
@@ -33,19 +19,24 @@
         class="flex-1 px-[31px] py-4 overflow-y-auto space-y-2"
         ref="chatContainer"
       >
-        <!-- 메시지 목록 -->
-        <ChatMessage
-          v-for="message in chatStore.sortedMessages"
+        <!-- 메시지 목록 with 날짜 구분 -->
+        <template
+          v-for="(message, index) in chatStore.sortedMessages"
           :key="message.messageId || message.id || Math.random()"
-          :username="
-            message.userName || message.username || '사용자' + message.userId
-          "
-          :content="message.message || message.content"
-          :time="message.time || formatTime(message.sentAt)"
-          :messageType="message.messageType || 'MESSAGE'"
-          :userId="message.userId"
-          :currentUserId="chatStore.currentUser?.userId"
-        />
+        >
+          <ChatMessage
+            :username="
+              message.userName || message.username || '사용자' + message.userId
+            "
+            :content="message.message || message.content"
+            :time="message.time"
+            :sentAt="message.sentAt"
+            :messageType="message.messageType || 'MESSAGE'"
+            :userId="message.userId"
+            :currentUserId="chatStore.currentUser?.userId"
+            :showDateSeparator="shouldShowDateSeparator(message, index)"
+          />
+        </template>
 
         <!-- 메시지가 없을 때 -->
         <div
@@ -177,6 +168,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useChatStore } from '@/stores/chat';
 import { useAuthStore } from '@/stores/auth';
 import ChatMessage from '@/components/chat/ChatMessage.vue';
+import Header from '@/components/layout/Header.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -207,6 +199,100 @@ const shouldShowInputArea = computed(() => {
     shouldShowChatUI.value && chatStore.isConnected && !chatStore.isLoading
   );
 });
+
+// 날짜 구분선 표시 여부 결정
+const shouldShowDateSeparator = (message, index) => {
+  // 시스템 메시지는 날짜 구분선 표시하지 않음
+  if (message.messageType === 'SYSTEM' || message.messageType === 'JOIN') {
+    return false;
+  }
+
+  // 첫 번째 메시지는 항상 날짜 표시
+  if (index === 0) {
+    return true;
+  }
+
+  // 현재 메시지의 날짜
+  const currentDate = getDateFromMessage(message);
+
+  // 이전 메시지들을 역순으로 확인하면서 첫 번째 일반 메시지와 비교
+  for (let i = index - 1; i >= 0; i--) {
+    const prevMsg = chatStore.sortedMessages[i];
+
+    // 시스템 메시지가 아닌 첫 번째 메시지와 비교
+    if (prevMsg.messageType !== 'SYSTEM' && prevMsg.messageType !== 'JOIN') {
+      const prevDate = getDateFromMessage(prevMsg);
+
+      // 날짜가 다르면 구분선 표시, 같으면 표시하지 않음
+      const result = !isSameDay(currentDate, prevDate);
+      return result;
+    }
+  }
+
+  // 이전에 일반 메시지가 없으면 날짜 표시
+  return true;
+};
+
+// 메시지에서 날짜 추출 (디버깅 로그 포함)
+const getDateFromMessage = (message) => {
+  const timestamp = message.sentAt || message.time;
+
+  console.log('🕐 날짜 추출 시도:', {
+    timestamp,
+    messageContent: message.content || message.message,
+    messageType: message.messageType,
+  });
+
+  if (!timestamp) {
+    console.log('⚠️ 타임스탬프 없음 - 현재 날짜 사용');
+    return new Date();
+  }
+
+  try {
+    let date;
+    if (Array.isArray(timestamp)) {
+      date = new Date(
+        timestamp[0], // year
+        timestamp[1] - 1, // month (0-based)
+        timestamp[2], // day
+        timestamp[3] || 0, // hour
+        timestamp[4] || 0, // minute
+        timestamp[5] || 0 // second
+      );
+      console.log('📅 배열 형태 날짜 변환:', {
+        array: timestamp,
+        result: date.toDateString(),
+      });
+    } else {
+      date = new Date(timestamp);
+      console.log('📅 문자열 형태 날짜 변환:', {
+        string: timestamp,
+        result: date.toDateString(),
+      });
+    }
+
+    if (isNaN(date.getTime())) {
+      console.error('❌ 유효하지 않은 날짜:', timestamp);
+      return new Date();
+    }
+
+    return date;
+  } catch (error) {
+    console.error('❌ 날짜 추출 오류:', error, 'timestamp:', timestamp);
+    return new Date();
+  }
+};
+
+// 같은 날인지 확인
+const isSameDay = (date1, date2) => {
+  if (!date1 || !date2) return false;
+
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+};
 
 // Methods
 const connectToChat = async () => {
@@ -262,24 +348,6 @@ const goBack = () => {
   // 🔑 핵심: 채팅방에서 나갈 때 연결을 끊지 않음
   console.log('🔙 채팅방에서 나가기 (연결 유지)');
   router.push('/');
-};
-
-// 시간 포맷팅 함수 (24시간 형식)
-const formatTime = (timestamp) => {
-  if (!timestamp) return '';
-
-  try {
-    const date = new Date(timestamp);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  } catch (error) {
-    console.error('시간 형식 변환 오류:', error);
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  }
 };
 
 // 🚨 새로 추가: 사용자 변경 감지 로직
@@ -433,9 +501,6 @@ window.addEventListener('beforeunload', () => {
   console.log('🌐 브라우저 종료/새로고침 - 연결 해제');
   chatStore.disconnect();
 });
-
-// 🔑 뒤로가기는 채팅 내에서의 이동이므로 연결 유지
-// (popstate 이벤트 리스너 제거)
 </script>
 
 <style scoped>

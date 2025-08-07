@@ -32,13 +32,36 @@ export const useChatStore = defineStore('chat', () => {
   // Getters
   const sortedMessages = computed(() => {
     return messages.value.sort(
-      (a, b) => new Date(a.sentAt) - new Date(b.sentAt)
+      (a, b) =>
+        new Date(getTimestampFromMessage(a)) -
+        new Date(getTimestampFromMessage(b))
     );
   });
 
   const isMyMessage = computed(() => (message) => {
     return message.userId === currentUser.value.userId;
   });
+
+  // 메시지에서 타임스탬프 추출하는 헬퍼 함수
+  const getTimestampFromMessage = (message) => {
+    const timestamp = message.sentAt || message.time;
+
+    if (Array.isArray(timestamp)) {
+      // 백엔드 배열 형식: [year, month, day, hour, minute, second]
+      return new Date(
+        timestamp[0], // year
+        timestamp[1] - 1, // month (0-based)
+        timestamp[2], // day
+        timestamp[3] || 0, // hour
+        timestamp[4] || 0, // minute
+        timestamp[5] || 0 // second
+      );
+    } else if (timestamp) {
+      return new Date(timestamp);
+    } else {
+      return new Date();
+    }
+  };
 
   // Actions
   const setCurrentUser = (userId, userName = null) => {
@@ -365,13 +388,14 @@ export const useChatStore = defineStore('chat', () => {
       return;
     }
 
-    // 메시지 형식 통일
+    // 메시지 형식 통일 - sentAt 원본 데이터 보존
     const formattedMessage = {
       ...message,
       id: message.messageId || Date.now() + Math.random(),
       username: message.userName || `사용자${message.userId}`,
       content: message.message || message.content,
-      time: formatTime(message.sentAt || new Date().toISOString()),
+      time: formatTimeForDisplay(message.sentAt || new Date().toISOString()),
+      sentAt: message.sentAt, // 원본 타임스탬프 보존 (날짜 구분용)
     };
 
     console.log('📝 포맷된 메시지:', formattedMessage);
@@ -400,34 +424,46 @@ export const useChatStore = defineStore('chat', () => {
     return connected;
   };
 
-  const formatTime = (timestamp) => {
+  // 화면 표시용 시간 포맷 (HH:MM)
+  const formatTimeForDisplay = (timestamp) => {
     try {
       let date;
 
       // 백엔드에서 배열 형태로 오는 경우 처리
       if (Array.isArray(timestamp)) {
         date = new Date(
-          timestamp[0],
-          timestamp[1] - 1,
-          timestamp[2],
-          timestamp[3],
-          timestamp[4],
-          timestamp[5]
+          timestamp[0], // year
+          timestamp[1] - 1, // month (0-based)
+          timestamp[2], // day
+          timestamp[3] || 0, // hour
+          timestamp[4] || 0, // minute
+          timestamp[5] || 0 // second
         );
       } else {
         date = new Date(timestamp);
+      }
+
+      // 유효하지 않은 날짜 체크
+      if (isNaN(date.getTime())) {
+        console.error('❌ 유효하지 않은 날짜:', timestamp);
+        return getCurrentTime();
       }
 
       const hours = date.getHours().toString().padStart(2, '0');
       const minutes = date.getMinutes().toString().padStart(2, '0');
       return `${hours}:${minutes}`;
     } catch (err) {
-      console.error('❌ 시간 형식 변환 오류:', err);
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      return `${hours}:${minutes}`;
+      console.error('❌ 시간 형식 변환 오류:', err, 'timestamp:', timestamp);
+      return getCurrentTime();
     }
+  };
+
+  // 현재 시간 반환 (폴백용)
+  const getCurrentTime = () => {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
   };
 
   const disconnect = () => {
@@ -515,5 +551,9 @@ export const useChatStore = defineStore('chat', () => {
     setError,
     clearError,
     cleanup,
+
+    // Helper functions
+    getTimestampFromMessage,
+    formatTimeForDisplay,
   };
 });
