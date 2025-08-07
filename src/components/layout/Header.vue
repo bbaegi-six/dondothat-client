@@ -81,6 +81,14 @@
           </svg>
         </button>
       </div>
+
+      <div
+        v-if="showUserCount"
+        class="flex items-center gap-1 font-pretendard text-base font-medium text-[#C9C9C9]"
+      >
+        <i class="fas fa-user-group text-base"></i>
+        <span>{{ userCount }}</span>
+      </div>
     </div>
     <!-- 헤더 하단 구분선 -->
     <div class="border-t border-[#414141] w-full"></div>
@@ -117,6 +125,14 @@ defineProps({
   showAddButton: {
     type: Boolean,
     default: false,
+  },
+  showUserCount: {
+    type: Boolean,
+    default: false,
+  },
+  userCount: {
+    type: Number,
+    default: 0,
   },
 });
 
