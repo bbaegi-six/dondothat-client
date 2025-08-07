@@ -3,7 +3,7 @@ import axios from 'axios';
 // API 기본 설정
 const api = axios.create({
   baseURL: '/api',
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -77,6 +77,12 @@ export const expensesAPI = {
   delete: (id) => api.delete(`/expenses/${id}`),
   getCategories: () => api.get('/expenses/categories'),
 };
+// account api 추가
+export const accountAPI = {
+  connectMain: (data) => api.post('/assets/connect', data),
+  connectSub: (data) => api.post('/assets/connect/sub', data),
+  delete: (status) => api.delete('/assets', { params: { status } }),
+};
 
 // 🎯 챌린지 API 추가
 export const challengeAPI = {
@@ -89,8 +95,8 @@ export const challengeAPI = {
           id: challengeId,
           name: getChallengeNameById(challengeId),
           description: getChallengeDescriptionById(challengeId),
-          status: 'ACTIVE'
-        }
+          status: 'ACTIVE',
+        },
       });
     }
     return api.get(`/challenges/${challengeId}`);
@@ -103,9 +109,13 @@ export const challengeAPI = {
       return Promise.resolve({
         data: [
           { id: 'CAFE_CHALLENGE', name: '카페 금지 챌린지', type: 'cafe' },
-          { id: 'DELIVERY_CHALLENGE', name: '배달음식 금지 챌린지', type: 'delivery' },
-          { id: 'TAXI_CHALLENGE', name: '택시 금지 챌린지', type: 'taxi' }
-        ]
+          {
+            id: 'DELIVERY_CHALLENGE',
+            name: '배달음식 금지 챌린지',
+            type: 'delivery',
+          },
+          { id: 'TAXI_CHALLENGE', name: '택시 금지 챌린지', type: 'taxi' },
+        ],
       });
     }
     return api.get('/challenges/recommendations');
@@ -121,10 +131,12 @@ export const challengeAPI = {
           challengeId: `user_challenge_${Date.now()}`,
           status: 'IN_PROGRESS', // 항상 성공 상태로 시작
           startDate: new Date().toISOString(),
-          endDate: new Date(Date.now() + data.duration * 24 * 60 * 60 * 1000).toISOString()
-        }
+          endDate: new Date(
+            Date.now() + data.duration * 24 * 60 * 60 * 1000
+          ).toISOString(),
+        },
       };
-      
+
       console.log(`🎯 ${challengeId} 챌린지 시작 - 성공 상태`);
       return Promise.resolve(mockResponse);
     }
@@ -150,8 +162,8 @@ export const challengeAPI = {
           totalDays: 35,
           savedAmount: 0,
           potentialSavedAmount: 130400,
-          dailyProgress: []
-        }
+          dailyProgress: [],
+        },
       });
     }
     return api.get(`/challenges/${challengeId}/progress`);
@@ -160,12 +172,12 @@ export const challengeAPI = {
   // 챌린지 완료
   completeChallenge: async (challengeId) => {
     if (process.env.NODE_ENV === 'development') {
-      return Promise.resolve({ 
-        data: { 
+      return Promise.resolve({
+        data: {
           success: true,
           completedAt: new Date().toISOString(),
-          totalSavedAmount: 130400
-        } 
+          totalSavedAmount: 130400,
+        },
       });
     }
     return api.post(`/challenges/${challengeId}/complete`);
@@ -174,33 +186,33 @@ export const challengeAPI = {
   // 챌린지 실패
   failChallenge: async (challengeId, failureData) => {
     if (process.env.NODE_ENV === 'development') {
-      return Promise.resolve({ 
-        data: { 
+      return Promise.resolve({
+        data: {
           success: true,
           failedAt: new Date().toISOString(),
-          failReason: failureData.reason || 'TRANSACTION_DETECTED'
-        } 
+          failReason: failureData.reason || 'TRANSACTION_DETECTED',
+        },
       });
     }
     return api.post(`/challenges/${challengeId}/fail`, failureData);
-  }
+  },
 };
 
 // 🛠️ Helper 함수들 (개발 모드용)
 function getChallengeNameById(challengeId) {
   const challengeNames = {
-    'CAFE_CHALLENGE': '카페 금지 챌린지',
-    'DELIVERY_CHALLENGE': '배달음식 금지 챌린지',
-    'TAXI_CHALLENGE': '택시 금지 챌린지'
+    CAFE_CHALLENGE: '카페 금지 챌린지',
+    DELIVERY_CHALLENGE: '배달음식 금지 챌린지',
+    TAXI_CHALLENGE: '택시 금지 챌린지',
   };
   return challengeNames[challengeId] || '챌린지';
 }
 
 function getChallengeDescriptionById(challengeId) {
   const challengeDescriptions = {
-    'CAFE_CHALLENGE': '카페에서 결제하지 않기',
-    'DELIVERY_CHALLENGE': '배달 음식 시키지 않기',
-    'TAXI_CHALLENGE': '택시 타지 않기'
+    CAFE_CHALLENGE: '카페에서 결제하지 않기',
+    DELIVERY_CHALLENGE: '배달 음식 시키지 않기',
+    TAXI_CHALLENGE: '택시 타지 않기',
   };
   return challengeDescriptions[challengeId] || '챌린지 설명';
 }
@@ -208,17 +220,15 @@ function getChallengeDescriptionById(challengeId) {
 // 챌린지 타입 매핑 함수 (ChallengeFlow에서 사용)
 export const getChallengeIdByType = (challengeType) => {
   const challengeIdMap = {
-    'cafe': 'CAFE_CHALLENGE',
-    'delivery': 'DELIVERY_CHALLENGE', 
-    'taxi': 'TAXI_CHALLENGE'
+    cafe: 'CAFE_CHALLENGE',
+    delivery: 'DELIVERY_CHALLENGE',
+    taxi: 'TAXI_CHALLENGE',
   };
   return challengeIdMap[challengeType] || 'DEFAULT_CHALLENGE';
 };
 
-// 필요시 나중에 추가
-// export const assetsAPI = {
-//   connect: (userId) => api.post(`/assets/connect?userId=${userId}`),
-//   delete: (userId) => api.delete(`/assets?userId=${userId}`),
+// export const challengesAPI = {
+//   getById: (id) => api.get(`/challenges/${id}`),
 // };
 
 // export const chatAPI = {

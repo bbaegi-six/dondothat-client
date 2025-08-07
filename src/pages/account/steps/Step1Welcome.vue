@@ -1,5 +1,5 @@
 <!-- step1welcome.vue -->
-<!-- step1welcome.vue -->
+
 <template>
   <div class="flex flex-col h-full px-5 relative">
     <!-- content -->
@@ -15,11 +15,8 @@
       </div>
 
       <div class="text-center">
-        <!-- <h2 class="text-2xl font-medium mb-2 text-white">
-          지금부터 계좌 연결을 시작합니다
-        </h2> -->
         <h2 class="text-xl font-medium mb-0 text-white">
-          지금부터 계좌 연결을 시작합니다
+          지금부터 {{ accountTypeText }} 연결을 시작합니다
         </h2>
       </div>
     </div>
@@ -40,8 +37,24 @@
 <script setup>
 import Button from '../../../components/Button.vue';
 import accountstr from '@/assets/accountstr.svg';
+import { computed } from 'vue';
+import { useAccountStore } from '../../../stores/account';
+
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 defineEmits(['next']);
+
+const accountStore = useAccountStore();
+
+// 계좌 타입에 따른 텍스트 변경
+const accountTypeText = computed(() => {
+  console.log(
+    '계좌타입 : ' +
+      accountStore.accountType +
+      '수정여부 : ' +
+      accountStore.isChanging
+  );
+  return accountStore.accountType === 'sub' ? '저금통' : '계좌';
+});
 </script>

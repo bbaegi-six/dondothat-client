@@ -55,7 +55,9 @@
         </button>
       </div>
 
-      <Button type="submit" @click="handleLogin" class="text-white">로그인</Button>
+      <Button type="submit" @click="handleLogin" class="text-white"
+        >로그인</Button
+      >
 
       <!-- 간편 로그인 -->
       <div class="relative text-center my-6 text-white text-sm">
@@ -93,19 +95,25 @@
       </div>
     </div>
   </div>
-  <ErrorModal v-if="showErrorModal" :message="errorMessage" @close="showErrorModal = false" />
+  <ErrorModal
+    v-if="showErrorModal"
+    :message="errorMessage"
+    @close="showErrorModal = false"
+  />
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
+import { useAccountStore } from '@/stores/account';
 import Input from '../../components/Input.vue';
 import Button from '../../components/Button.vue';
 import ErrorModal from '../../components/common/ErrorModal.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
+const accountStore = useAccountStore();
 
 // 반응형 데이터
 
@@ -141,6 +149,7 @@ const handleLogin = async () => {
 
   if (success) {
     if (authStore.user && !authStore.user.assetConnected) {
+      accountStore.setAccount('main', false);
       router.push('/account');
     } else {
       router.push('/');

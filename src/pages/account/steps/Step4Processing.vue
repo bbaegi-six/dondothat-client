@@ -22,10 +22,14 @@
       </div>
 
       <!-- Text Content -->
-      <h2 class="text-lg font-semibold mb-2 text-white">계좌 정보 확인 중</h2>
+      <h2 class="text-lg font-semibold mb-2 text-white">{{ statusMessage }}</h2>
       <p class="text-gray-400 text-sm">
         안전한 연결을 위해 잠시만 기다려 주세요
       </p>
+      <!-- 은행 정보 표시 -->
+      <div v-if="selectedBankName" class="mt-4 text-center">
+        <p class="text-gray-300 text-sm">{{ selectedBankName }} 연결 중...</p>
+      </div>
     </div>
 
     <!-- Additional Info - Fixed at bottom -->
@@ -45,7 +49,7 @@
             </svg>
             <span class="text-white text-sm font-medium">예상 완료 시간</span>
           </div>
-          <p class="text-gray-300 text-xs">약 30초 ~ 1분 정도 소요됩니다.</p>
+          <p class="text-gray-300 text-xs">약 10초 ~ 1분 정도 소요됩니다.</p>
           <p class="text-gray-300 text-xs">
             은행 서버 상황에 따라 시간이 다를 수 있어요
           </p>
@@ -56,15 +60,98 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useAccountStore } from '../../../stores/account';
+import { accountService } from '../../../services/accountService';
+
+const props = defineProps({
+  flowData: {
+    type: Object,
+    default: () => ({}),
+  },
+});
 
 const emit = defineEmits(['next']);
+const accountStore = useAccountStore();
 
-onMounted(() => {
-  // 3초 후 무조건 성공으로 step5로 이동
-  setTimeout(() => {
-    emit('next');
-  }, 3000);
+const statusMessage = ref('계좌 정보 확인 중');
+
+// 선택된 은행명
+const selectedBankName = computed(() => {
+  return (
+    props.flowData?.selectedBank?.name || props.flowData?.accountInfo?.bankName
+  );
+});
+
+onMounted(async () => {
+  // Step4에서 실제 백엔드 API 호출 수행
+  try {
+    // 상태 메시지 업데이트
+    statusMessage.value = '은행 서버 연결 중...';
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    statusMessage.value = '계좌 정보 인증 중...';
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // 실제 API 호출
+    const accountData = {
+      bankName: props.flowData?.accountInfo?.bankName,
+      bankId: props.flowData?.accountInfo?.bankId,
+      bankpw: props.flowData?.accountInfo?.bankpw,
+      bankAccount: props.flowData?.accountInfo?.bankAccount,
+    };
+    let result;
+    statusMessage.value = '보안 검증 중...';
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // 계좌 타입에 따라 다른 API 호출
+    if (accountStore.accountType === 'sub') {
+      result = await accountService.connectSubAccount(accountData);
+    } else {
+      result = await accountService.connectMainAccount(accountData);
+    }
+
+    statusMessage.value = '연결 완료 처리 중...';
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    console.log('계좌 연결 API 응답:', result);
+
+    // 백엔드 응답 구조에 따른 처리
+    if (result && result.success === true) {
+      // 성공 시 Step5로 이동
+      emit('next', {
+        ...props.flowData, // Step2, Step3 데이터 유지
+        connectionResult: {
+          success: true,
+          accountName: result.accountName, // 백엔드에서 반환한 계좌명 등
+          message: result.message,
+        },
+      });
+    } else {
+      // 백엔드에서 success: false로 응답한 경우
+      emit('next', {
+        ...props.flowData,
+        connectionResult: {
+          success: false,
+          error: result?.message || '계좌 연결에 실패했습니다.',
+        },
+      });
+    }
+  } catch (error) {
+    console.error('계좌 연결 실패:', error);
+
+    statusMessage.value = '연결 실패 처리 중...';
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    // 실패 시에도 Step5로 이동하되 에러 정보 전달
+    emit('next', {
+      ...props.flowData, // Step2, Step3 데이터 유지
+      connectionResult: {
+        success: false,
+        error: error.message || '계좌 연결에 실패했습니다.',
+      },
+    });
+  }
 });
 </script>
 
