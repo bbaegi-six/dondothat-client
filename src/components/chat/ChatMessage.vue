@@ -1,7 +1,7 @@
 <template>
   <!-- 날짜 구분선 (새로운 날짜일 때만 표시) -->
-  <div v-if="showDateSeparator" class="flex justify-center py-2 mt-4 mb-2">
-    <div class="bg-[#414141] text-[#C9C9C9] text-xs px-3 py-1 rounded-full">
+  <div v-if="showDateSeparator" class="flex justify-center py-0.5 mt-1 mb-0.5">
+    <div class="bg-[#555555] text-[#C9C9C9] text-xs px-3 py-1 rounded-full">
       {{ formatDateSeparator(sentAt) }}
     </div>
   </div>
