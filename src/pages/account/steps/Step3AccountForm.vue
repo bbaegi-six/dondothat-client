@@ -57,12 +57,24 @@
         <input
           v-model="formData.bankAccount"
           type="text"
-          placeholder="계좌번호를 입력해주세요"
+          :placeholder="accountPlaceholder"
           @input="handleAccountNumberInput"
           class="w-full h-12 px-4 bg-white rounded-lg border-none text-gray-900 placeholder-gray-500 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#FF5555]"
         />
+        <!-- 계좌번호 입력 안내 (항상 영역 유지, 투명도로 표시/숨김) -->
+        <div class="mt-2 h-4">
+          <p
+            class="text-red-400 text-[11px] transition-opacity duration-200"
+            :class="
+              formData.bankAccount && !isAccountNumberValid
+                ? 'opacity-100'
+                : 'opacity-0'
+            "
+          >
+            * {{ accountValidationMessage || '공간 유지용 텍스트' }}
+          </p>
+        </div>
       </div>
-
       <!-- 에러 메시지 표시 -->
       <div v-if="errorMessage" class="w-[328px]">
         <div
@@ -194,7 +206,6 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { useAccountStore } from '../../../stores/account';
 import Button from '../../../components/Button.vue';
 
 const props = defineProps({
@@ -206,7 +217,6 @@ const props = defineProps({
 
 const emit = defineEmits(['next']);
 
-const accountStore = useAccountStore();
 const showPassword = ref(false);
 const errorMessage = ref('');
 
@@ -226,8 +236,6 @@ const agreements = ref({
 
 // 컴포넌트 마운트 시 기존 데이터 복원
 onMounted(() => {
-  console.log('Step3 마운트 - flowData:', props.flowData);
-
   // 기존에 입력했던 데이터가 있으면 복원
   if (props.flowData?.accountInfo) {
     const accountInfo = props.flowData.accountInfo;
@@ -247,8 +255,6 @@ onMounted(() => {
         marketing: true,
       };
     }
-
-    console.log('기존 데이터 복원:', formData.value);
   }
 });
 
@@ -341,42 +347,84 @@ const handleAccountNumberInput = (event) => {
     errorMessage.value = '';
   }
 };
-
-const isFormValid = computed(() => {
-  // 계좌번호에서 숫자만 추출
+// 계좌번호 유효성 검증 (별도 computed로 분리)
+const isAccountNumberValid = computed(() => {
   const numbersOnly = formData.value.bankAccount.replace(/[^0-9]/g, '');
   const bankName = props.flowData?.selectedBank?.name || '';
 
-  // 은행별 유효성 검사
-  let isAccountNumberValid = false;
+  if (!numbersOnly) return false;
 
   switch (bankName) {
     case '신한은행':
-      isAccountNumberValid = numbersOnly.length === 12;
-      break;
+      return numbersOnly.length === 12;
     case '국민은행':
-      isAccountNumberValid = numbersOnly.length === 14;
-      break;
+      return numbersOnly.length === 14;
     case '우리은행':
-      isAccountNumberValid = numbersOnly.length === 13;
-      break;
+      return numbersOnly.length === 13;
     case '기업은행':
-      isAccountNumberValid = numbersOnly.length === 14;
-      break;
+      return numbersOnly.length === 14;
     case '하나은행':
-      isAccountNumberValid = numbersOnly.length === 14;
-      break;
+      return numbersOnly.length === 14; // 14자리로 수정 (기존 코드와 일치)
     default:
-      // 다른 은행들은 11-15자리
-      isAccountNumberValid =
-        numbersOnly.length >= 11 && numbersOnly.length <= 15;
+      return numbersOnly.length >= 11 && numbersOnly.length <= 15;
   }
+});
 
+// 계좌번호 검증 메시지
+const accountValidationMessage = computed(() => {
+  const numbersOnly = formData.value.bankAccount.replace(/[^0-9]/g, '');
+  const bankName = props.flowData?.selectedBank?.name || '';
+
+  if (!numbersOnly) return '';
+
+  switch (bankName) {
+    case '신한은행':
+      return `숫자만 12자리 입력하세요 (현재 ${numbersOnly.length}자리)`;
+    case '국민은행':
+      return `숫자만 14자리 입력하세요 (현재 ${numbersOnly.length}자리)`;
+    case '우리은행':
+      return `숫자만 13자리 입력하세요 (현재 ${numbersOnly.length}자리)`;
+    case '기업은행':
+      return `숫자만 14자리 입력하세요 (현재 ${numbersOnly.length}자리)`;
+    case '하나은행':
+      return `숫자만 14자리 입력하세요 (현재 ${numbersOnly.length}자리)`;
+    default:
+      if (numbersOnly.length < 11) {
+        return `숫자만 11자리 이상 입력하세요 (현재 ${numbersOnly.length}자리)`;
+      } else if (numbersOnly.length > 15) {
+        return `숫자만 15자리 이하로 입력하세요 (현재 ${numbersOnly.length}자리)`;
+      }
+      return '';
+  }
+});
+
+// 은행별 계좌번호 placeholder 텍스트 (기존과 동일)
+const accountPlaceholder = computed(() => {
+  const bankName = props.flowData?.selectedBank?.name || '';
+
+  switch (bankName) {
+    case '신한은행':
+      return '계좌번호 12자리를 입력해주세요';
+    case '국민은행':
+      return '계좌번호 14자리를 입력해주세요';
+    case '우리은행':
+      return '계좌번호 13자리를 입력해주세요';
+    case '기업은행':
+      return '계좌번호 14자리를 입력해주세요';
+    case '하나은행':
+      return '계좌번호 14자리를 입력해주세요';
+    default:
+      return '계좌번호 11~15자리를 입력해주세요';
+  }
+});
+
+// 기존 isFormValid에서 isAccountNumberValid 분리해서 사용
+const isFormValid = computed(() => {
   return (
     formData.value.bankId.length > 0 &&
     formData.value.bankpw.length > 0 &&
     formData.value.bankAccount.length > 0 &&
-    isAccountNumberValid &&
+    isAccountNumberValid.value && // 분리된 computed 사용
     agreements.value.service &&
     agreements.value.privacy &&
     agreements.value.financial
