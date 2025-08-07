@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { challengeAPI, getChallengeIdByType } from '@/utils/api';
+import challengeService from '@/services/challengeService';
 
 export const useChallengeStore = defineStore('challenge', () => {
   // --- 상태 (State) ---
@@ -69,71 +69,67 @@ export const useChallengeStore = defineStore('challenge', () => {
 
   // --- 액션 (Actions) ---
   
-  // 챌린지 참여
-  const joinChallenge = async (challengeType, days) => {
-    try {
-      isLoading.value = true;
-      error.value = null;
+// 챌린지 참여
+const joinChallenge = async (challengeType, days) => {
+  try {
+    isLoading.value = true;
+    error.value = null;
 
-      const challengeId = getChallengeIdByType(challengeType);
-      const response = await challengeAPI.joinChallenge(challengeId, {
-        duration: days,
-        type: challengeType
-      });
+    const response = await challengeService.joinChallenge(challengeType, days);
 
-      // 상태 업데이트
-      activeChallenge.value = {
-        id: response.data.challengeId,
-        type: challengeType,
-        title: challengeMetadata.value.title,
-        days: days,
-        currentDay: 1,
-        status: response.data.status || 'IN_PROGRESS',
-        savedAmount: 0,
-        potentialSavedAmount: calculatePotentialSavings(challengeType, days),
-        startDate: response.data.startDate || new Date().toISOString(),
-        endDate: response.data.endDate,
-        failedTransactionId: response.data.failedTransactionId || null,
-        dailyProgress: []
-      };
+    // 상태 업데이트
+    activeChallenge.value = {
+      id: response.data.challengeId,
+      type: challengeType,
+      title: challengeMetadata.value.title,
+      days: days,
+      currentDay: 1,
+      status: response.data.status || 'IN_PROGRESS',
+      savedAmount: 0,
+      potentialSavedAmount: calculatePotentialSavings(challengeType, days),
+      startDate: response.data.startDate || new Date().toISOString(),
+      endDate: response.data.endDate,
+      failedTransactionId: response.data.failedTransactionId || null,
+      dailyProgress: []
+    };
 
-      console.log('✅ 챌린지 참여 성공:', activeChallenge.value);
-      return { success: true, data: activeChallenge.value };
+    console.log('✅ 챌린지 참여 성공:', activeChallenge.value);
+    return { success: true, data: activeChallenge.value };
 
-    } catch (err) {
-      error.value = err.message;
-      console.error('❌ 챌린지 참여 실패:', err);
-      return { success: false, error: err.message };
-    } finally {
-      isLoading.value = false;
-    }
-  };
+  } catch (err) {
+    error.value = err.message;
+    console.error('❌ 챌린지 참여 실패:', err);
+    return { success: false, error: err.message };
+  } finally {
+    isLoading.value = false;
+  }
+};
 
   // 챌린지 진행 상황 조회
-  const fetchProgress = async () => {
-    if (!activeChallenge.value.id) return;
+const fetchProgress = async () => {
+  if (!activeChallenge.value.id) return;
 
-    try {
-      isLoading.value = true;
-      const response = await challengeAPI.getProgress(activeChallenge.value.id);
-      
-      // 상태 업데이트
-      Object.assign(activeChallenge.value, {
-        currentDay: response.data.currentDay,
-        status: response.data.status,
-        savedAmount: response.data.savedAmount,
-        dailyProgress: response.data.dailyProgress || [],
-        failedTransactionId: response.data.failedTransactionId
-      });
+  try {
+    isLoading.value = true;
+    const response = await challengeService.getProgress();
+    
+    // 상태 업데이트
+    Object.assign(activeChallenge.value, {
+      currentDay: response.data.currentDay,
+      status: response.data.status,
+      savedAmount: response.data.savedAmount,
+      dailyProgress: response.data.dailyProgress || [],
+      failedTransactionId: response.data.failedTransactionId
+    });
 
-      return response.data;
-    } catch (err) {
-      error.value = err.message;
-      console.error('진행 상황 조회 실패:', err);
-    } finally {
-      isLoading.value = false;
-    }
-  };
+    return response.data;
+  } catch (err) {
+    error.value = err.message;
+    console.error('진행 상황 조회 실패:', err);
+  } finally {
+    isLoading.value = false;
+  }
+};
 
   // 챌린지 완료
   const completeChallenge = async () => {
@@ -141,7 +137,7 @@ export const useChallengeStore = defineStore('challenge', () => {
 
     try {
       isLoading.value = true;
-      const response = await challengeAPI.completeChallenge(activeChallenge.value.id);
+      const response = await challengeService.completeChallenge(activeChallenge.value.id);
       
       activeChallenge.value.status = 'COMPLETED';
       
@@ -163,34 +159,32 @@ export const useChallengeStore = defineStore('challenge', () => {
   };
 
   // 챌린지 실패 처리
-  const failChallenge = async (failureReason = 'TRANSACTION_DETECTED') => {
-    if (!activeChallenge.value.id) return;
+const failChallenge = async (failureReason = 'TRANSACTION_DETECTED') => {
+  if (!activeChallenge.value.id) return;
 
-    try {
-      isLoading.value = true;
-      const response = await challengeAPI.failChallenge(activeChallenge.value.id, {
-        reason: failureReason
-      });
-      
-      activeChallenge.value.status = 'FAILED';
-      
-      // 히스토리에 추가
-      challengeHistory.value.push({
-        ...activeChallenge.value,
-        failedAt: new Date().toISOString(),
-        failReason: failureReason
-      });
+  try {
+    isLoading.value = true;
+    const response = await challengeService.failChallenge(activeChallenge.value.id, failureReason);
+    
+    activeChallenge.value.status = 'FAILED';
+    
+    // 히스토리에 추가
+    challengeHistory.value.push({
+      ...activeChallenge.value,
+      failedAt: new Date().toISOString(),
+      failReason: failureReason
+    });
 
-      console.log('💥 챌린지 실패:', response.data);
-      return { success: true, data: response.data };
-    } catch (err) {
-      error.value = err.message;
-      console.error('챌린지 실패 처리 오류:', err);
-      return { success: false, error: err.message };
-    } finally {
-      isLoading.value = false;
-    }
-  };
+    console.log('💥 챌린지 실패:', response.data);
+    return { success: true, data: response.data };
+  } catch (err) {
+    error.value = err.message;
+    console.error('챌린지 실패 처리 오류:', err);
+    return { success: false, error: err.message };
+  } finally {
+    isLoading.value = false;
+  }
+};
 
   // 챌린지 재시작 (다시 도전하기)
   const retryChallenge = async (days) => {

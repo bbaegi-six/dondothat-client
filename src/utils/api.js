@@ -84,152 +84,26 @@ export const accountAPI = {
   delete: (status) => api.delete('/assets', { params: { status } }),
 };
 
-// 🎯 챌린지 API 추가
+// 챌린지 API - API 호출만 담당
 export const challengeAPI = {
   // 챌린지 상세 조회
-  getChallenge: async (challengeId) => {
-    if (process.env.NODE_ENV === 'development') {
-      // Mock 데이터
-      return Promise.resolve({
-        data: {
-          id: challengeId,
-          name: getChallengeNameById(challengeId),
-          description: getChallengeDescriptionById(challengeId),
-          status: 'ACTIVE',
-        },
-      });
-    }
-    return api.get(`/challenges/${challengeId}`);
-  },
+  getChallenge: (challengeId) => api.get(`/challenges/${challengeId}`),
 
-  // 추천 챌린지 조회
-  getRecommendations: async () => {
-    if (process.env.NODE_ENV === 'development') {
-      // Mock 데이터
-      return Promise.resolve({
-        data: [
-          { id: 'CAFE_CHALLENGE', name: '카페 금지 챌린지', type: 'cafe' },
-          {
-            id: 'DELIVERY_CHALLENGE',
-            name: '배달음식 금지 챌린지',
-            type: 'delivery',
-          },
-          { id: 'TAXI_CHALLENGE', name: '택시 금지 챌린지', type: 'taxi' },
-        ],
-      });
-    }
-    return api.get('/challenges/recommendations');
-  },
+  // 추천 챌린지 조회  
+  getRecommendations: () => api.get('/challenges/recommendations'),
 
   // 챌린지 참여
-  joinChallenge: async (challengeId, data) => {
-    if (process.env.NODE_ENV === 'development') {
-      // Mock 데이터 - 모든 챌린지가 성공으로 시작
-      const mockResponse = {
-        data: {
-          success: true,
-          challengeId: `user_challenge_${Date.now()}`,
-          status: 'IN_PROGRESS', // 항상 성공 상태로 시작
-          startDate: new Date().toISOString(),
-          endDate: new Date(
-            Date.now() + data.duration * 24 * 60 * 60 * 1000
-          ).toISOString(),
-        },
-      };
+  joinChallenge: (challengeId, data) => api.post(`/challenges/${challengeId}/join`, data),
 
-      console.log(`🎯 ${challengeId} 챌린지 시작 - 성공 상태`);
-      return Promise.resolve(mockResponse);
-    }
-    return api.get(`/challenges/${challengeId}/join`, data);
-  },
-
-  // 챌린지 탈퇴
-  leaveChallenge: async (challengeId) => {
-    if (process.env.NODE_ENV === 'development') {
-      return Promise.resolve({ data: { success: true } });
-    }
-    return api.delete(`/challenges/${challengeId}/leave`);
-  },
-
-  // 진척도 조회
-  getProgress: async (challengeId) => {
-    if (process.env.NODE_ENV === 'development') {
-      // Mock 데이터
-      return Promise.resolve({
-        data: {
-          status: 'IN_PROGRESS',
-          currentDay: 1,
-          totalDays: 35,
-          savedAmount: 0,
-          potentialSavedAmount: 130400,
-          dailyProgress: [],
-        },
-      });
-    }
-    return api.get(`/challenges/${challengeId}/progress`);
-  },
+  // 진척도 조회 - 새로 추가된 API
+  getProgress: () => api.get('/challenges/progress'),
 
   // 챌린지 완료
-  completeChallenge: async (challengeId) => {
-    if (process.env.NODE_ENV === 'development') {
-      return Promise.resolve({
-        data: {
-          success: true,
-          completedAt: new Date().toISOString(),
-          totalSavedAmount: 130400,
-        },
-      });
-    }
-    return api.post(`/challenges/${challengeId}/complete`);
-  },
+  completeChallenge: (challengeId) => api.post(`/challenges/${challengeId}/complete`),
 
   // 챌린지 실패
-  failChallenge: async (challengeId, failureData) => {
-    if (process.env.NODE_ENV === 'development') {
-      return Promise.resolve({
-        data: {
-          success: true,
-          failedAt: new Date().toISOString(),
-          failReason: failureData.reason || 'TRANSACTION_DETECTED',
-        },
-      });
-    }
-    return api.post(`/challenges/${challengeId}/fail`, failureData);
-  },
+  failChallenge: (challengeId, failureData) => api.post(`/challenges/${challengeId}/fail`, failureData),
 };
-
-// 🛠️ Helper 함수들 (개발 모드용)
-function getChallengeNameById(challengeId) {
-  const challengeNames = {
-    CAFE_CHALLENGE: '카페 금지 챌린지',
-    DELIVERY_CHALLENGE: '배달음식 금지 챌린지',
-    TAXI_CHALLENGE: '택시 금지 챌린지',
-  };
-  return challengeNames[challengeId] || '챌린지';
-}
-
-function getChallengeDescriptionById(challengeId) {
-  const challengeDescriptions = {
-    CAFE_CHALLENGE: '카페에서 결제하지 않기',
-    DELIVERY_CHALLENGE: '배달 음식 시키지 않기',
-    TAXI_CHALLENGE: '택시 타지 않기',
-  };
-  return challengeDescriptions[challengeId] || '챌린지 설명';
-}
-
-// 챌린지 타입 매핑 함수 (ChallengeFlow에서 사용)
-export const getChallengeIdByType = (challengeType) => {
-  const challengeIdMap = {
-    cafe: 'CAFE_CHALLENGE',
-    delivery: 'DELIVERY_CHALLENGE',
-    taxi: 'TAXI_CHALLENGE',
-  };
-  return challengeIdMap[challengeType] || 'DEFAULT_CHALLENGE';
-};
-
-// export const challengesAPI = {
-//   getById: (id) => api.get(`/challenges/${id}`),
-// };
 
 // export const chatAPI = {
 //   getUserChatRooms: (userId) => api.get(`/chat/user/${userId}`),
