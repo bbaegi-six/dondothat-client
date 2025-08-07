@@ -134,6 +134,7 @@
   import { ref, computed, onMounted } from 'vue';
   import Header from '@/components/layout/Header.vue';
   import ChallengeFailed from './ChallengeFailed.vue';
+  import challengeService from '@/services/challengeService';
   
   // Props
   const props = defineProps({
