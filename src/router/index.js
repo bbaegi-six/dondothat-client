@@ -38,7 +38,15 @@ const routes = [
     path: '/account',
     name: 'Account',
     component: Account,
-    // meta: { requiresAuth: true }, // 나중에 제거
+    meta: { requiresAuth: true },
+    beforeEnter: (to, from, next) => {
+      // URL 직접 접근 차단 - 다른 페이지에서만 접근 가능
+      if (!from.name) {
+        next('/'); // 홈으로 리다이렉트
+        return;
+      }
+      next();
+    },
   },
   {
     path: '/login',
@@ -69,7 +77,7 @@ const routes = [
     path: '/challenge/days-input',
     name: 'ChallengeDaysInput',
     component: () => import('../pages/challenge/ChallengeDaysInput.vue'),
-    // meta: { requiresAuth: true }, //로그인 해결되면 주석해제 
+    // meta: { requiresAuth: true }, //로그인 해결되면 주석해제
   },
   {
     path: '/challenge/connectsub',
