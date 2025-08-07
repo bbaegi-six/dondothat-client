@@ -1,29 +1,15 @@
 <template>
   <div class="flex flex-col h-screen bg-default max-w-[390px] mx-auto">
-    <!-- Custom Header -->
-    <header
-      class="flex items-center px-5 py-4 bg-default text-white h-[60px] box-border w-full fixed top-0 left-1/2 transform -translate-x-1/2 max-w-[390px] z-50"
-    >
-      <!-- 뒤로가기 버튼 -->
-      <button @click="goBack" class="mr-3 p-1">
-        <i class="fas fa-arrow-left text-white text-lg"></i>
-      </button>
-
-      <!-- 채팅방 제목 (헤더 전체 중앙) -->
-      <h2
-        class="font-pretendard text-xl font-semibold m-0 absolute left-1/2 transform -translate-x-1/2"
-      >
-        {{ challengeName }}
-      </h2>
-
-      <!-- 접속자 수 (우측 정렬) -->
-      <div class="flex items-center gap-1 ml-auto">
-        <i class="fas fa-user-group text-[#C9C9C9] text-base"></i>
-        <span class="text-[#C9C9C9] text-base font-medium">{{
-          chatStore.userCount
-        }}</span>
-      </div>
-    </header>
+    <!-- 공통 헤더 컴포넌트 사용 -->
+    <Header
+      :title="challengeName"
+      :show-back="false"
+      :show-logo="false"
+      :show-points="false"
+      :show-add-button="false"
+      :show-user-count="true"
+      :user-count="chatStore.userCount"
+    />
 
     <!-- Body Content with proper top margin for fixed header -->
     <div class="flex flex-col flex-1 mt-[60px]">
@@ -182,6 +168,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useChatStore } from '@/stores/chat';
 import { useAuthStore } from '@/stores/auth';
 import ChatMessage from '@/components/chat/ChatMessage.vue';
+import Header from '@/components/layout/Header.vue';
 
 const route = useRoute();
 const router = useRouter();
