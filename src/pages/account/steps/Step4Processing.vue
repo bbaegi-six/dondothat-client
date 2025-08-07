@@ -84,10 +84,6 @@ const selectedBankName = computed(() => {
 });
 
 onMounted(async () => {
-  console.log('Step4 Processing 시작:', {
-    accountType: accountStore.accountType,
-  });
-
   // Step4에서 실제 백엔드 API 호출 수행
   try {
     // 상태 메시지 업데이트
@@ -104,9 +100,6 @@ onMounted(async () => {
       bankpw: props.flowData?.accountInfo?.bankpw,
       bankAccount: props.flowData?.accountInfo?.bankAccount,
     };
-
-    console.log('백엔드 API 호출 시작:', accountData);
-
     let result;
     statusMessage.value = '보안 검증 중...';
     await new Promise((resolve) => setTimeout(resolve, 2000));

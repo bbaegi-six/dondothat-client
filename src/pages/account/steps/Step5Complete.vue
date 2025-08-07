@@ -145,10 +145,12 @@
 import { computed, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAccountStore } from '../../../stores/account';
+// import { useAuthStore } from '../../stores/auth';
 import Button from '../../../components/Button.vue';
 
 const router = useRouter();
 const accountStore = useAccountStore();
+// const authStore = useAuthStore();
 
 const props = defineProps({
   flowData: {
@@ -188,8 +190,6 @@ const getErrorMessage = (errorCode) => {
 onMounted(() => {
   const connectionResult = props.flowData?.connectionResult;
 
-  console.log('Step5 연결 결과:', connectionResult);
-
   if (connectionResult) {
     isError.value = !connectionResult.success;
     if (!connectionResult.success) {
@@ -212,6 +212,7 @@ onMounted(() => {
 
 // 계좌 타입에 따른 제목들
 const successTitle = computed(() => {
+  // 📄 authStore.user.assetConnected ture로 변경하기
   if (accountStore.accountType === 'sub') {
     return '저금통 연결 완료!';
   }
@@ -275,22 +276,19 @@ const accountName = computed(() => {
 
 // 버튼 핸들러
 const goToChallenge = () => {
-  console.log('챌린지로 이동');
   // 계좌 타입 초기화
   accountStore.clearAccountType();
   router.push('/challenge');
 };
 
 const goToHome = () => {
-  console.log('홈으로 이동');
   // 계좌 타입 초기화
   accountStore.clearAccountType();
-  router.push('/home');
+  router.push('/');
 };
 
 const retryConnection = () => {
   // 다시 연결하기 - step3로 돌아가기 (기존 데이터 유지)
-  console.log('다시 연결 시도 - step3로 돌아가기 (데이터 유지)');
   emit('back', { preserveData: true });
 };
 </script>

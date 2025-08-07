@@ -49,7 +49,12 @@ const accountStore = useAccountStore();
 
 // 계좌 타입에 따른 텍스트 변경
 const accountTypeText = computed(() => {
-  console.log('계좌타입 : ' + accountStore.accountType);
+  console.log(
+    '계좌타입 : ' +
+      accountStore.accountType +
+      '수정여부 : ' +
+      accountStore.isChanging
+  );
   return accountStore.accountType === 'sub' ? '저금통' : '계좌';
 });
 </script>

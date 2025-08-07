@@ -101,7 +101,7 @@ const nextStep = (data = {}) => {
     transitionDirection.value = 'forward';
     Object.assign(flowData, data);
     currentStep.value++;
-    console.log('Next step:', currentStep.value, 'Data:', flowData);
+    console.log('Next step:', currentStep.value);
   }
 };
 

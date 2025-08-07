@@ -77,6 +77,12 @@ export const expensesAPI = {
   delete: (id) => api.delete(`/expenses/${id}`),
   getCategories: () => api.get('/expenses/categories'),
 };
+// account api 추가
+export const accountAPI = {
+  connectMain: (data) => api.post('/assets/connect', data),
+  connectSub: (data) => api.post('/assets/connect/sub', data),
+  delete: (status) => api.delete('/assets', { params: { status } }),
+};
 
 // 🎯 챌린지 API 추가
 export const challengeAPI = {
@@ -219,12 +225,6 @@ export const getChallengeIdByType = (challengeType) => {
     taxi: 'TAXI_CHALLENGE',
   };
   return challengeIdMap[challengeType] || 'DEFAULT_CHALLENGE';
-};
-
-export const accountAPI = {
-  connectMain: (data) => api.post('/assets/connect', data),
-  connectSub: (data) => api.post('/assets/connect/sub', data),
-  delete: (status) => api.delete('/assets', { params: { status } }),
 };
 
 // export const challengesAPI = {

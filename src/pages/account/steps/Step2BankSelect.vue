@@ -103,7 +103,6 @@ const banks = ref([
 // 메서드들
 const selectBank = (bank) => {
   selectedBank.value = bank;
-  // console.log('Selected bank:', bank.name);
 };
 
 const nextStep = () => {
