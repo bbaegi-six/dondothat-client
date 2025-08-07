@@ -29,7 +29,7 @@
         :imgSrc="accounts[0].imageUrl"
         :accountName="accounts[0].name"
         :amount="accounts[0].balance"
-        @change="handleChange"
+        @change="handleChange('main')"
       />
     </div>
     <div class="account2">
@@ -39,7 +39,7 @@
         :imgSrc="accounts[1].imageUrl"
         :accountName="accounts[1].name"
         :amount="accounts[1].balance"
-        @change="handleChange"
+        @change="handleChange('sub')"
       />
     </div>
     <ConfirmModal
@@ -80,6 +80,8 @@ import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '../../stores/auth'; // auth 스토어 임포트
 import { useRouter } from 'vue-router';
+import { useAccountStore } from '@/stores/account';
+import { accountService } from '@/services/accountService';
 
 // 이미지 임포트
 import kbLogo from '@/assets/logo/kb.svg';
@@ -90,6 +92,8 @@ const { user } = storeToRefs(authStore); // auth 스토어에서 user 정보 가
 
 const router = useRouter();
 const showModal = ref(false);
+
+const accountStore = useAccountStore();
 
 // user.value에서 직접 닉네임과 이메일 가져오기
 const nickname = user.value?.nickname || '게스트';
@@ -118,15 +122,37 @@ const badges = ref([
   { image: eatBadge },
 ]);
 
-function handleChange() {
+function handleChange(type) {
   showModal.value = true; // 모달 띄우기
+  accountStore.setAccount(type, true); // main or sub
 }
 
-function handleConfirm() {
+async function handleConfirm() {
   showModal.value = false;
-  router.push('/account'); // 원하는 경로로 변경
-}
 
+  try {
+    // 현재 계좌 삭제
+    const status = accountStore.isMainAccount ? 'main' : 'sub';
+    // ✅ 응답 값을 변수에 저장
+    const response = await accountService.deleteAccount(status);
+
+    // ✅ 응답 데이터의 message 필드에 접근하여 출력
+    if (response && response.message) {
+      console.log('계좌 삭제 메시지:', response.message);
+    } else {
+      console.log('계좌 삭제 성공'); // message 필드가 없을 경우 기본 메시지
+    }
+
+    // ✅ 삭제 성공하면 계좌 연결 화면으로 이동
+    router.push('/account');
+  } catch (e) {
+    console.error('계좌 삭제 실패', e);
+    // 오류 처리 필요 시 모달 또는 alert 표시
+    if (e.message) {
+      console.error('계좌 삭제 실패 메시지:', e.message);
+    }
+  }
+}
 async function logout() {
   await authStore.logout(); // auth 스토어의 logout 액션 호출
   router.push('/login');

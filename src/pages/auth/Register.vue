@@ -109,12 +109,14 @@
         </div>
 
         <div class="w-[328px] mx-auto">
-          <Input v-model="age" type="number" placeholder="나이" class="w-full" />
+          <Input
+            v-model="age"
+            type="number"
+            placeholder="나이"
+            class="w-full"
+          />
           <div class="h-1">
-            <span
-              v-if="showErrors && !age"
-              class="text-brand text-xs mt-1"
-            >
+            <span v-if="showErrors && !age" class="text-brand text-xs mt-1">
               * 필수 항목입니다
             </span>
             <span v-else-if="ageError" class="text-brand text-xs mt-1">
@@ -175,7 +177,9 @@
         </div>
 
         <div class="w-[328px] mx-auto">
-          <Button @click="handleNext" class="w-full" :disabled="isSubmitting">다음</Button>
+          <Button @click="handleNext" class="w-full" :disabled="isSubmitting"
+            >다음</Button
+          >
         </div>
       </div>
     </div>
@@ -193,7 +197,9 @@ import { authAPI } from '../../utils/api.js';
 
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
+import { useAccountStore } from '@/stores/account';
 
+const accountStore = useAccountStore();
 const router = useRouter();
 const authStore = useAuthStore();
 
@@ -337,9 +343,12 @@ const handleNext = async () => {
     // 회원가입 성공 후 자동 로그인 시도
     const loginSuccess = await authStore.login(email.value, password.value);
     if (loginSuccess) {
+      accountStore.setAccount('main', false);
       router.push('/account'); // 계좌 연결 플로우 시작
     } else {
-      alert('회원가입은 성공했지만 자동 로그인에 실패했습니다. 직접 로그인해주세요.');
+      alert(
+        '회원가입은 성공했지만 자동 로그인에 실패했습니다. 직접 로그인해주세요.'
+      );
       router.push('/login'); // 자동 로그인 실패 시 로그인 페이지로 이동
     }
   } catch (error) {

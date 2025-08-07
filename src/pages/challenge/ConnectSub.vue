@@ -40,7 +40,7 @@
         <button
           class="w-full h-14 py-3 rounded-16 transition"
           :class="'bg-brand text-white hover:bg-red-600'"
-          @click="router.push('/account')"
+          @click="goAccount()"
         >
           연결하기
         </button>
@@ -59,6 +59,13 @@
 <script setup>
 import Header from '@/components/layout/Header.vue';
 import { useRouter } from 'vue-router';
+import { useAccountStore } from '@/stores/account';
 
+const accountStore = useAccountStore();
 const router = useRouter();
+
+const goAccount = () => {
+  accountStore.setAccount('sub', false);
+  router.push('/account');
+};
 </script>

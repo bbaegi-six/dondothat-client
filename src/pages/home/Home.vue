@@ -95,7 +95,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { useExpensesStore } from '@/stores/expenses';
+import { useAccountStore } from '@/stores/account';
 
+const accountStore = useAccountStore();
 const router = useRouter();
 const chartCanvas = ref(null);
 const expensesStore = useExpensesStore();
@@ -180,6 +182,7 @@ const createChart = () => {
 
 // 페이지 이동 함수들
 const goToAccountStep2 = () => {
+  accountStore.setAccount('sub', false);
   router.push('/account');
 };
 
