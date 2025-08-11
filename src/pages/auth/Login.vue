@@ -101,7 +101,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 import { useAccountStore } from '@/stores/account';
@@ -146,6 +146,9 @@ const handleLogin = async () => {
   const success = await authStore.login(email.value, password.value);
 
   if (success) {
+    // Pinia 스토어의 상태 변경이 Vue의 반응성 시스템에 완전히 전파될 때까지 기다립니다.
+    await nextTick();
+    
     if (authStore.user && !authStore.user.assetConnected) {
       accountStore.setAccount('main', false);
       router.push('/account');
