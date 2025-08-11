@@ -118,6 +118,19 @@ onMounted(async () => {
 
     // 백엔드 응답 구조에 따른 처리
     if (result && result.success === true) {
+      // ✅ 성공 시 assetConnected를 true로 업데이트
+      try {
+        statusMessage.value = '사용자 정보 업데이트 중...';
+        await accountService.updateAssetConnected(true);
+
+        // authStore의 사용자 정보도 로컬에서 업데이트
+        // if (authStore.user) {
+        //   authStore.user.assetConnected = true;
+        // }
+      } catch (updateError) {
+        console.error('assetConnected 업데이트 실패:', updateError);
+      }
+
       // 성공 시 Step5로 이동
       emit('next', {
         ...props.flowData, // Step2, Step3 데이터 유지
