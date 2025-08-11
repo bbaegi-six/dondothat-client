@@ -23,8 +23,7 @@ export const useExpensesStore = defineStore('expenses', () => {
         transactionDate.getFullYear() === currentYear;
 
       // 수입 카테고리 제외하고 지출만 반환
-      const isExpense =
-        transaction.category !== '수입' && transaction.category !== '미지정';
+      const isExpense = transaction.category !== '수입';
 
       return isCurrentMonth && isExpense;
     });
@@ -159,7 +158,7 @@ export const useExpensesStore = defineStore('expenses', () => {
 
   const getDailyTotal = (transactions) => {
     const expenseTransactions = transactions.filter(
-      (t) => t.category !== '수입' && t.category !== '미지정'
+      (t) => t.category !== '수입'
     );
     const total = expenseTransactions.reduce(
       (sum, t) => sum + Math.abs(t.amount),
