@@ -1,5 +1,5 @@
 <template>
-  <Header showLogo />
+  <Header showLogo :show-border="false" />
   <div
     class="min-h-screen w-[390px] mx-auto bg-[#2f2f2f] pt-[88px] px-[31px] pb-[90px]"
   >
