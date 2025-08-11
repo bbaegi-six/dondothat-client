@@ -1,11 +1,5 @@
 <template>
     <div class="flex flex-col h-screen bg-default">
-      <!-- Header -->
-      <Header 
-        :show-logo="true" 
-        :show-points="true" 
-        :points="1250" 
-      />
   
       <!-- Timer Circle - Top Section -->
       <div class="flex flex-col items-center pt-[60px] pb-4">
@@ -139,7 +133,6 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import Header from '@/components/layout/Header.vue';
 
 // Emit 이벤트 정의
 const emit = defineEmits(['challenge-selected']);

@@ -1,11 +1,5 @@
 <template>
     <div class="flex flex-col h-screen bg-default">
-      <!-- Header -->
-      <Header 
-        :show-logo="true" 
-        :show-points="true" 
-        :points="1250" 
-      />
   
       <!-- Title Section - 타이머와 동일한 위치에서 제거 -->
       <div class="flex flex-col items-center pt-[60px] pb-4">
@@ -85,18 +79,17 @@
   
   <script setup>
   import { ref, computed, onMounted } from 'vue';
-  import Header from '@/components/layout/Header.vue';
-  
+  import { useRouter } from 'vue-router'; // 추가
+
+  const router = useRouter();
   // Props
   const props = defineProps({
     selectedChallenge: {
       type: String,
-      required: true
+      required: false
     }
   });
   
-  // Emits
-  const emit = defineEmits(['loadingComplete']);
   
   // 챌린지 정보 매핑
   const challengeInfo = {
@@ -168,9 +161,10 @@
       console.log('챌린지 로딩 완료');
       // 라우터를 사용한 페이지 이동 (실제 프로젝트에서는 router.push 사용)
       // router.push('/challenge/start');
-      
+      //router.push('/challenge/selection');
+      router.push('/challenge/flow')
       // 또는 emit을 통해 부모 컴포넌트에 완료 신호 전달
-      emit('loadingComplete', props.selectedChallenge);
+      //emit('loadingComplete', props.selectedChallenge);
     }, 3000);
   });
   </script>

@@ -1,11 +1,6 @@
+<!-- challengeFailed.vue -->
 <template>
     <div class="flex flex-col h-screen bg-default">
-      <!-- Header -->
-      <Header 
-        :show-logo="true" 
-        :show-points="true" 
-        :points="1250" 
-      />
   
       <!-- Challenge Icon & Title -->
       <div class="flex items-center justify-center mt-[70px] mb-4">
@@ -110,7 +105,6 @@
   <script setup>
   import { ref, computed, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
-  import Header from '@/components/layout/Header.vue';
   import { useUserStore } from '@/stores/profile';
   
   // Props

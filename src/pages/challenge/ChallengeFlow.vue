@@ -1,14 +1,8 @@
 <template>
     <div>
-      <!-- 1단계: Loading -->
-      <ChallengeLoading 
-        v-if="currentStep === 'loading'"
-        @loading-complete="handleLoadingComplete"
-      />
-      
       <!-- 2단계: Selection -->
       <ChallengeSelection 
-        v-else-if="currentStep === 'selection'"
+        v-if="currentStep === 'selection'"
         @challenge-selected="handleChallengeSelected"
       />
       
@@ -140,7 +134,6 @@
   <script setup>
   import { ref, computed, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
-  import ChallengeLoading from './ChallengeLoading.vue';
   import ChallengeSelection from './ChallengeSelection.vue';
   import ChallengeDaysInput from './ChallengeDaysInput.vue';
   import ChallengeProgress from './ChallengeProgress.vue';
@@ -156,7 +149,7 @@
   const isDevelopment = process.env.NODE_ENV === 'development';
   
   // 플로우 상태
-  const currentStep = ref('loading');
+  const currentStep = ref('selection');
   const selectedChallenge = ref(null);
   const challengeDays = ref(0);
   
@@ -234,10 +227,6 @@
   };
   
   // 플로우 핸들러들
-  const handleLoadingComplete = () => {
-    console.log('✅ 로딩 완료 → 선택 페이지로');
-    currentStep.value = 'selection';
-  };
   
   const handleChallengeSelected = (challenge) => {
     console.log('✅ 챌린지 선택됨:', challenge);

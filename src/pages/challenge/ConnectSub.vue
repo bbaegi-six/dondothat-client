@@ -2,8 +2,6 @@
   <div>
     <!-- Main Challenge Page -->
     <div class="flex flex-col h-screen">
-      <!-- Header -->
-      <Header :show-logo="true" :show-points="true" :points="1250" />
 
       <!-- Main Content Area -->
       <div
@@ -57,7 +55,6 @@
 </template>
 
 <script setup>
-import Header from '@/components/layout/Header.vue';
 import { useRouter } from 'vue-router';
 import { useAccountStore } from '@/stores/account';
 
