@@ -62,5 +62,14 @@ export const accountService = {
       throw new Error(`계좌 삭제 실패: ${this.getErrorMessage(error)}`);
     }
   },
+  // assetConnected 상태 업데이트
+  async updateAssetConnected(assetConnected = true) {
+    try {
+      const response = await accountAPI.updateConnected(assetConnected);
+      return response;
+    } catch (error) {
+      console.log('connected update 요청 실패', error);
+    }
+  },
 };
 export default accountService;
