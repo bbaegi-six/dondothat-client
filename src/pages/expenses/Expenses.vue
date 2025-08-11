@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen w-[390px] mx-auto"
+    class="min-h-screen w-[390px] mx-auto relative"
     style="
       background-color: #2f2f2f;
       padding-top: 88px;
@@ -392,6 +392,55 @@
         <p style="color: #c6c6c6; font-size: 14px">저금통 내역이 없습니다.</p>
       </div>
     </div>
+
+    <!-- 새로고침 버튼 -->
+    <button
+      @click="refreshExpenses"
+      class="absolute"
+      style="
+        bottom: 80px;
+        right: 31px;
+        width: 48px;
+        height: 48px;
+        background-color: #c9c9c9;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      "
+      :disabled="loading"
+    >
+      <!-- 새로고침 아이콘 -->
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        :style="{
+          transform: loading ? 'rotate(360deg)' : 'rotate(0deg)',
+          transition: 'transform 0.5s ease-in-out',
+        }"
+      >
+        <path
+          d="M1 4V10H7M23 20V14H17"
+          stroke="#ffffff"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15"
+          stroke="#ffffff"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
   </div>
 </template>
 
@@ -455,6 +504,19 @@ const editTransaction = (transaction) => {
 const addTransaction = () => {
   router.push('/expenses/new');
   console.log('새 거래 추가 페이지로 이동');
+};
+
+// 새로고침 버튼 관련
+const loading = computed(() => expensesStore.loading);
+
+const refreshExpenses = async () => {
+  console.log('지출 내역 새로고침 시작');
+  try {
+    await expensesStore.fetchExpensesFromAPI();
+    console.log('지출 내역 새로고침 완료');
+  } catch (error) {
+    console.error('지출 내역 새로고침 실패:', error);
+  }
 };
 </script>
 
