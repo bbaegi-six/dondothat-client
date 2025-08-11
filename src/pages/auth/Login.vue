@@ -1,14 +1,12 @@
 <template>
   <div class="flex-1 px-[31px] flex flex-col overflow-y-auto">
     <!-- 로고 -->
-    <div class="text-center my-5 mb-10">
-      <div class="text-[60px] mb-4">💰</div>
-      <h1
-        class="font-anton-sc text-2xl text-brand leading-[22px] m-0 font-normal"
-      >
-        Don do<br />
-        that
-      </h1>
+    <div class="text-center mt-16 mb-10">
+      <img
+        src="@/assets/logo/dondothat_full-vertical_red.png"
+        alt="Don do that Logo"
+        class="mx-auto h-32"
+      />
     </div>
 
     <!-- 로그인 폼 -->
