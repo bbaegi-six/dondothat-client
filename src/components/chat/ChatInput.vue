@@ -10,7 +10,7 @@
           :disabled="!isConnected"
           type="text"
           placeholder="채팅을 입력하세요"
-          class="w-full h-12 px-4 py-3 rounded-xl bg-white text-gray-800 placeholder-gray-400 focus:outline-none text-sm disabled:bg-gray-200 disabled:cursor-not-allowed"
+          class="w-full h-12 px-4 py-3 rounded-xl bg-white text-gray-800 placeholder-gray-400 text-sm disabled:bg-gray-200 disabled:cursor-not-allowed border-0 outline-none focus:outline-none focus:ring-0 focus:border-transparent appearance-none shadow-none"
         />
       </div>
       <button
