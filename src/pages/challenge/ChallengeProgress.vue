@@ -1,3 +1,4 @@
+<!-- challengeprogress.vue -->
 <template>
     <div>
       <!-- 실패한 경우 실패 화면 표시 -->
@@ -11,12 +12,6 @@
       
       <!-- 성공 또는 진행 중인 경우 기존 화면 표시 -->
       <div v-else class="flex flex-col h-screen bg-default">
-        <!-- Header -->
-        <Header 
-          :show-logo="true" 
-          :show-points="true" 
-          :points="1250" 
-        />
     
         <!-- 저금 완료 상태 -->
         <div v-if="isSavingCompleted" class="flex flex-col items-center justify-center flex-1">
@@ -132,7 +127,6 @@
   
   <script setup>
   import { ref, computed, onMounted } from 'vue';
-  import Header from '@/components/layout/Header.vue';
   import ChallengeFailed from './ChallengeFailed.vue';
   import challengeService from '@/services/challengeService';
   

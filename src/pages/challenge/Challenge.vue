@@ -1,13 +1,8 @@
+<!-- challenge.vue -->
 <template>
   <div>
     <!-- Main Challenge Page -->
     <div v-if="!showChallengeFlow" class="flex flex-col h-screen">
-      <!-- Header -->
-      <Header 
-        :show-logo="true" 
-        :show-points="true" 
-        :points="1250" 
-      />
 
       <!-- Main Content Area -->
       <div class="flex-1 flex items-center justify-center pt-[60px] pb-[90px] px-5">
@@ -50,19 +45,42 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import Header from '@/components/layout/Header.vue';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import Button from '@/components/Button.vue';
 import ChallengeFlow from './ChallengeFlow.vue';
+import challengeService from '@/services/challengeService'; // ← 이 부분 추가
 
+const router = useRouter(); // 추가
 const showChallengeFlow = ref(false);
 
 const startChallenge = () => {
-  //console.log('챌린지 시작하기 클릭됨');
-  showChallengeFlow.value = true;
+  router.push('/challenge/loading');
 };
+
+// 페이지 로드 시 진척도 확인
+const checkCurrentChallenge = async () => {
+  try {
+    const result = await challengeService.getProgress();
+    
+    if (result && result.challenge_id) {
+      // 진행 중인 챌린지가 있으면 → ChallengeProgress.vue로 이동
+      showChallengeFlow.value = true;
+    } else {
+      // 진행 중인 챌린지가 없으면 → 현재 화면 유지 (피그마 디자인)
+      console.log('진행 중인 챌린지 없음');
+    }
+  } catch (error) {
+    console.error('챌린지 상태 확인 실패:', error);
+    // 에러 시에도 메인 화면 유지
+  }
+};
+
+onMounted(() => {
+  checkCurrentChallenge();
+});
 </script>
 
 <style scoped>
 /* 고정 크기 스타일 - 반응형 없음 */
-</style>
+</style> 

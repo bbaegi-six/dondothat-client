@@ -70,6 +70,11 @@ const routes = [
     // meta: { requiresAuth: true }, //로그인 해결되면 주석 해제
   },
   {
+    path: '/challenge/loading',  // 이 경로 추가함
+    name: 'ChallengeLoading',
+    component: () => import('@/pages/challenge/ChallengeLoading.vue'),
+  },
+  {
     path: '/challenge/flow',
     component: () => import('@/pages/challenge/ChallengeFlow.vue'),
   },
