@@ -235,7 +235,7 @@ export const useExpensesStore = defineStore('expenses', () => {
   });
 
   // 금액 포맷팅 함수들 통합
-  const formatAmount = (amount) => {
+  const formatAmount = (amount, category = null) => {
     const formattedAmount = Math.abs(amount).toLocaleString();
     // 수입 카테고리인 경우
     if (category === '수입') {
