@@ -205,7 +205,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import Button from '../../../components/Button.vue';
 
 const props = defineProps({
@@ -234,6 +234,13 @@ const agreements = ref({
   marketing: false,
 });
 
+const handleGlobalKeydown = (event) => {
+  if (event.key === 'Enter' && isFormValid.value) {
+    event.preventDefault();
+    goToNextStep();
+  }
+};
+
 // 컴포넌트 마운트 시 기존 데이터 복원
 onMounted(() => {
   // 기존에 입력했던 데이터가 있으면 복원
@@ -256,6 +263,11 @@ onMounted(() => {
       };
     }
   }
+  document.addEventListener('keydown', handleGlobalKeydown);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleGlobalKeydown);
 });
 
 // flowData 변화 감지하여 데이터 복원
