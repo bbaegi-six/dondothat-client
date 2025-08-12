@@ -71,10 +71,14 @@ const handleSave = async () => {
     await authAPI.updateProfile({ nickname: nickname.value.trim() });
 
     // 💡 사용자 정보 즉시 갱신
-    await authStore.checkAuth();
+    await authStore.checkAuth(true);
 
     console.log('닉네임 변경 완료, 마이페이지로 이동');
-    router.push('/profile');
+
+    // 사용자 정보 갱신이 완료된 후 약간의 지연을 두고 이동
+    setTimeout(() => {
+      router.push('/profile');
+    }, 100);
   } catch (error) {
     console.error('닉네임 저장 실패:', error);
     alert('닉네임 변경에 실패했습니다. 다시 시도해주세요.');

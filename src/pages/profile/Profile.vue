@@ -75,7 +75,7 @@ import AccountCard from '../../components/profile/AccountCard.vue';
 import ConfirmModal from './ConfirmModal.vue';
 
 // import { onMounted } from "vue";
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '../../stores/auth'; // auth 스토어 임포트
 import { useRouter } from 'vue-router';
@@ -108,29 +108,13 @@ const router = useRouter();
 const showModal = ref(false);
 const accountStore = useAccountStore();
 
-// user.value에서 직접 닉네임과 이메일 가져오기
-const nickname = user.value?.nickname || '게스트';
-const email = user.value?.email || 'guest@example.com';
+// 사용자 정보 (reactive)
+const nickname = computed(() => user.value?.nickname || '게스트');
+const email = computed(() => user.value?.email || 'guest@example.com');
 
 // 계좌 정보
 const mainAccount = ref(null);
 const subAccount = ref(null);
-
-// accounts와 badges는 userStore에서 가져오지 않으므로 임시 데이터 유지
-// const accounts = ref([
-//   {
-//     id: 1,
-//     imageUrl: kbLogo,
-//     name: 'KB 마이핏 통장',
-//     balance: 1500000,
-//   },
-//   {
-//     id: 2,
-//     imageUrl: kbLogo,
-//     name: '국민 저축 통장',
-//     balance: 500000,
-//   },
-// ]);
 
 // 은행 로고 매핑
 const bankLogos = {
@@ -369,9 +353,23 @@ async function logout() {
   router.push('/login');
 }
 
+// 사용자 정보 새로고침 함수를 더 강력하게 수정
+async function refreshUserInfo() {
+  try {
+    console.log('사용자 정보 갱신 시작');
+    await authStore.checkAuth(true); // 강제로 최신 사용자 정보 갱신
+    console.log('갱신된 사용자 정보:', user.value);
+  } catch (error) {
+    console.error('사용자 정보 갱신 실패:', error);
+  }
+}
+
 // 컴포넌트 마운트 시 계좌 정보 로드
-onMounted(() => {
-  loadAssets();
+onMounted(async () => {
+  // 사용자 정보를 먼저 갱신
+  await refreshUserInfo();
+  // 계좌 정보 로드
+  await loadAssets();
 });
 </script>
 
