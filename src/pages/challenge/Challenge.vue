@@ -8,18 +8,18 @@
         <!-- Empty State Container - 328 × 296 -->
         <div class="w-[328px] h-[296px] text-center flex flex-col justify-center mt-10">
           <!-- Icon Circle - 하얀색 배경 -->
-          <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-8">
+          <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-8 challenge-enter-animation" style="animation-delay: 0.1s;">
             <i class="fas fa-trophy text-4xl" style="color: #FF5555;"></i>
           </div>
 
           <!-- Main Text -->
-          <h2 class="text-white text-2xl font-bold mb-6 leading-tight font-pretendard">
+          <h2 class="text-white text-2xl font-bold mb-6 leading-tight font-pretendard challenge-enter-animation" style="animation-delay: 0.2s;">
             아직 참여 중인<br />
             챌린지가 없어요
           </h2>
 
           <!-- Subtitle -->
-          <div class="text-white text-base font-pretendard space-y-1 mb-12">
+          <div class="text-white text-base font-pretendard space-y-1 mb-12 challenge-enter-animation" style="animation-delay: 0.3s;">
             <p>새로운 도전을 통해</p>
             <p>소비 습관을 개선해볼까요?</p>
           </div>
@@ -31,7 +31,8 @@
         <Button 
           :disabled="false"
           @click="startChallenge"
-          class="font-normal"
+          class="font-normal challenge-enter-animation"
+          style="animation-delay: 0.4s;"
         >
           챌린지 시작하기
         </Button>
@@ -58,5 +59,19 @@ const startChallenge = () => {
 </script>
 
 <style scoped>
-/* 고정 크기 스타일 - 반응형 없음 */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.challenge-enter-animation {
+  opacity: 0; /* Start invisible */
+  animation: slide-up 0.5s ease-out forwards;
+}
 </style>

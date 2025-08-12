@@ -51,13 +51,15 @@
       <div class="px-4 pb-4">
         <div class="space-y-4 flex flex-col items-center">
           <button 
-            v-for="challenge in recommendedChallengesStore.challenges"
+            v-for="(challenge, index) in recommendedChallengesStore.challenges"
             :key="challenge.challengeId"
             @click="selectChallenge(challenge)"
             :class="[
               'w-[328px] h-[98px] bg-default border-2 rounded-2xl p-4 flex items-center gap-4 transition-colors',
-              selectedChallenge && selectedChallenge.challengeId === challenge.challengeId ? 'border-brand' : 'border-gray-1'
+              selectedChallenge && selectedChallenge.challengeId === challenge.challengeId ? 'border-brand' : 'border-gray-1',
+              'challenge-card-animation'
             ]"
+            :style="{ 'animation-delay': `${index * 0.1}s` }"
           >
             <div class="w-12 h-12 bg-gray-1 rounded-full flex items-center justify-center">
               <i :class="[getCategoryIcon(challenge.categoryId).icon, 'text-2xl']" :style="{ color: getCategoryIcon(challenge.categoryId).color }"></i>
@@ -79,8 +81,10 @@
             'w-[328px] h-[56px] rounded-2xl font-normal transition',
             selectedChallenge 
               ? 'bg-brand text-white hover:bg-red-600' 
-              : 'bg-gray-5 text-gray-2'
+              : 'bg-gray-5 text-gray-2',
+            'challenge-card-animation'
           ]"
+          :style="{ 'animation-delay': '0.8s' }"
         >
           {{ selectedChallenge ? '선택한 챌린지 시작하기' : '챌린지를 선택해주세요' }}
         </button>
@@ -153,3 +157,21 @@ onUnmounted(() => {
   }
 });
 </script>
+
+<style scoped>
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.challenge-card-animation {
+  opacity: 0; /* Start invisible */
+  animation: slide-up 0.5s ease-out forwards;
+}
+</style>
