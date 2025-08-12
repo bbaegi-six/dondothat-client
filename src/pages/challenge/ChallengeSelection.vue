@@ -3,9 +3,9 @@
     <!-- Top Section (Timer, Title, Subtitle) -->
     <div class="flex flex-col items-center pt-[120px] pb-4 fade-in">
       <div class="relative mb-6">
-        <div class="w-20 h-20 relative">
+        <div class="w-24 h-24 relative">
           <!-- Background Circle -->
-          <svg class="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80">
+          <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 80 80">
             <circle
               cx="40"
               cy="40"
@@ -30,7 +30,7 @@
           </svg>
           <!-- Timer Number -->
           <div class="absolute inset-0 flex items-center justify-center">
-            <span class="text-white text-2xl font-normal font-pretendard">{{
+            <span class="text-white text-4xl font-normal font-pretendard">{{
               timeLeft
             }}</span>
           </div>
