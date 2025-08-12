@@ -1,14 +1,12 @@
 <template>
   <div class="flex-1 px-[31px] flex flex-col overflow-y-auto">
     <!-- 로고 -->
-    <div class="text-center my-5 mb-10">
-      <div class="text-[60px] mb-4">💰</div>
-      <h1
-        class="font-anton-sc text-2xl text-brand leading-[22px] m-0 font-normal"
-      >
-        Don do<br />
-        that
-      </h1>
+    <div class="text-center mt-16 mb-10">
+      <img
+        src="@/assets/logo/dondothat_full-vertical_red.png"
+        alt="Don do that Logo"
+        class="mx-auto h-32"
+      />
     </div>
 
     <!-- 로그인 폼 -->
@@ -103,7 +101,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 import { useAccountStore } from '@/stores/account';
@@ -148,6 +146,9 @@ const handleLogin = async () => {
   const success = await authStore.login(email.value, password.value);
 
   if (success) {
+    // Pinia 스토어의 상태 변경이 Vue의 반응성 시스템에 완전히 전파될 때까지 기다립니다.
+    await nextTick();
+    
     if (authStore.user && !authStore.user.assetConnected) {
       accountStore.setAccount('main', false);
       router.push('/account');

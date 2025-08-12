@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
 // API 기본 설정
 const api = axios.create({
@@ -85,6 +85,8 @@ export const accountAPI = {
   connectMain: (data) => api.post('/assets/connect', data),
   connectSub: (data) => api.post('/assets/connect/sub', data),
   delete: (status) => api.delete('/assets', { params: { status } }),
+  updateConnected: (assetConnected) =>
+    api.put(`/user/update-assetConnected?assetConnected=${assetConnected}`),
 };
 
 // 챌린지 API - API 호출만 담당

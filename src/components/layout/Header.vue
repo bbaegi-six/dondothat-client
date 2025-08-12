@@ -23,12 +23,12 @@
             />
           </svg>
         </button>
-        <h1
+        <img
           v-if="showLogo"
-          class="font-anton-sc text-xl text-primary-red m-0 font-normal"
-        >
-          Don do that
-        </h1>
+          src="@/assets/logo/dondothat_full-horizontal_red.png"
+          alt="Don do that Logo"
+          class="h-6"
+        />
         <h2
           v-if="title"
           class="m-0"
@@ -91,7 +91,7 @@
       </div>
     </div>
     <!-- 헤더 하단 구분선 -->
-    <div class="border-t border-[#414141] w-full"></div>
+    <div v-if="showBorder" class="border-t border-[#414141] w-full"></div>
   </header>
 </template>
 
@@ -133,6 +133,10 @@ defineProps({
   userCount: {
     type: Number,
     default: 0,
+  },
+  showBorder: {
+    type: Boolean,
+    default: true,
   },
 });
 

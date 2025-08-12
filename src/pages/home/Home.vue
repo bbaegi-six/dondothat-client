@@ -1,10 +1,28 @@
 <template>
-  <Header showLogo />
+  <Header showLogo :show-border="false" />
   <div
     class="min-h-screen w-[390px] mx-auto bg-[#2f2f2f] pt-[88px] px-[31px] pb-[90px]"
   >
-    <!-- 저금통 연결 섹션 -->
+    <!-- 저금통 섹션 -->
+    <div v-if="authStore.user && authStore.user.savingConnected">
+      <div
+        class="w-[328px] h-[56px] bg-[#414141] rounded-2xl flex items-center px-6 cursor-pointer"
+      >
+        <div class="font-pretendard font-medium text-base text-white">
+          지금까지 아낀 금액
+        </div>
+        <FontAwesomeIcon
+          :icon="farCircleQuestion"
+          class="text-[#c9c9c9] ml-1 mr-auto"
+        />
+        <div class="font-pretendard font-bold text-lg text-white mr-2">
+          12,000원
+        </div>
+        <FontAwesomeIcon :icon="faAngleRight" class="text-white w-[10px] h-4" />
+      </div>
+    </div>
     <div
+      v-else
       class="w-[328px] h-[56px] bg-[#414141] rounded-2xl flex items-center px-6 cursor-pointer"
       @click="goToAccountStep2"
     >
@@ -96,7 +114,9 @@ import {
 
 import { useExpensesStore } from '@/stores/expenses';
 import { useAccountStore } from '@/stores/account';
+import { useAuthStore } from '@/stores/auth';
 
+const authStore = useAuthStore();
 const accountStore = useAccountStore();
 const router = useRouter();
 const chartCanvas = ref(null);

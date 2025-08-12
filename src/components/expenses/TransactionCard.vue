@@ -57,7 +57,7 @@
             width: 80px;
           "
         >
-          {{ formatAmount(transaction.amount) }}
+          {{ formatAmount(transaction.amount, transaction.category) }}
         </div>
       </div>
       <div style="display: flex; justify-content: space-between">

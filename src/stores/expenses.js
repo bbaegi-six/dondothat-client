@@ -17,10 +17,14 @@ export const useExpensesStore = defineStore('expenses', () => {
     const currentYear = new Date().getFullYear();
     return transactions.value.filter((transaction) => {
       const transactionDate = new Date(transaction.date);
-      return (
+      const isCurrentMonth =
         transactionDate.getMonth() + 1 === currentMonth.value &&
-        transactionDate.getFullYear() === currentYear
-      );
+        transactionDate.getFullYear() === currentYear;
+
+      // 수입 카테고리 제외하고 지출만 반환
+      const isExpense = transaction.category !== '수입';
+
+      return isCurrentMonth && isExpense;
     });
   });
 
@@ -38,7 +42,10 @@ export const useExpensesStore = defineStore('expenses', () => {
 
   const monthlyExpense = computed(() => {
     if (!Array.isArray(currentMonthTransactions.value)) return 0;
-    return currentMonthTransactions.value.reduce((sum, t) => sum + t.amount, 0);
+    return currentMonthTransactions.value.reduce((sum, t) => {
+      // 지출만 합계 (수입은 이미 currentMonthTransactions에서 제외됨)
+      return sum + Math.abs(t.amount);
+    }, 0);
   });
 
   // 저금통 관련 computed 추가
@@ -149,7 +156,13 @@ export const useExpensesStore = defineStore('expenses', () => {
   };
 
   const getDailyTotal = (transactions) => {
-    const total = transactions.reduce((sum, t) => sum + t.amount, 0);
+    const expenseTransactions = transactions.filter(
+      (t) => t.category !== '수입'
+    );
+    const total = expenseTransactions.reduce(
+      (sum, t) => sum + Math.abs(t.amount),
+      0
+    );
     return total > 0 ? `-${total.toLocaleString()}원` : '0원';
   };
 
@@ -199,8 +212,12 @@ export const useExpensesStore = defineStore('expenses', () => {
   };
 
   // 금액 포맷팅 함수 추가
-  const formatAmount = (amount) => {
+  const formatAmount = (amount, category = '') => {
     const formattedAmount = Math.abs(amount).toLocaleString();
+    // 수입 카테고리인 경우
+    if (category === '수입') {
+      return `+${formattedAmount}원`;
+    }
     return `-${formattedAmount}원`;
   };
 
