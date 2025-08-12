@@ -87,6 +87,8 @@ export const accountAPI = {
   delete: (status) => api.delete('/assets', { params: { status } }),
   updateConnected: (assetConnected) =>
     api.put(`/user/update-assetConnected?assetConnected=${assetConnected}`),
+  updateSubConnected: (assetSubConnected) =>
+    api.put(`/user/update-savingConnected?assetConnected=${assetSubConnected}`),
 };
 
 // 챌린지 API - API 호출만 담당
@@ -94,20 +96,23 @@ export const challengeAPI = {
   // 챌린지 상세 조회
   getChallenge: (challengeId) => api.get(`/challenges/${challengeId}`),
 
-  // 추천 챌린지 조회  
+  // 추천 챌린지 조회
   getRecommendations: () => api.get('/challenges/recommendations'),
 
   // 챌린지 참여
-  joinChallenge: (challengeId, data) => api.post(`/challenges/${challengeId}/join`, data),
+  joinChallenge: (challengeId, data) =>
+    api.post(`/challenges/${challengeId}/join`, data),
 
   // 진척도 조회 - 새로 추가된 API
   getProgress: () => api.get('/challenges/progress'),
 
   // 챌린지 완료
-  completeChallenge: (challengeId) => api.post(`/challenges/${challengeId}/complete`),
+  completeChallenge: (challengeId) =>
+    api.post(`/challenges/${challengeId}/complete`),
 
   // 챌린지 실패
-  failChallenge: (challengeId, failureData) => api.post(`/challenges/${challengeId}/fail`, failureData),
+  failChallenge: (challengeId, failureData) =>
+    api.post(`/challenges/${challengeId}/fail`, failureData),
 };
 
 // export const chatAPI = {
