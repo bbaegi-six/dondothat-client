@@ -285,16 +285,19 @@ const goToChallenge = () => {
 
 const goToHome = async () => {
   console.log('자산연동 완료 - 홈으로 이동 시작');
-  
+
   // 백그라운드에서 지출 내역 미리 로딩
   try {
     console.log('백그라운드 지출 내역 로딩 시작...');
     await expensesStore.fetchExpensesFromAPI();
     console.log('백그라운드 지출 내역 로딩 완료!');
   } catch (error) {
-    console.warn('백그라운드 지출 내역 로딩 실패 (사용자 플로우에는 영향 없음):', error);
+    console.warn(
+      '백그라운드 지출 내역 로딩 실패 (사용자 플로우에는 영향 없음):',
+      error
+    );
   }
-  
+
   // 계좌 타입 초기화
   accountStore.clearAccountType();
   router.push('/');
