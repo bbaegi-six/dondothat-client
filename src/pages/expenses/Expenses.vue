@@ -432,12 +432,10 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { useExpensesStore } from '../../stores/expenses.js';
 import Header from '../../components/layout/Header.vue';
 import TransactionCard from '../../components/expenses/TransactionCard.vue';
 
-const router = useRouter();
 const expensesStore = useExpensesStore();
 
 // 탭 상태 관리
@@ -484,11 +482,11 @@ const getDailySavingsTotal = (items) => {
 };
 
 const editTransaction = (transaction) => {
-  router.push(`/expenses/${transaction.id}`);
+  expensesStore.navigateToExpenseEdit(transaction.id);
 };
 
 const addTransaction = () => {
-  router.push('/expenses/new');
+  expensesStore.navigateToExpenseAdd();
   console.log('새 거래 추가 페이지로 이동');
 };
 
