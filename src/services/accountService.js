@@ -71,5 +71,13 @@ export const accountService = {
       console.log('connected update 요청 실패', error);
     }
   },
+  async updateSubAssetConnected(assetConnected = true) {
+    try {
+      const response = await accountAPI.updateSubConnected(assetConnected);
+      return response;
+    } catch (error) {
+      console.log('connected update 요청 실패', error);
+    }
+  },
 };
 export default accountService;
