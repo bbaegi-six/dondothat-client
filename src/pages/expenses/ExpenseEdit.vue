@@ -26,6 +26,7 @@
           <span class="text-white text-base font-medium">분류</span>
           <div class="flex gap-2">
             <button
+              v-show="false"
               @click="editableData.type = 'income'"
               :class="[
                 'px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200 border hover:bg-white hover:text-[#2f2f2f] active:bg-white active:text-[#2f2f2f]',
