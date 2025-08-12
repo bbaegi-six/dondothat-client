@@ -2,7 +2,7 @@
     <div class="flex flex-col h-screen bg-default">
   
       <!-- Timer Circle - Top Section -->
-      <div class="flex flex-col items-center pt-[120px] pb-4">
+      <div class="flex flex-col items-center pt-[120px] pb-4 challenge-card-animation" style="animation-delay: 0.1s;">
         <div class="relative mb-6">
           <div class="w-20 h-20 relative">
             <!-- Background Circle -->
@@ -40,6 +40,12 @@
         <h1 class="text-white text-xl font-bold text-center mb-2 font-pretendard">
           원하는 챌린지를 선택해주세요
         </h1>
+
+        <!-- Subtitle -->
+        <div class="text-white/70 text-sm text-center font-pretendard">
+          <p>30초 후에 선택하지 않으면</p>
+          <p>AI 추천 챌린지가 선택됩니다</p>
+        </div>
       </div>
 
       <!-- Middle Spacer to push content down -->
