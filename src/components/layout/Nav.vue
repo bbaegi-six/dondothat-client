@@ -10,12 +10,11 @@
       :class="{
         'hover:scale-105': true,
         'hover:bg-white/10': true,
-        'bg-primary-red/20': $route.path === item.path,
       }"
     >
       <div
-        class="flex items-center justify-center w-6 h-6 text-white/60"
-        :class="{ 'text-primary-red': $route.path === item.path }"
+        class="flex items-center justify-center w-6 h-6"
+        :class="$route.path === item.path ? 'text-brand' : 'text-white/60'"
       >
         <div v-html="item.icon" class="w-full h-full"></div>
       </div>
