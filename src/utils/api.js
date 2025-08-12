@@ -80,6 +80,13 @@ export const expensesAPI = {
   delete: (id) => api.delete(`/expenses/${id}`),
   getCategories: () => api.get('/expenses/categories'),
 };
+
+export const savingAPI = {
+  getTotal: () => api.get('/saving/total'),
+  getHistory: () => api.get('/saving/history'),
+  save: (id) => api.post(`/saving/save/${id}`),
+};
+
 // account api 추가
 export const accountAPI = {
   connectMain: (data) => api.post('/assets/connect', data),

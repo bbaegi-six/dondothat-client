@@ -72,7 +72,7 @@
             margin-top: 2px;
           "
         >
-          {{ transaction.category }}
+          {{ transaction.categoryDisplay || transaction.category }}
         </div>
         <div
           style="
@@ -143,9 +143,14 @@ const getIconStyle = (category) => {
   };
 };
 
-// 스토어의 공통 포맷팅 메서드 사용 (type 파라미터 제거)
-const formatAmount = (amount) => {
-  return expensesStore.formatAmount(amount);
+// 금액 포맷팅 (저금통 데이터는 + 표시)
+const formatAmount = (amount, category) => {
+  const formattedAmount = Math.abs(amount).toLocaleString();
+  // 저금통 데이터인 경우 + 표시
+  if (props.transaction.isSaving) {
+    return `+${formattedAmount}원`;
+  }
+  return expensesStore.formatAmount(amount, category);
 };
 </script>
 
