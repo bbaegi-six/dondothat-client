@@ -1,8 +1,7 @@
-<!-- challengeSelection.vue -->
 <template>
   <div class="flex flex-col h-screen bg-default">
-    <!-- Timer Circle - Top Section -->
-    <div class="flex flex-col items-center pt-[60px] pb-4">
+    <!-- Top Section (Timer, Title, Subtitle) -->
+    <div class="flex flex-col items-center pt-[80px] pb-4">
       <div class="relative mb-6">
         <div class="w-20 h-20 relative">
           <!-- Background Circle -->
@@ -44,56 +43,59 @@
       </h1>
 
       <!-- Subtitle -->
-      <div class="text-white/90 text-sm text-center font-pretendard">
+      <div class="text-white/90 text-sm text-center font-pretendard mb-8">
         <p>30초 후에 선택하지 않으면</p>
         <p>AI 추천 챌린지가 선택됩니다</p>
       </div>
     </div>
 
-    <!-- Middle Spacer -->
-    <div class="flex-1"></div>
+    <!-- Spacer to push content to bottom -->
+    <div class="flex-grow"></div>
 
-    <!-- Challenge Cards - Bottom Section -->
-    <div class="px-4 pb-4">
-      <div class="space-y-4 flex flex-col items-center">
+    <!-- Fixed Bottom Section (Challenge Cards + Button) -->
+    <div>
+      <!-- Challenge Cards - Bottom Section -->
+      <div class="px-4 pb-4">
+        <div class="space-y-4 flex flex-col items-center">
+          <button
+            v-for="challenge in challenges"
+            :key="challenge.challengeId"
+            @click="selectChallenge(challenge.challengeId)"
+            :class="[
+              'w-[328px] h-[98px] bg-default border-2 rounded-2xl p-4 flex items-center gap-4 transition-colors',
+              selectedChallenge === challenge.challengeId ? 'border-brand' : 'border-gray-1',
+            ]"
+          >
+            <div
+              class="w-12 h-12 bg-gray-1 rounded-full flex items-center justify-center"
+            >
+              <i :class="getCategoryIcon(challenge.categoryId)" :style="{ color: getCategoryColor(challenge.categoryId) }"></i>
+            </div>
+            <div class="flex-1 text-left">
+              <h3 class="text-white text-base font-bold">{{ challenge.title }}</h3>
+              <p class="text-gray-3 text-sm">{{ challenge.summary }}</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Selection Button - Just above nav -->
+      <div class="px-8 pt-0 pb-[90px]">
         <button
-          v-for="challenge in challenges"
-          :key="challenge.challengeId"
-          @click="selectChallenge(challenge.challengeId)"
+          :disabled="!selectedChallenge"
+          @click="startChallenge"
           :class="[
-            'w-[328px] h-[98px] bg-default border-2 rounded-2xl p-4 flex items-center gap-4 transition-colors',
-            selectedChallenge === challenge.challengeId ? 'border-brand' : 'border-gray-1',
+            'w-[328px] h-[56px] rounded-2xl font-normal transition',
+            selectedChallenge
+              ? 'bg-brand text-white hover:bg-red-600'
+              : 'bg-gray-5 text-gray-2',
           ]"
         >
-          <div
-            class="w-12 h-12 bg-gray-1 rounded-full flex items-center justify-center"
-          >
-            <i :class="getCategoryIcon(challenge.categoryId)" :style="{ color: getCategoryColor(challenge.categoryId) }"></i>
-          </div>
-          <div class="flex-1 text-left">
-            <h3 class="text-white text-base font-bold">{{ challenge.title }}</h3>
-            <p class="text-gray-3 text-sm">{{ challenge.summary }}</p>
-          </div>
+          {{
+            selectedChallenge ? '선택한 챌린지 시작하기' : '챌린지를 선택해주세요'
+          }}
         </button>
       </div>
-    </div>
-
-    <!-- Selection Button - Just above nav -->
-    <div class="px-8 pb-[90px]">
-      <button
-        :disabled="!selectedChallenge"
-        @click="startChallenge"
-        :class="[
-          'w-[328px] h-[56px] rounded-2xl font-normal transition',
-          selectedChallenge
-            ? 'bg-brand text-white hover:bg-red-600'
-            : 'bg-gray-5 text-gray-2',
-        ]"
-      >
-        {{
-          selectedChallenge ? '선택한 챌린지 시작하기' : '챌린지를 선택해주세요'
-        }}
-      </button>
     </div>
   </div>
 </template>

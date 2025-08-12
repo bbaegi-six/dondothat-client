@@ -2,7 +2,7 @@
 <template>
   <div class="flex flex-col h-screen bg-default">
     <!-- Timer Circle - Top Section -->
-    <div class="flex flex-col items-center pt-[60px] pb-4">
+    <div class="flex flex-col items-center pt-[80px] pb-4">
       <div class="relative mb-6">
         <div class="w-20 h-20 relative">
           <!-- Background Circle -->

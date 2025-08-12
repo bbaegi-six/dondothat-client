@@ -2,16 +2,16 @@
 <template>
   <div class="flex flex-col h-screen bg-default">
     <!-- Title Section - 타이머와 동일한 위치에서 제거 -->
-    <div class="flex flex-col items-center pt-[60px] pb-4">
+    <div class="flex flex-col items-center pt-[30px] pb-4">
       <!-- 빈 공간 유지 -->
     </div>
 
     <!-- Loading Content - 중앙 배치 -->
     <div class="flex-1 flex flex-col items-center justify-center px-8">
       <!-- Loading Icon -->
-      <div class="w-16 h-16 mb-8">
+      <div class="w-28 h-28 mb-8">
         <svg
-          class="w-16 h-16 text-white animate-spin-slow"
+          class="w-28 h-28 text-white animate-spin-slow"
           viewBox="0 0 24 24"
           fill="currentColor"
         >
@@ -33,7 +33,7 @@
     </div>
 
     <!-- Blurred Challenge Cards - 원본과 동일한 위치 -->
-    <div class="px-4 pb-4">
+    <div class="px-4 pb-4 mt-[-16]">
       <div class="space-y-4 flex flex-col items-center blur-sm opacity-50">
         <!-- 카페 금지 챌린지 -->
         <div
