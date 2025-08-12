@@ -2,7 +2,7 @@
     <div class="flex flex-col h-screen bg-default">
   
       <!-- Timer Circle - Top Section -->
-      <div class="flex flex-col items-center pt-[120px] pb-4 flex-grow">
+      <div class="flex flex-col items-center pt-[120px] pb-4">
         <div class="relative mb-6">
           <div class="w-20 h-20 relative">
             <!-- Background Circle -->
@@ -41,6 +41,9 @@
           원하는 챌린지를 선택해주세요
         </h1>
       </div>
+
+      <!-- Middle Spacer to push content down -->
+      <div class="flex-1"></div>
   
       <!-- Middle Spacer -->
   
@@ -68,7 +71,7 @@
       </div>
   
       <!-- Selection Button - Just above nav -->
-      <div class="px-8">
+      <div class="px-8 pb-8">
         <button
           :disabled="!selectedChallenge"
           @click="startChallenge"

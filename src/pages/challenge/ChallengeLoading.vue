@@ -1,11 +1,5 @@
 <template>
     <div class="flex flex-col h-screen bg-default">
-      <!-- Header -->
-      <Header 
-        :show-logo="true" 
-        :show-points="true" 
-        :points="1250" 
-      />
   
       <!-- Title Section - 타이머와 동일한 위치에서 제거 -->
       <div class="flex flex-col items-center pt-[60px] pb-4">

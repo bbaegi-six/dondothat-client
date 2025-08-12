@@ -71,6 +71,7 @@ const routes = [
   },
   {
     path: '/challenge/flow',
+    name: 'ChallengeFlow',
     component: () => import('@/pages/challenge/ChallengeFlow.vue'),
   },
   {
