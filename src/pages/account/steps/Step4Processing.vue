@@ -121,8 +121,12 @@ onMounted(async () => {
       // ✅ 성공 시 assetConnected를 true로 업데이트
       try {
         statusMessage.value = '사용자 정보 업데이트 중...';
-        await accountService.updateAssetConnected(true);
-
+        if (accountStore.accountType === 'main') {
+          await accountService.updateAssetConnected(true);
+        } else if (accountStore.accountType === 'sub') {
+          await accountService.updateSubAssetConnected(true);
+          console.log('updatesubassetconnected true 변경');
+        }
         // authStore의 사용자 정보도 로컬에서 업데이트
         // if (authStore.user) {
         //   authStore.user.assetConnected = true;

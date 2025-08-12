@@ -1,38 +1,59 @@
 <template>
   <Header :showBack="true" title="닉네임 변경"></Header>
-  <div class="mt-20 mx-auto w-[328px]">
-    <!-- 위쪽 내용 -->
-    <div>
-      <p class="text-white text-sm mb-2">변경할 닉네임</p>
-      <Input
-        v-model="nickname"
-        placeholder="닉네임을 입력하세요"
-        class="w-full"
+  <div
+    style="
+      padding: 20px;
+      padding-top: 80px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      max-width: 400px;
+      margin: 0 auto;
+    "
+  >
+    <div style="flex: 1; display: flex; flex-direction: column">
+      <div style="margin-top: 20px">
+        <p
+          style="
+            color: white;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: block;
+          "
+        >
+          변경할 닉네임
+        </p>
+        <Input
+          v-model="nickname"
+          placeholder="닉네임을 입력하세요"
+          style="width: 100%; margin-bottom: 16px"
+        />
+      </div>
+    </div>
+
+    <div style="padding-bottom: 20px; margin-top: auto">
+      <Button
+        @click="handleSave"
+        label="저장"
+        :disabled="!nickname || nickname.trim() === ''"
+        style="width: 100%; height: 48px; font-size: 16px; font-weight: 600"
       />
-      <div class="h-1">
-        <span v-if="showErrors && !nickname" class="text-brand text-xs mt-1">
-          * 필수 항목입니다
-        </span>
-      </div>
-      <div class="fixed bottom-4">
-        <Button @click="handleSave" label="저장" :disabled="!nickname" />
-      </div>
     </div>
   </div>
 </template>
+
 <script setup>
 import Header from '../../components/layout/Header.vue';
-import Input from '../../components/Input.vue'; // InputWithButton 대신 Input 임포트
+import Input from '../../components/Input.vue';
 import Button from '../../components/Button.vue';
-import { authAPI } from '../../utils/api'; // authAPI 임포트
-import { useAuthStore } from '../../stores/auth'; // useAuthStore 임포트
+import { authAPI } from '../../utils/api';
+import { useAuthStore } from '../../stores/auth';
 
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const nickname = ref('');
-const showErrors = ref(false);
-const authStore = useAuthStore(); // authStore 사용
+const authStore = useAuthStore();
 const router = useRouter();
 
 // 현재 사용자 닉네임으로 초기화
@@ -41,17 +62,23 @@ if (authStore.user?.nickname) {
 }
 
 const handleSave = async () => {
-  showErrors.value = true;
-
-  if (!nickname.value) {
+  // 공백 체크
+  if (!nickname.value || nickname.value.trim() === '') {
     return;
   }
 
   try {
-    await authAPI.updateProfile({ nickname: nickname.value });
-    // 사용자 정보 업데이트 후 auth 스토어의 사용자 정보 갱신
-    await authStore.checkAuth();
-    router.push('/profile');
+    await authAPI.updateProfile({ nickname: nickname.value.trim() });
+
+    // 💡 사용자 정보 즉시 갱신
+    await authStore.checkAuth(true);
+
+    console.log('닉네임 변경 완료, 마이페이지로 이동');
+
+    // 사용자 정보 갱신이 완료된 후 약간의 지연을 두고 이동
+    setTimeout(() => {
+      router.push('/profile');
+    }, 100);
   } catch (error) {
     console.error('닉네임 저장 실패:', error);
     alert('닉네임 변경에 실패했습니다. 다시 시도해주세요.');

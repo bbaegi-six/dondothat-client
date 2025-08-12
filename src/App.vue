@@ -25,8 +25,16 @@ const shouldShowNav = computed(() => {
     '/profile/mychallenge',
     'ChallengeFlow',
     'ChallengeSelection',
+    '/challenge/flow',
   ];
-  return !noNavRoutes.includes(route.name);
+
+  // 다시 디버깅 추가
+  console.log('=== 현재 상태 ===');
+  console.log('현재 경로:', route.path);
+  console.log('noNavRoutes에 포함?:', noNavRoutes.includes(route.path));
+  console.log('shouldShowNav:', !noNavRoutes.includes(route.path));
+
+  return !noNavRoutes.includes(route.path);
 });
 </script>
 
