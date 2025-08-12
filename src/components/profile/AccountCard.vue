@@ -11,7 +11,7 @@
         margin-bottom: 15px;
       "
     >
-      <Img :src="imgSrc" style="width: 40px" />
+      <img :src="imgSrc" style="width: 40px" />
       <p style="margin-left: 12px">{{ accountName }}</p>
       <p style="margin-left: 30px">{{ formattedAmount }}원</p>
     </div>
@@ -32,8 +32,8 @@
 </template>
 
 <script setup>
-import BaseCard from "../BaseCard.vue";
-import { computed } from "vue";
+import BaseCard from '../BaseCard.vue';
+import { computed } from 'vue';
 
 const props = defineProps({
   imgSrc: {
@@ -53,5 +53,5 @@ const props = defineProps({
 // 금액 포맷 (3자리 콤마)
 const formattedAmount = computed(() => props.amount.toLocaleString());
 
-defineEmits(["change"]);
+defineEmits(['change']);
 </script>
