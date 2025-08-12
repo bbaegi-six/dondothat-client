@@ -66,17 +66,27 @@
           v-if="showAddButton"
           @click="$emit('add-click')"
           class="rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
-          style="width: 32px; height: 32px; background-color: #ff5555"
+          style="width: 32px; height: 32px; background-color: #c9c9c9"
         >
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 448 512"
             width="16"
             height="16"
-            fill="#ffffff"
+            viewBox="0 0 24 24"
+            fill="none"
           >
             <path
-              d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"
+              d="M1 4V10H7M23 20V14H17"
+              stroke="#ffffff"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15"
+              stroke="#ffffff"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             />
           </svg>
         </button>

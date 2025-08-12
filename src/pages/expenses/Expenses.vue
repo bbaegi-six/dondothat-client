@@ -13,7 +13,7 @@
       :showBack="false"
       title="내역"
       :showAddButton="true"
-      @add-click="addTransaction"
+      @add-click="refreshExpenses"
     />
 
     <!-- 탭 -->
@@ -393,16 +393,16 @@
       </div>
     </div>
 
-    <!-- 새로고침 버튼 -->
+    <!-- 내역추가 버튼 -->
     <button
-      @click="refreshExpenses"
-      class="absolute"
+      @click="addTransaction"
+      class="fixed"
       style="
         bottom: 80px;
         right: 31px;
         width: 48px;
         height: 48px;
-        background-color: #c9c9c9;
+        background-color: #ff5555;
         border: none;
         border-radius: 50%;
         display: flex;
@@ -414,30 +414,16 @@
       "
       :disabled="loading"
     >
-      <!-- 새로고침 아이콘 -->
+      <!-- + 아이콘 -->
       <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 448 512"
         width="20"
         height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        :style="{
-          transform: loading ? 'rotate(360deg)' : 'rotate(0deg)',
-          transition: 'transform 0.5s ease-in-out',
-        }"
+        fill="#ffffff"
       >
         <path
-          d="M1 4V10H7M23 20V14H17"
-          stroke="#ffffff"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <path
-          d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15"
-          stroke="#ffffff"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"
         />
       </svg>
     </button>
