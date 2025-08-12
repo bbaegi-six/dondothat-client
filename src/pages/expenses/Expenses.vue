@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen w-[390px] mx-auto"
+    class="min-h-screen w-[390px] mx-auto relative"
     style="
       background-color: #2f2f2f;
       padding-top: 88px;
@@ -13,7 +13,7 @@
       :showBack="false"
       title="내역"
       :showAddButton="true"
-      @add-click="addTransaction"
+      @add-click="refreshExpenses"
     />
 
     <!-- 탭 -->
@@ -392,17 +392,50 @@
         <p style="color: #c6c6c6; font-size: 14px">저금통 내역이 없습니다.</p>
       </div>
     </div>
+
+    <!-- 내역추가 버튼 -->
+    <button
+      @click="addTransaction"
+      class="fixed"
+      style="
+        bottom: 80px;
+        right: calc((100vw - 390px) / 2 + 31px);
+        width: 48px;
+        height: 48px;
+        background-color: #ff5555;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      "
+      :disabled="loading"
+    >
+      <!-- + 아이콘 -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 448 512"
+        width="20"
+        height="20"
+        fill="#ffffff"
+      >
+        <path
+          d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"
+        />
+      </svg>
+    </button>
   </div>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { useExpensesStore } from '../../stores/expenses.js';
 import Header from '../../components/layout/Header.vue';
 import TransactionCard from '../../components/expenses/TransactionCard.vue';
 
-const router = useRouter();
 const expensesStore = useExpensesStore();
 
 // 탭 상태 관리
@@ -449,12 +482,25 @@ const getDailySavingsTotal = (items) => {
 };
 
 const editTransaction = (transaction) => {
-  router.push(`/expenses/${transaction.id}`);
+  expensesStore.navigateToExpenseEdit(transaction.id);
 };
 
 const addTransaction = () => {
-  router.push('/expenses/new');
+  expensesStore.navigateToExpenseAdd();
   console.log('새 거래 추가 페이지로 이동');
+};
+
+// 새로고침 버튼 관련
+const loading = computed(() => expensesStore.loading);
+
+const refreshExpenses = async () => {
+  console.log('지출 내역 새로고침 시작');
+  try {
+    await expensesStore.fetchExpensesFromAPI();
+    console.log('지출 내역 새로고침 완료');
+  } catch (error) {
+    console.error('지출 내역 새로고침 실패:', error);
+  }
 };
 </script>
 

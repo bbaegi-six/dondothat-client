@@ -121,35 +121,11 @@ const accountStore = useAccountStore();
 const router = useRouter();
 const chartCanvas = ref(null);
 const expensesStore = useExpensesStore();
-const categoryData = ref([]);
 const chartInstance = ref(null);
-
-// 차트 색상 팔레트
-// 카테고리별 색상 매핑
-const categoryColorMap = {
-  배달음식: '#FF7376',
-  카페: '#FF9595',
-  쇼핑: '#FFA66F',
-  택시: '#FFC457',
-  편의점: '#FFE7AC',
-  문화: '#CDE897',
-  술: '#72E39C',
-  대중교통: '#8CC2FF',
-  의료: '#8F95EC',
-  생활: '#CF8FEC',
-  식비: '#F680DB',
-  그외: '#C9C9C9',
-  수입: '#FFFFFF',
-};
-
-// 카테고리에 따른 색상 가져오기 함수
-const getCategoryColor = (categoryName) => {
-  return categoryColorMap[categoryName] || categoryColorMap['그외'];
-};
 
 // 차트 생성
 const createChart = () => {
-  if (!chartCanvas.value || !categoryData.value.length) return;
+  if (!chartCanvas.value || !expensesStore.chartData.length) return;
 
   // 기존 차트 인스턴스가 있다면 제거
   if (chartInstance.value) {
@@ -158,16 +134,16 @@ const createChart = () => {
 
   const ctx = chartCanvas.value.getContext('2d');
 
-  // 카테고리별 색상 배열 생성
-  const colors = categoryData.value.map((item) => getCategoryColor(item.name));
+  // 카테고리별 색상 배열
+  const colors = expensesStore.chartData.map((item) => item.color);
 
   chartInstance.value = new Chart(ctx, {
     type: 'pie',
     data: {
-      labels: categoryData.value.map((item) => item.name),
+      labels: expensesStore.chartData.map((item) => item.name),
       datasets: [
         {
-          data: categoryData.value.map((item) => item.amount),
+          data: expensesStore.chartData.map((item) => item.amount),
           backgroundColor: colors,
           borderWidth: 0,
         },
@@ -225,26 +201,6 @@ onMounted(async () => {
       );
     });
   }
-
-  // 카테고리별 데이터 계산
-  const categoryMap = new Map();
-  expensesStore.currentMonthTransactions
-    .filter((transaction) => transaction.category !== '수입')
-    .forEach((transaction) => {
-      const categoryName = transaction.category || '기타';
-      const amount = transaction.amount || 0;
-
-      if (categoryMap.has(categoryName)) {
-        categoryMap.set(categoryName, categoryMap.get(categoryName) + amount);
-      } else {
-        categoryMap.set(categoryName, amount);
-      }
-    });
-
-  categoryData.value = Array.from(categoryMap.entries())
-    .map(([name, amount]) => ({ name, amount }))
-    .sort((a, b) => b.amount - a.amount);
-
   await nextTick(); // DOM 업데이트 완료 대기
   createChart();
 });

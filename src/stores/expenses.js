@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { expensesService } from '@/services/expensesService';
+import router from '@/router';
 // API  서비스 import
 
 export const useExpensesStore = defineStore('expenses', () => {
@@ -172,47 +173,69 @@ export const useExpensesStore = defineStore('expenses', () => {
     return `+${total.toLocaleString()}원`;
   };
 
-  // 카테고리 목록 정의
-  const categories = [
-    '배달음식',
-    '카페',
-    '쇼핑',
-    '택시',
-    '편의점',
-    '문화',
-    '술',
-    '교통',
-    '의료',
-    '생활',
-    '식비',
-    '그외',
-    '수입',
-  ];
-
-  // 카테고리 메타데이터 함수 추가
-  const getCategoryMetadata = (category) => {
-    const categoryMap = {
-      배달음식: { icon: 'fas fa-motorcycle', color: '#ff7376' },
-      카페: { icon: 'fas fa-mug-saucer', color: '#ff9595' },
-      쇼핑: { icon: 'fas fa-bag-shopping', color: '#ffa66f' },
-      택시: { icon: 'fas fa-taxi', color: '#ffc457' },
-      편의점: { icon: 'fas fa-store', color: '#ffe7ac' },
-      문화: { icon: 'fas fa-clapperboard', color: '#cde897' },
-      술: { icon: 'fas fa-wine-bottle', color: '#72e39c' },
-      교통: { icon: 'fas fa-train-subway', color: '#8cc2ff' },
-      의료: { icon: 'fas fa-suitcase-medical', color: '#8f95ec' },
-      생활: { icon: 'fas fa-home', color: '#cf8fec' },
-      식비: { icon: 'fas fa-utensils', color: '#f680db' },
-      그외: { icon: 'fas fa-ellipsis', color: '#c9c9c9' },
-      수입: { icon: 'fas fa-coins', color: '#ffffff' },
-      기타: { icon: 'fas fa-ellipsis', color: '#c9c9c9' },
-    };
-
-    return categoryMap[category] || categoryMap['그외'];
+  // 카테고리 마스터 데이터 통합 (ID, 아이콘, 색상 포함)
+  const categoryMasterData = {
+    배달음식: { id: 1, icon: 'fas fa-motorcycle', color: '#ff7376' },
+    카페: { id: 2, icon: 'fas fa-mug-saucer', color: '#ff9595' },
+    쇼핑: { id: 3, icon: 'fas fa-bag-shopping', color: '#ffa66f' },
+    택시: { id: 4, icon: 'fas fa-taxi', color: '#ffc457' },
+    편의점: { id: 5, icon: 'fas fa-store', color: '#ffe7ac' },
+    문화: { id: 6, icon: 'fas fa-clapperboard', color: '#cde897' },
+    술: { id: 7, icon: 'fas fa-wine-bottle', color: '#72e39c' },
+    교통: { id: 8, icon: 'fas fa-train-subway', color: '#8cc2ff' },
+    의료: { id: 9, icon: 'fas fa-suitcase-medical', color: '#8f95ec' },
+    생활: { id: 10, icon: 'fas fa-home', color: '#cf8fec' },
+    식비: { id: 11, icon: 'fas fa-utensils', color: '#f680db' },
+    그외: { id: 12, icon: 'fas fa-ellipsis', color: '#c9c9c9' },
+    수입: { id: 13, icon: 'fas fa-coins', color: '#ffffff' },
+    기타: { id: 12, icon: 'fas fa-ellipsis', color: '#c9c9c9' }, // 그외와 동일
   };
 
-  // 금액 포맷팅 함수 추가
-  const formatAmount = (amount, category = '') => {
+  // 카테고리 목록 (순서 유지)
+  const categories = Object.keys(categoryMasterData).filter(key => key !== '기타');
+
+  // 카테고리 관련 유틸리티 함수들
+  const getCategoryMetadata = (category) => {
+    return categoryMasterData[category] || categoryMasterData['그외'];
+  };
+
+  const getCategoryIdByName = (categoryName) => {
+    return categoryMasterData[categoryName]?.id || 12;
+  };
+
+  const getCategoryNameById = (categoryId) => {
+    return Object.keys(categoryMasterData).find(name => 
+      categoryMasterData[name].id === categoryId
+    ) || '그외';
+  };
+
+  const getCategoryColorByName = (categoryName) => {
+    return categoryMasterData[categoryName]?.color || '#c9c9c9';
+  };
+
+  // 차트 데이터 계산 (Home.vue에서 사용)
+  const chartData = computed(() => {
+    const categoryMap = new Map();
+    
+    currentMonthTransactions.value
+      .filter((transaction) => transaction.category !== '수입')
+      .forEach((transaction) => {
+        const categoryName = transaction.category || '기타';
+        const amount = transaction.amount || 0;
+        categoryMap.set(categoryName, (categoryMap.get(categoryName) || 0) + amount);
+      });
+
+    return Array.from(categoryMap.entries())
+      .map(([name, amount]) => ({ 
+        name, 
+        amount, 
+        color: getCategoryColorByName(name) 
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  });
+
+  // 금액 포맷팅 함수들 통합
+  const formatAmount = (amount, category = null) => {
     const formattedAmount = Math.abs(amount).toLocaleString();
     // 수입 카테고리인 경우
     if (category === '수입') {
@@ -221,9 +244,127 @@ export const useExpensesStore = defineStore('expenses', () => {
     return `-${formattedAmount}원`;
   };
 
+  const formatCurrency = (amount, options = {}) => {
+    const { showSign = false, showPlus = false } = options;
+    const formattedAmount = Math.abs(amount).toLocaleString();
+    
+    if (showSign && amount < 0) return `-${formattedAmount}원`;
+    if (showPlus && amount > 0) return `+${formattedAmount}원`;
+    if (showSign || showPlus) return `${formattedAmount}원`;
+    return `${formattedAmount}원`;
+  };
+
+  // 네비게이션 액션들
+  const navigateToExpenseEdit = (transactionId) => {
+    router.push(`/expenses/${transactionId}`);
+  };
+
+  const navigateToExpenseAdd = () => {
+    router.push('/expenses/new');
+  };
+
+  const navigateToExpenses = () => {
+    router.push('/expenses');
+  };
+
+  const navigateToHome = () => {
+    router.push('/');
+  };
+
+  // API 데이터 변환 함수들
+  const transformApiResponseToTransaction = (apiItem) => {
+    const dateObj = apiItem.expenditureDate ? new Date(apiItem.expenditureDate) : new Date();
+    return {
+      id: apiItem.expenditureId,
+      name: apiItem.description || '거래내역',
+      category: getCategoryNameById(apiItem.categoryId) || '기타',
+      amount: apiItem.amount || 0,
+      date: dateObj.toISOString().split('T')[0],
+      time: dateObj.toTimeString().slice(0, 5),
+    };
+  };
+
+  const transformTransactionToApiFormat = (formData) => {
+    return {
+      amount: parseFloat(formData.amount),
+      categoryId: getCategoryIdByName(formData.category),
+      description: formData.name || '거래내역',
+      expenditureDate: `${formData.date} ${formData.time || '00:00'}:00`,
+      // assetId는 백엔드에서 자동으로 main 계좌 ID 설정
+    };
+  };
+
   // ID로 거래내역 조회 함수 추가 (ExpenseEdit.vue에서 필요)
   const getTransactionById = (id) => {
     return transactions.value.find((transaction) => transaction.id == id);
+  };
+
+  // 날짜 유틸리티 함수들
+  const formatDisplayDate = (dateString) => {
+    const date = new Date(dateString);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+    const dayName = dayNames[date.getDay()];
+    return `${month}월 ${day}일 (${dayName})`;
+  };
+
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+    return {
+      date: `${year}-${month}-${day}`,
+      time: `${hours}:${minutes}`,
+    };
+  };
+
+  const formatDateForApi = (date, time = '00:00') => {
+    return `${date} ${time}:00`;
+  };
+
+  // 거래 내역 유효성 검사
+  const validateTransaction = (data) => {
+    const errors = [];
+    
+    if (!data.name?.trim()) {
+      errors.push('거래처명을 입력해주세요.');
+    }
+    
+    if (!data.amount || data.amount <= 0) {
+      errors.push('올바른 금액을 입력해주세요.');
+    }
+    
+    if (!data.category) {
+      errors.push('카테고리를 선택해주세요.');
+    }
+    
+    if (!data.date) {
+      errors.push('날짜를 선택해주세요.');
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  };
+
+  // 새 거래 템플릿 생성
+  const createNewTransactionTemplate = () => {
+    const { date, time } = getCurrentDateTime();
+    return {
+      id: 'new',
+      name: '',
+      type: 'expense',
+      amount: 0,
+      category: '그외',
+      date,
+      time,
+    };
   };
 
   return {
@@ -237,6 +378,7 @@ export const useExpensesStore = defineStore('expenses', () => {
     totalSavings,
     groupedSavingsData,
     categories,
+    chartData,
     fetchExpensesFromAPI,
     addTransaction,
     updateTransaction,
@@ -248,7 +390,22 @@ export const useExpensesStore = defineStore('expenses', () => {
     getDailyTotal,
     getDailySavingsTotal,
     getCategoryMetadata,
+    getCategoryIdByName,
+    getCategoryNameById,
+    getCategoryColorByName,
     formatAmount,
+    formatCurrency,
+    navigateToExpenseEdit,
+    navigateToExpenseAdd,
+    navigateToExpenses,
+    navigateToHome,
+    transformApiResponseToTransaction,
+    transformTransactionToApiFormat,
     getTransactionById,
+    formatDisplayDate,
+    getCurrentDateTime,
+    formatDateForApi,
+    validateTransaction,
+    createNewTransactionTemplate,
   };
 });
