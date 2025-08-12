@@ -85,6 +85,7 @@
             <div class="flex-1 text-left">
               <h3 class="text-white text-base font-bold">
                 {{ challenge.title }}
+                <span v-if="index === 0" class="ml-2 px-2 py-1 text-xs font-semibold text-white bg-[#ff5555] rounded-full">AI 추천</span>
               </h3>
               <p class="text-gray-3 text-sm">{{ challenge.summary }}</p>
             </div>
@@ -187,9 +188,8 @@ const startTimer = () => {
     if (timeLeft.value <= 0) {
       clearInterval(timerInterval.value);
       if (props.challenges && props.challenges.length > 0) {
-        const randomChallenge =
-          props.challenges[Math.floor(Math.random() * props.challenges.length)];
-        selectedChallenge.value = randomChallenge.challengeId;
+        // Select the first challenge (AI recommended)
+        selectedChallenge.value = props.challenges[0].challengeId;
 
         setTimeout(() => {
           startChallenge();
