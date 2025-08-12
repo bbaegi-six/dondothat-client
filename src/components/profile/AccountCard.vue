@@ -5,15 +5,35 @@
       style="
         width: 100%;
         display: flex;
-        justify-content: space-between;
+        /* justify-content: space-between; */
         align-items: center;
         padding: 8px;
         margin-bottom: 15px;
       "
     >
-      <img :src="imgSrc" style="width: 40px" />
+      <img
+        :src="imgSrc"
+        alt="은행 로고"
+        style="width: 40px; height: 40px; margin-right: 12px"
+      />
+      <div style="flex: 1">
+        <p
+          style="
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.3;
+          "
+        >
+          {{ accountName }}
+        </p>
+        <p style="margin: 4px 0 0 0; font-size: 14px; color: #ccc">
+          {{ formattedAmount }}원
+        </p>
+      </div>
+      <!-- <img :src="imgSrc" style="width: 40px" />
       <p style="margin-left: 12px">{{ accountName }}</p>
-      <p style="margin-left: 30px">{{ formattedAmount }}원</p>
+      <p style="margin-left: 30px">{{ formattedAmount }}원</p> -->
     </div>
 
     <!-- 하단: 버튼 (가운데 정렬) -->
