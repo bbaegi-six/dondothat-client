@@ -26,10 +26,6 @@
       <p class="text-gray-400 text-sm">
         안전한 연결을 위해 잠시만 기다려 주세요
       </p>
-      <!-- 은행 정보 표시 -->
-      <div v-if="selectedBankName" class="mt-4 text-center">
-        <p class="text-gray-300 text-sm">{{ selectedBankName }} 연결 중...</p>
-      </div>
     </div>
 
     <!-- Additional Info - Fixed at bottom -->
@@ -63,6 +59,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useAccountStore } from '../../../stores/account';
 import { accountService } from '../../../services/accountService';
+import { useAuthStore } from '@/stores/auth';
 
 const props = defineProps({
   flowData: {
@@ -71,9 +68,10 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['next']);
 const accountStore = useAccountStore();
+const authStore = useAuthStore();
 
+const emit = defineEmits(['next']);
 const statusMessage = ref('계좌 정보 확인 중');
 
 // 선택된 은행명
@@ -87,7 +85,7 @@ onMounted(async () => {
   // Step4에서 실제 백엔드 API 호출 수행
   try {
     // 상태 메시지 업데이트
-    statusMessage.value = '은행 서버 연결 중...';
+    statusMessage.value = `${selectedBankName.value} 서버 연결 중...`;
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     statusMessage.value = '계좌 정보 인증 중...';
@@ -123,14 +121,17 @@ onMounted(async () => {
         statusMessage.value = '사용자 정보 업데이트 중...';
         if (accountStore.accountType === 'main') {
           await accountService.updateAssetConnected(true);
+          // 로컬 업데이트
+          if (authStore.user) {
+            authStore.user.assetConnected = true;
+          }
         } else if (accountStore.accountType === 'sub') {
           await accountService.updateSubAssetConnected(true);
-          console.log('updatesubassetconnected true 변경');
+          // 로컬 업데이트
+          if (authStore.user) {
+            authStore.user.savingConnected = true;
+          }
         }
-        // authStore의 사용자 정보도 로컬에서 업데이트
-        // if (authStore.user) {
-        //   authStore.user.assetConnected = true;
-        // }
       } catch (updateError) {
         console.error('assetConnected 업데이트 실패:', updateError);
       }
