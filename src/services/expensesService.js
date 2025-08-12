@@ -1,5 +1,4 @@
 import { expensesAPI } from '@/utils/api';
-import { useExpensesStore } from '@/stores/expenses';
 
 export const expensesService = {
   // 지출 내역 조회 (userId를 올바르게 전달하도록 수정)
@@ -26,27 +25,19 @@ export const expensesService = {
     }
   },
 
-  // 지출 내역 생성
+  // 지출 내역 생성 (데이터 변환 로직 제거)
   async createExpense(expenseData) {
     try {
-      const expensesStore = useExpensesStore();
-      
-      // store의 변환 함수 사용
-      const data = expensesStore.transformTransactionToApiFormat(expenseData);
-      return await expensesAPI.create(data);
+      return await expensesAPI.create(expenseData);
     } catch (error) {
       throw new Error(`지출 내역 생성 실패: ${error.message}`);
     }
   },
 
-  // 지출 내역 수정
+  // 지출 내역 수정 (데이터 변환 로직 제거)
   async updateExpense(id, expenseData) {
     try {
-      const expensesStore = useExpensesStore();
-      
-      // store의 변환 함수 사용
-      const data = expensesStore.transformTransactionToApiFormat(expenseData);
-      return await expensesAPI.update(id, data);
+      return await expensesAPI.update(id, expenseData);
     } catch (error) {
       throw new Error(`지출 내역 수정 실패: ${error.message}`);
     }
