@@ -8,10 +8,10 @@
     <ChallengeFailed v-else-if="showFailed" :challenge-data="challengeData" />
 
     <!-- 참여 중인 챌린지가 없는 경우 (기본 화면) -->
-    <div v-else class="flex flex-col h-screen">
+    <div v-else :class="['flex flex-col h-screen pt-[10vh]', { 'is-leaving': isLeaving }]">
       <!-- Main Content Area -->
       <div
-        class="flex-1 flex items-center justify-center pt-[60px] pb-[90px] px-5"
+        class="flex-1 flex items-center justify-center pt-[60px] pb-[90px] px-5 slide-up-animation"
       >
         <!-- Empty State Container - 328 × 296 -->
         <div
@@ -41,7 +41,7 @@
       </div>
 
       <!-- Start Challenge Button - 컨테이너 밖으로 분리 -->
-      <div class="px-8 pb-[90px]">
+      <div class="px-8 pb-[90px] slide-up-animation" style="animation-delay: 0.2s;">
         <Button :disabled="false" @click="startChallenge" class="font-normal">
           챌린지 시작하기
         </Button>
@@ -65,21 +65,21 @@ const authStore = useAuthStore();
 // 화면 상태 관리
 const showProgress = ref(false);
 const showFailed = ref(false);
+const isLeaving = ref(false); // New reactive variable for leaving animation
 
 // 백엔드에서 받아온 챌린지 데이터
 const challengeData = ref(null);
 
 // 새 챌린지 시작
 const startChallenge = () => {
-  router.push('/challenge/flow');
-  // 저금통 계좌가 연결되지 않은 경우
-  // if (!authStore.user.savingConnected) {
-  //   // 저금통 계좌 연결 페이지로 이동 (connectsub.vue)
-  //   router.push('/challenge/connectsub');
-  // } else {
-  //   // 저금통 계좌가 연결된 경우 바로 챌린지 플로우로 이동
-  //   router.push('/challenge/flow');
-  // }
+  isLeaving.value = true; // Trigger leaving animation
+  setTimeout(() => {
+    if (!authStore.user.savingConnected) {
+      router.push('/challenge/connectsub');
+    } else {
+      router.push('/challenge/flow');
+    }
+  }, 500); // Match animation duration
 };
 
 // 페이지 로드 시 진척도 확인
@@ -201,4 +201,34 @@ if (process.env.NODE_ENV === 'development') {
 
 <style scoped>
 /* 고정 크기 스타일 - 반응형 없음 */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px); /* Moves upwards */
+  }
+}
+
+.slide-up-animation {
+  animation: slide-up 0.5s ease-out forwards;
+  animation-fill-mode: backwards;
+}
+
+.is-leaving .slide-up-animation {
+  animation: slide-down 0.5s ease-out forwards;
+}
 </style>

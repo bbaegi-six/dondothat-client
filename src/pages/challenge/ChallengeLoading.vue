@@ -1,6 +1,12 @@
 <!-- ChallengeLoading.vue -->
 <template>
-  <div class="flex flex-col h-screen bg-default">
+  <div
+    :class="[
+      'flex flex-col h-screen bg-default',
+      { 'fade-out': isFadingOut, 'fade-in': !isFadingOut },
+    ]"
+    ref="loadingContainer"
+  >
     <!-- Title Section - 타이머와 동일한 위치에서 제거 -->
     <div class="flex flex-col items-center pt-[30px] pb-4">
       <!-- 빈 공간 유지 -->
@@ -27,7 +33,7 @@
       </h2>
 
       <div class="text-white/70 text-sm text-center font-pretendard">
-        <p>지난 소비내역을 기준으로</p>
+        <p>최근 소비내역을 기반으로</p>
         <p>과소비를 판단합니다</p>
       </div>
     </div>
@@ -116,10 +122,13 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import challengeService from '@/services/challengeService';
 
 const emit = defineEmits(['loading-complete']);
+
+const loadingContainer = ref(null);
+const isFadingOut = ref(false);
 
 const fetchRecommendations = async () => {
   try {
@@ -130,23 +139,38 @@ const fetchRecommendations = async () => {
     console.error('추천 챌린지 조회 실패:', error);
     // API 실패 시 기본 챌린지 목록 반환
     return [
-      { challengeId: 1, title: '배달음식 금지 챌린지', summary: '배달 대신 직접 요리!' },
-      { challengeId: 3, title: '쇼핑 금지 챌린지', summary: '불필요한 소비 줄이기!' },
+      {
+        challengeId: 1,
+        title: '배달음식 금지 챌린지',
+        summary: '배달 대신 직접 요리!',
+      },
+      {
+        challengeId: 3,
+        title: '쇼핑 금지 챌린지',
+        summary: '불필요한 소비 줄이기!',
+      },
       { challengeId: 7, title: '술 금지 챌린지', summary: '금주 도전!' },
     ];
   }
 };
 
 onMounted(async () => {
-  console.log('⏳ 챌린지 로딩 시작 - API 호출 및 최소 1.5초 대기');
+  console.log('⏳ 챌린지 로딩 시작 - API 호출 및 최소 5초 대기');
 
-  const minLoadingTime = new Promise(resolve => setTimeout(resolve, 1500));
+  const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 5000));
   const fetchPromise = fetchRecommendations();
 
   const [, challenges] = await Promise.all([minLoadingTime, fetchPromise]);
 
   console.log('✅ 로딩 완료 - 챌린지 목록 조회 완료:', challenges);
-  emit('loading-complete', challenges);
+
+  // Start fade-out animation
+  isFadingOut.value = true;
+
+  // Wait for fade-out animation to complete before emitting
+  setTimeout(() => {
+    emit('loading-complete', challenges);
+  }, 500); // Match this duration with the fade-out animation duration
 });
 </script>
 
@@ -159,5 +183,31 @@ onMounted(async () => {
 
 .animate-spin-slow {
   animation: spin-slow 2s linear infinite;
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-out {
+  animation: fadeOut 0.5s ease-out forwards;
 }
 </style>
