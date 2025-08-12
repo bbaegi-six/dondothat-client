@@ -70,6 +70,8 @@ export const authAPI = {
     }),
   // 사용자 정보 조회
   fetchMe: () => api.get('/user/me'),
+  // 마이페이지 관련 API 추가
+  getMyPageAccounts: () => api.get('/mypage/accounts'),
 };
 
 export const expensesAPI = {
