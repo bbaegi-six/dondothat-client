@@ -399,7 +399,7 @@
       class="fixed"
       style="
         bottom: 80px;
-        right: 31px;
+        right: calc((100vw - 390px) / 2 + 31px);
         width: 48px;
         height: 48px;
         background-color: #ff5555;
