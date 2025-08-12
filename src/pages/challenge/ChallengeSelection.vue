@@ -60,7 +60,7 @@
             ]"
           >
             <div class="w-12 h-12 bg-gray-1 rounded-full flex items-center justify-center">
-              <i :class="[getCategoryIcon(challenge.categoryId), 'text-white', 'text-2xl']"></i>
+              <i :class="[getCategoryIcon(challenge.categoryId).icon, 'text-2xl']" :style="{ color: getCategoryIcon(challenge.categoryId).color }"></i>
             </div>
             <div class="flex-1 text-left">
               <h3 class="text-white text-base font-bold">{{ challenge.title }}</h3>
@@ -125,9 +125,9 @@ const startTimer = () => {
 };
 
 const getCategoryIcon = (categoryId) => {
-  if (!expensesStore.categoryMasterData) return 'fas fa-question-circle';
+  if (!expensesStore.categoryMasterData) return { icon: 'fas fa-question-circle', color: '#c9c9c9' };
   const category = Object.values(expensesStore.categoryMasterData).find(cat => cat.id === categoryId);
-  return category ? category.icon : 'fas fa-question-circle';
+  return category ? { icon: category.icon, color: category.color } : { icon: 'fas fa-question-circle', color: '#c9c9c9' };
 };
 
 const selectChallenge = (challenge) => {

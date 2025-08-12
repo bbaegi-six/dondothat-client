@@ -416,5 +416,6 @@ export const useExpensesStore = defineStore('expenses', () => {
     formatDateForApi,
     validateTransaction,
     createNewTransactionTemplate,
+    categoryMasterData,
   };
 });
