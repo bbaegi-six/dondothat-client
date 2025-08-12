@@ -1,8 +1,8 @@
+<!-- connectsub.vue -->
 <template>
   <div>
     <!-- Main Challenge Page -->
     <div class="flex flex-col h-screen">
-
       <!-- Main Content Area -->
       <div
         class="flex-1 flex items-center justify-center pt-[60px] pb-[90px] px-5"
@@ -63,6 +63,8 @@ const router = useRouter();
 
 const goAccount = () => {
   accountStore.setAccount('sub', false);
+  // 챌린지에서 왔다는 정보를 저장 (계좌 연결 후 돌아갈 곳)
+  // accountStore.setReturnPath('/challenge/flow');
   router.push('/account');
 };
 </script>
