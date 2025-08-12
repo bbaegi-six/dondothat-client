@@ -33,9 +33,9 @@
         :amount="subAccount.balance"
         @change="handleChange('sub')"
       />
-      <div v-else class="no-account">
+      <div v-else class="no-savings">
         <p>연결된 저금통 계좌가 없습니다.</p>
-        <button @click="router.push('/account')" class="connect-btn">
+        <button @click="handleConnectAccount('sub')" class="connect-btn">
           계좌 연결하기
         </button>
       </div>
@@ -214,6 +214,13 @@ function handleChange(type) {
   accountStore.setAccount(type, true); // main or sub
 }
 
+// 새로운 저금통 연결 함수
+function handleConnectAccount(type) {
+  // type을 accountStore에 설정하고 계좌 연결 페이지로 이동
+  accountStore.setAccount(type, false); // false = 새로 연결 (변경이 아님)
+  router.push('/account');
+}
+
 async function handleConfirm() {
   showModal.value = false;
 
@@ -282,7 +289,8 @@ onMounted(() => {
   flex-direction: column;
   align-items: flex-start;
 }
-.no-account {
+.no-account,
+.no-savings {
   padding: 20px;
   text-align: center;
   background-color: rgba(255, 255, 255, 0.1);
