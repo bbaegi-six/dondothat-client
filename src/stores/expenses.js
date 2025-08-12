@@ -325,7 +325,7 @@ export const useExpensesStore = defineStore('expenses', () => {
     const day = String(now.getDate()).padStart(2, '0');
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
-    
+
     return {
       date: `${year}-${month}-${day}`,
       time: `${hours}:${minutes}`,
@@ -339,26 +339,26 @@ export const useExpensesStore = defineStore('expenses', () => {
   // 거래 내역 유효성 검사
   const validateTransaction = (data) => {
     const errors = [];
-    
+
     if (!data.name?.trim()) {
       errors.push('거래처명을 입력해주세요.');
     }
-    
+
     if (!data.amount || data.amount <= 0) {
       errors.push('올바른 금액을 입력해주세요.');
     }
-    
+
     if (!data.category) {
       errors.push('카테고리를 선택해주세요.');
     }
-    
+
     if (!data.date) {
       errors.push('날짜를 선택해주세요.');
     }
-    
+
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   };
 

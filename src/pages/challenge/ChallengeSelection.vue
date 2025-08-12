@@ -30,7 +30,7 @@
             ]"
           >
             <div class="w-12 h-12 bg-gray-1 rounded-full flex items-center justify-center">
-              <!-- You can add an icon here based on challenge.categoryId or some other property -->
+              <i :class="[getCategoryIcon(challenge.categoryId), 'text-white', 'text-2xl']"></i>
             </div>
             <div class="flex-1 text-left">
               <h3 class="text-white text-base font-bold">{{ challenge.title }}</h3>
@@ -62,9 +62,16 @@
 import { ref } from 'vue';
 import Header from '@/components/layout/Header.vue';
 import { useRecommendedChallengesStore } from '@/stores/recommendedChallenges';
+import { useExpensesStore } from '@/stores/expenses';
 
 const recommendedChallengesStore = useRecommendedChallengesStore();
+const expensesStore = useExpensesStore();
 const selectedChallenge = ref(null);
+
+const getCategoryIcon = (categoryId) => {
+  const category = Object.values(expensesStore.categoryMasterData).find(cat => cat.id === categoryId);
+  return category ? category.icon : 'fas fa-question-circle';
+};
 
 const selectChallenge = (challenge) => {
   selectedChallenge.value = challenge;
