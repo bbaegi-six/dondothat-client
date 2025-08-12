@@ -8,14 +8,13 @@
       />
   
       <!-- Main Title -->
-      <div class="flex flex-col items-center pt-[60px] pb-4">
+      <div class="flex flex-col items-center pt-[120px] pb-4 flex-grow">
         <h1 class="text-white text-xl font-bold text-center mb-2 font-pretendard">
           원하는 챌린지를 선택해주세요
         </h1>
       </div>
   
       <!-- Middle Spacer -->
-      <div class="flex-1"></div>
   
       <!-- Challenge Cards - Bottom Section -->
       <div class="px-4 pb-4">
@@ -69,6 +68,7 @@ const expensesStore = useExpensesStore();
 const selectedChallenge = ref(null);
 
 const getCategoryIcon = (categoryId) => {
+  if (!expensesStore.categoryMasterData) return 'fas fa-question-circle';
   const category = Object.values(expensesStore.categoryMasterData).find(cat => cat.id === categoryId);
   return category ? category.icon : 'fas fa-question-circle';
 };
