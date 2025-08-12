@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+  import.meta.env.VITE_API_BASE_URL || 'https://54.208.50.238/api';
 
 // API 기본 설정
 const api = axios.create({
@@ -109,8 +109,8 @@ export const challengeAPI = {
   getRecommendations: () => api.get('/challenges/recommendations'),
 
   // 챌린지 참여
-  joinChallenge: (challengeId, data) =>
-    api.post(`/challenges/${challengeId}/join`, data),
+  joinChallengeByIdAndPeriod: (challengeId, period) =>
+    api.post(`/challenges/join/${challengeId}/${period}`),
 
   // 진척도 조회 - 새로 추가된 API
   getProgress: () => api.get('/challenges/progress'),

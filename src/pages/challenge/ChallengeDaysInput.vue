@@ -99,7 +99,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 // Props
 const props = defineProps({
   selectedChallenge: {
-    type: String,
+    type: Object, // Changed from String to Object
     required: true,
   },
 });
@@ -143,7 +143,7 @@ const handleBlur = () => {
 const completeInput = () => {
   if (isValidInput.value) {
     emit('dateComplete', {
-      challenge: props.selectedChallenge,
+      challengeId: props.selectedChallenge.challengeId, // Access challengeId from the object
       days: Number(selectedDays.value),
     });
   }
