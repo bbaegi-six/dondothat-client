@@ -158,18 +158,132 @@ function getBankLogo(bankName) {
 
   if (!bankName) return kbLogo; // 기본 로고
 
-  // 은행명 매핑 개선
+  // 은행명 매핑 완성
   const bankMapping = {
+    // 국민은행
     국민은행: 'kb',
     국민: 'kb',
     kb: 'kb',
+    KB: 'kb',
+    국민카드: 'kb',
+
+    // 하나은행
     하나은행: 'hana',
     하나: 'hana',
+    hana: 'hana',
+    HANA: 'hana',
+    하나카드: 'hana',
+
+    // 신한은행
     신한은행: 'shinhan',
     신한: 'shinhan',
+    shinhan: 'shinhan',
+    SHINHAN: 'shinhan',
+    신한카드: 'shinhan',
+
+    // 우리은행
     우리은행: 'woori',
     우리: 'woori',
-    // 다른 은행들...
+    woori: 'woori',
+    WOORI: 'woori',
+    우리카드: 'woori',
+
+    // 농협은행 (NH)
+    농협은행: 'nh',
+    농협: 'nh',
+    nh: 'nh',
+    NH: 'nh',
+    농협카드: 'nh',
+    농협중앙회: 'nh',
+
+    // 기업은행 (IBK)
+    기업은행: 'ibk',
+    기업: 'ibk',
+    ibk: 'ibk',
+    IBK: 'ibk',
+    IBK기업은행: 'ibk',
+
+    // 산업은행 (KDB)
+    산업은행: 'kdb',
+    산업: 'kdb',
+    kdb: 'kdb',
+    KDB: 'kdb',
+    KDB산업은행: 'kdb',
+
+    // 씨티은행
+    씨티은행: 'citi',
+    시티은행: 'citi',
+    씨티: 'citi',
+    시티: 'citi',
+    citi: 'citi',
+    CITI: 'citi',
+    citibank: 'citi',
+
+    // SC제일은행
+    sc은행: 'sc',
+    sc제일은행: 'sc',
+    SC은행: 'sc',
+    SC제일은행: 'sc',
+    sc: 'sc',
+    SC: 'sc',
+    제일은행: 'sc',
+
+    // 새마을금고 (MG)
+    새마을금고: 'mg',
+    새마을: 'mg',
+    mg: 'mg',
+    MG: 'mg',
+    mg새마을금고: 'mg',
+
+    // 우체국
+    우체국: 'post',
+    우정사업본부: 'post',
+    post: 'post',
+    POST: 'post',
+
+    // 수협은행
+    수협은행: 'suhyup',
+    수협: 'suhyup',
+    suhyup: 'suhyup',
+    SUHYUP: 'suhyup',
+    수협중앙회: 'suhyup',
+
+    // 대구은행
+    대구은행: 'daegu',
+    대구: 'daegu',
+    daegu: 'daegu',
+    DAEGU: 'daegu',
+    DGB: 'daegu',
+    dgb: 'daegu',
+
+    // 전북은행
+    전북은행: 'jeonbuk',
+    전북: 'jeonbuk',
+    jeonbuk: 'jeonbuk',
+    JEONBUK: 'jeonbuk',
+    JB: 'jeonbuk',
+    jb: 'jeonbuk',
+
+    // 케이뱅크
+    케이뱅크: 'kbank',
+    케이: 'kbank',
+    kbank: 'kbank',
+    KBANK: 'kbank',
+    K뱅크: 'kbank',
+
+    // 부산은행 (Bukyong)
+    부산은행: 'bukyong',
+    부산: 'bukyong',
+    bukyong: 'bukyong',
+    BUKYONG: 'bukyong',
+    BNK: 'bukyong',
+    bnk: 'bukyong',
+
+    // 신협 (CU)
+    신협: 'cu',
+    신용협동조합: 'cu',
+    cu: 'cu',
+    CU: 'cu',
   };
 
   const bankKey =
