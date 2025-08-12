@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import Button from '../../../components/Button.vue';
 import kbLogo from '@/assets/logo/kb.svg';
 import shinhanLogo from '@/assets/logo/shinhan.svg';
@@ -75,6 +75,24 @@ const emit = defineEmits(['next', 'update-data']);
 
 // 반응형 데이터
 const selectedBank = ref(null);
+
+// 엔터 키 이벤트 핸들러
+const handleGlobalKeydown = (event) => {
+  if (event.key === 'Enter' && selectedBank.value) {
+    event.preventDefault();
+    nextStep();
+  }
+};
+
+// 컴포넌트 마운트 시 전역 키보드 이벤트 리스너 추가
+onMounted(() => {
+  document.addEventListener('keydown', handleGlobalKeydown);
+});
+
+// 컴포넌트 언마운트 시 이벤트 리스너 제거
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleGlobalKeydown);
+});
 
 // 은행 목록 데이터 (codefapi 기준)
 const banks = ref([
