@@ -94,11 +94,21 @@
       <div class="pb-4 border-b border-[#575757]">
         <div class="flex justify-between items-center">
           <span class="text-white text-base font-medium">날짜</span>
-          <input
-            v-model="editableData.date"
-            type="date"
-            class="text-white text-base font-medium bg-transparent border-none outline-none text-right"
-          />
+          <button
+            @click="showDateModal = true"
+            class="text-white text-base font-medium bg-transparent border-none outline-none text-right flex items-center gap-2"
+          >
+            {{ expensesStore.formatDisplayDate(editableData.date) }}
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+              <path
+                d="M2 4L6 8L2 12"
+                stroke="#FFFFFF"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -165,6 +175,91 @@
         </div>
       </div>
     </div>
+
+    <!-- 날짜 선택 모달 -->
+    <div
+      v-if="showDateModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-end z-[9999]"
+    >
+      <div
+        class="bg-[#2f2f2f] w-full rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-white text-xl font-semibold">날짜 선택</h3>
+          <button
+            @click="showDateModal = false"
+            class="text-white text-2xl"
+          >
+            &times;
+          </button>
+        </div>
+        
+        <!-- 년/월 선택 -->
+        <div class="flex justify-between items-center mb-4">
+          <button
+            @click="changeMonth(-1)"
+            class="text-white p-2 rounded-lg hover:bg-[#414141]"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <h4 class="text-white text-lg font-medium">
+            {{ currentYear }}년 {{ currentMonth }}월
+          </h4>
+          <button
+            @click="changeMonth(1)"
+            class="text-white p-2 rounded-lg hover:bg-[#414141]"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- 요일 헤더 -->
+        <div class="grid grid-cols-7 gap-1 mb-2">
+          <div v-for="day in ['일', '월', '화', '수', '목', '금', '토']" :key="day" 
+               class="text-center text-gray-400 text-sm py-2">
+            {{ day }}
+          </div>
+        </div>
+
+        <!-- 캘린더 그리드 -->
+        <div class="grid grid-cols-7 gap-1">
+          <!-- 이전 달의 빈 공간 -->
+          <div v-for="n in startDayOfMonth" :key="`empty-${n}`" class="h-12"></div>
+          
+          <!-- 현재 달의 날짜들 -->
+          <button
+            v-for="day in daysInMonth"
+            :key="day"
+            @click="selectDate(day)"
+            :class="[
+              'h-12 rounded-lg flex items-center justify-center text-white transition-colors',
+              isSelectedDate(day) 
+                ? 'bg-[#ff5555] text-white' 
+                : 'hover:bg-[#414141]',
+              isToday(day) && !isSelectedDate(day)
+                ? 'bg-[#575757]'
+                : ''
+            ]"
+          >
+            {{ day }}
+          </button>
+        </div>
+
+        <!-- 확인 버튼 -->
+        <div class="mt-6">
+          <button
+            @click="showDateModal = false"
+            class="w-full h-14 bg-[#ff5555] text-white rounded-16 font-medium"
+          >
+            확인
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -188,22 +283,7 @@ const isNewTransaction = computed(
 const transactionData = computed(() => {
   if (isNewTransaction.value) {
     // 새 거래 추가 모드
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-
-    return {
-      id: 'new',
-      name: '',
-      type: 'expense',
-      amount: 0,
-      category: '그외',
-      date: `${year}-${month}-${day}`,
-      time: `${hours}:${minutes}`,
-    };
+    return expensesStore.createNewTransactionTemplate();
   }
 
   const transaction = expensesStore.getTransactionById(transactionId.value);
@@ -232,6 +312,20 @@ const editableData = reactive({
 
 // 모달 상태
 const showCategoryModal = ref(false);
+const showDateModal = ref(false);
+
+// 캘린더 관련 상태
+const currentCalendarDate = ref(new Date());
+
+// 캘린더 computed 속성들
+const currentYear = computed(() => currentCalendarDate.value.getFullYear());
+const currentMonth = computed(() => currentCalendarDate.value.getMonth() + 1);
+const daysInMonth = computed(() => {
+  return new Date(currentYear.value, currentMonth.value - 1 + 1, 0).getDate();
+});
+const startDayOfMonth = computed(() => {
+  return new Date(currentYear.value, currentMonth.value - 1, 1).getDay();
+});
 
 // 카테고리 목록 (스토어에서 가져오기)
 const categories = expensesStore.categories;
@@ -243,32 +337,57 @@ const selectCategoryFromModal = (category) => {
   console.log('카테고리 변경:', category);
 };
 
-// 입력 유효성 검사
+const changeMonth = (direction) => {
+  const newDate = new Date(currentCalendarDate.value);
+  newDate.setMonth(newDate.getMonth() + direction);
+  currentCalendarDate.value = newDate;
+};
+
+const selectDate = (day) => {
+  const selectedDate = new Date(currentYear.value, currentMonth.value - 1, day);
+  const year = selectedDate.getFullYear();
+  const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+  const dayStr = String(day).padStart(2, '0');
+  
+  editableData.date = `${year}-${month}-${dayStr}`;
+};
+
+const isSelectedDate = (day) => {
+  if (!editableData.date) return false;
+  
+  const selectedDate = new Date(editableData.date);
+  return (
+    selectedDate.getFullYear() === currentYear.value &&
+    selectedDate.getMonth() + 1 === currentMonth.value &&
+    selectedDate.getDate() === day
+  );
+};
+
+const isToday = (day) => {
+  const today = new Date();
+  return (
+    today.getFullYear() === currentYear.value &&
+    today.getMonth() + 1 === currentMonth.value &&
+    today.getDate() === day
+  );
+};
+
+// 입력 유효성 검사 (store 함수 사용)
 const validateInput = () => {
-  if (!editableData.name.trim()) {
-    alert('거래처명을 입력해주세요.');
+  const validation = expensesStore.validateTransaction(editableData);
+  
+  if (!validation.isValid) {
+    alert(validation.errors[0]); // 첫 번째 에러 메시지 표시
     return false;
   }
-  if (!editableData.amount || editableData.amount <= 0) {
-    alert('올바른 금액을 입력해주세요.');
-    return false;
-  }
-  if (!editableData.category) {
-    alert('카테고리를 선택해주세요.');
-    return false;
-  }
+  
   return true;
 };
 
-// 거래 데이터 생성
-const createTransactionData = () => ({
-  name: editableData.name,
-  type: editableData.type,
-  amount: Number(editableData.amount),
-  category: editableData.category,
-  date: editableData.date,
-  time: editableData.time,
-});
+// 거래 데이터 생성 (store 변환 함수 사용)
+const createTransactionData = () => {
+  return expensesStore.transformTransactionToApiFormat(editableData);
+};
 
 // 저장
 const saveTransaction = () => {
@@ -340,6 +459,11 @@ onMounted(() => {
     editableData.category = data.category;
     editableData.date = data.date;
     editableData.time = data.time;
+  }
+
+  // 캘린더 초기 날짜를 선택된 날짜로 설정
+  if (editableData.date) {
+    currentCalendarDate.value = new Date(editableData.date);
   }
 });
 </script>
