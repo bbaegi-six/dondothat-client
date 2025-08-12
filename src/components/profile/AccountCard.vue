@@ -1,52 +1,47 @@
 <template>
   <BaseCard>
     <!-- 상단: 이미지 + 계좌명 + 금액 -->
-    <div
-      style="
-        width: 100%;
-        display: flex;
-        /* justify-content: space-between; */
-        align-items: center;
-        padding: 8px;
-        margin-bottom: 15px;
-      "
-    >
-      <img
-        :src="imgSrc"
-        alt="은행 로고"
-        style="width: 40px; height: 40px; margin-right: 12px"
-      />
-      <div style="flex: 1">
-        <p
-          style="
-            margin: 0;
-            font-size: 16px;
-            font-weight: bold;
-            line-height: 1.3;
-          "
-        >
-          {{ accountName }}
-        </p>
-        <p style="margin: 4px 0 0 0; font-size: 14px; color: #ccc">
-          {{ formattedAmount }}원
-        </p>
+    <div style="width: 100%; display: flex; align-items: center; padding: 8px">
+      <!-- 왼쪽: 로고 + 계좌 정보 -->
+      <div style="display: flex; align-items: center; flex: 1">
+        <img
+          :src="imgSrc"
+          alt="은행 로고"
+          style="width: 40px; height: 40px; margin-right: 12px"
+        />
+        <div style="flex: 1">
+          <p
+            style="
+              margin: 0;
+              font-size: 16px;
+              font-weight: bold;
+              line-height: 1.3;
+            "
+          >
+            {{ accountName }}
+          </p>
+          <p style="margin: 4px 0 0 0; font-size: 14px; color: #ccc">
+            {{ formattedAmount }}원
+          </p>
+        </div>
       </div>
-      <!-- <img :src="imgSrc" style="width: 40px" />
-      <p style="margin-left: 12px">{{ accountName }}</p>
-      <p style="margin-left: 30px">{{ formattedAmount }}원</p> -->
-    </div>
 
-    <!-- 하단: 버튼 (가운데 정렬) -->
-    <div
-      class="font-light"
-      style="
-        font-size: 12px;
-        font-weight: normal;
-        text-align: center;
-        margin-top: 12px;
-      "
-    >
-      <button @click="$emit('change')">변경하기</button>
+      <!-- 오른쪽: 편집 아이콘 -->
+      <button
+        @click="$emit('change')"
+        style="
+          background: none;
+          border: none;
+          color: #ffffff;
+          cursor: pointer;
+          padding: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <i class="fa-solid fa-pencil" style="font-size: 14px"></i>
+      </button>
     </div>
   </BaseCard>
 </template>
