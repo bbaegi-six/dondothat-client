@@ -8,7 +8,6 @@
       :title="isNewTransaction ? '내역 추가' : '내역 수정'"
     />
 
-    <!-- 거래처명 -->
     <div class="mb-6">
       <input
         v-model="editableData.name"
@@ -18,9 +17,7 @@
       />
     </div>
 
-    <!-- 폼 필드들 -->
     <div class="space-y-6">
-      <!-- 분류 -->
       <div class="pb-4 border-b border-[#575757]">
         <div class="flex items-center justify-between">
           <span class="text-white text-base font-medium">분류</span>
@@ -52,7 +49,6 @@
         </div>
       </div>
 
-      <!-- 금액 -->
       <div class="pb-4 border-b border-[#575757]">
         <div class="flex items-center justify-between">
           <span class="text-white text-base font-medium">금액</span>
@@ -68,7 +64,6 @@
         </div>
       </div>
 
-      <!-- 카테고리 -->
       <div class="pb-4 border-b border-[#575757]">
         <div class="flex justify-between items-center">
           <span class="text-white text-base font-medium">카테고리</span>
@@ -90,7 +85,6 @@
         </div>
       </div>
 
-      <!-- 날짜 -->
       <div class="pb-4 border-b border-[#575757]">
         <div class="flex justify-between items-center">
           <span class="text-white text-base font-medium">날짜</span>
@@ -112,7 +106,6 @@
         </div>
       </div>
 
-      <!-- 시간 -->
       <div class="pb-4 border-b border-[#575757]">
         <div class="flex justify-between items-center">
           <span class="text-white text-base font-medium">시간</span>
@@ -125,7 +118,6 @@
       </div>
     </div>
 
-    <!-- 버튼들 -->
     <div class="flex gap-3 mt-12 mb-16">
       <button
         @click="handleButtonClick"
@@ -141,7 +133,6 @@
       </button>
     </div>
 
-    <!-- 카테고리 선택 모달 -->
     <div
       v-if="showCategoryModal"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-end z-[9999]"
@@ -176,7 +167,6 @@
       </div>
     </div>
 
-    <!-- 날짜 선택 모달 -->
     <div
       v-if="showDateModal"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-end z-[9999]"
@@ -186,22 +176,24 @@
       >
         <div class="flex justify-between items-center mb-6">
           <h3 class="text-white text-xl font-semibold">날짜 선택</h3>
-          <button
-            @click="showDateModal = false"
-            class="text-white text-2xl"
-          >
+          <button @click="showDateModal = false" class="text-white text-2xl">
             &times;
           </button>
         </div>
-        
-        <!-- 년/월 선택 -->
+
         <div class="flex justify-between items-center mb-4">
           <button
             @click="changeMonth(-1)"
             class="text-white p-2 rounded-lg hover:bg-[#414141]"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path
+                d="M12.5 15L7.5 10L12.5 5"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </button>
           <h4 class="text-white text-lg font-medium">
@@ -212,44 +204,50 @@
             class="text-white p-2 rounded-lg hover:bg-[#414141]"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path
+                d="M7.5 5L12.5 10L7.5 15"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </button>
         </div>
 
-        <!-- 요일 헤더 -->
         <div class="grid grid-cols-7 gap-1 mb-2">
-          <div v-for="day in ['일', '월', '화', '수', '목', '금', '토']" :key="day" 
-               class="text-center text-gray-400 text-sm py-2">
+          <div
+            v-for="day in ['일', '월', '화', '수', '목', '금', '토']"
+            :key="day"
+            class="text-center text-gray-400 text-sm py-2"
+          >
             {{ day }}
           </div>
         </div>
 
-        <!-- 캘린더 그리드 -->
         <div class="grid grid-cols-7 gap-1">
-          <!-- 이전 달의 빈 공간 -->
-          <div v-for="n in startDayOfMonth" :key="`empty-${n}`" class="h-12"></div>
-          
-          <!-- 현재 달의 날짜들 -->
+          <div
+            v-for="n in startDayOfMonth"
+            :key="`empty-${n}`"
+            class="h-12"
+          ></div>
+
           <button
             v-for="day in daysInMonth"
             :key="day"
             @click="selectDate(day)"
             :class="[
               'h-12 rounded-lg flex items-center justify-center text-white transition-colors',
-              isSelectedDate(day) 
-                ? 'bg-[#ff5555] text-white' 
+              isSelectedDate(day)
+                ? 'bg-[#ff5555] text-white'
                 : 'hover:bg-[#414141]',
-              isToday(day) && !isSelectedDate(day)
-                ? 'bg-[#575757]'
-                : ''
+              isToday(day) && !isSelectedDate(day) ? 'bg-[#575757]' : '',
             ]"
           >
             {{ day }}
           </button>
         </div>
 
-        <!-- 확인 버튼 -->
         <div class="mt-6">
           <button
             @click="showDateModal = false"
@@ -321,7 +319,7 @@ const currentCalendarDate = ref(new Date());
 const currentYear = computed(() => currentCalendarDate.value.getFullYear());
 const currentMonth = computed(() => currentCalendarDate.value.getMonth() + 1);
 const daysInMonth = computed(() => {
-  return new Date(currentYear.value, currentMonth.value - 1 + 1, 0).getDate();
+  return new Date(currentYear.value, currentMonth.value, 0).getDate();
 });
 const startDayOfMonth = computed(() => {
   return new Date(currentYear.value, currentMonth.value - 1, 1).getDay();
@@ -348,13 +346,13 @@ const selectDate = (day) => {
   const year = selectedDate.getFullYear();
   const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
   const dayStr = String(day).padStart(2, '0');
-  
+
   editableData.date = `${year}-${month}-${dayStr}`;
 };
 
 const isSelectedDate = (day) => {
   if (!editableData.date) return false;
-  
+
   const selectedDate = new Date(editableData.date);
   return (
     selectedDate.getFullYear() === currentYear.value &&
@@ -375,38 +373,33 @@ const isToday = (day) => {
 // 입력 유효성 검사 (store 함수 사용)
 const validateInput = () => {
   const validation = expensesStore.validateTransaction(editableData);
-  
+
   if (!validation.isValid) {
     alert(validation.errors[0]); // 첫 번째 에러 메시지 표시
     return false;
   }
-  
+
   return true;
 };
 
-// 거래 데이터 생성 (store 변환 함수 사용)
-const createTransactionData = () => {
-  return expensesStore.transformTransactionToApiFormat(editableData);
-};
-
 // 저장
-const saveTransaction = () => {
+const saveTransaction = async () => {
   if (!validateInput()) return;
 
-  const transactionData = createTransactionData();
   let success = false;
 
   if (isNewTransaction.value) {
-    success = expensesStore.addTransaction(transactionData);
+    // 이제 editableData를 직접 전달합니다.
+    success = await expensesStore.addTransaction(editableData);
   } else {
-    success = expensesStore.updateTransaction(
+    // 이제 editableData를 직접 전달합니다.
+    success = await expensesStore.updateTransaction(
       transactionId.value,
-      transactionData
+      editableData
     );
   }
 
   if (success) {
-    console.log('저장할 데이터:', transactionData);
     alert(
       isNewTransaction.value
         ? '거래내역이 추가되었습니다.'
@@ -433,9 +426,9 @@ const cancelAdd = () => {
 };
 
 // 거래내역 삭제
-const deleteTransaction = () => {
+const deleteTransaction = async () => {
   if (confirm('정말로 삭제하시겠습니까?')) {
-    const success = expensesStore.deleteTransaction(transactionId.value);
+    const success = await expensesStore.deleteTransaction(transactionId.value);
     if (success) {
       console.log('삭제할 거래내역 ID:', transactionId.value);
       alert('거래내역이 삭제되었습니다.');

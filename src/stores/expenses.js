@@ -78,8 +78,8 @@ export const useExpensesStore = defineStore('expenses', () => {
             : new Date();
           return {
             id: item.expenditureId, // expenditureId -> id
-            name: item.description || '거래내역', // description -> name
-            category: item.categoryName || '기타', // categoryName -> category
+            name: item.description, // description -> name
+            category: item.categoryName, // categoryName -> category
             amount: item.amount || 0, // amount는 그대로 사용
             date: dateObj.toISOString().split('T')[0], // 'YYYY-MM-DD' 형식
             time: dateObj.toTimeString().split(' ')[0].substring(0, 5), // 'HH:MM' 형식
@@ -102,8 +102,10 @@ export const useExpensesStore = defineStore('expenses', () => {
   // 지출 내역 추가
   async function addTransaction(transactionData) {
     try {
-      await expensesService.createExpense(transactionData);
-      await fetchExpensesFromAPI(); // 데이터 변경 후 전체 내역 다시 로드
+      // 스토어에서 직접 데이터 변환
+      const apiData = this.transformTransactionToApiFormat(transactionData);
+      await expensesService.createExpense(apiData);
+      await this.fetchExpensesFromAPI(); // 데이터 변경 후 전체 내역 다시 로드
       return true;
     } catch (error) {
       console.error('거래내역 추가 실패:', error);
@@ -114,8 +116,10 @@ export const useExpensesStore = defineStore('expenses', () => {
   // 지출 내역 수정
   async function updateTransaction(id, updatedData) {
     try {
-      await expensesService.updateExpense(id, updatedData);
-      await fetchExpensesFromAPI(); // 데이터 변경 후 전체 내역 다시 로드
+      // 스토어에서 직접 데이터 변환
+      const apiData = this.transformTransactionToApiFormat(updatedData);
+      await expensesService.updateExpense(id, apiData);
+      await this.fetchExpensesFromAPI(); // 데이터 변경 후 전체 내역 다시 로드
       return true;
     } catch (error) {
       console.error('거래내역 수정 실패:', error);
@@ -192,7 +196,9 @@ export const useExpensesStore = defineStore('expenses', () => {
   };
 
   // 카테고리 목록 (순서 유지)
-  const categories = Object.keys(categoryMasterData).filter(key => key !== '기타');
+  const categories = Object.keys(categoryMasterData).filter(
+    (key) => key !== '기타'
+  );
 
   // 카테고리 관련 유틸리티 함수들
   const getCategoryMetadata = (category) => {
@@ -204,9 +210,11 @@ export const useExpensesStore = defineStore('expenses', () => {
   };
 
   const getCategoryNameById = (categoryId) => {
-    return Object.keys(categoryMasterData).find(name => 
-      categoryMasterData[name].id === categoryId
-    ) || '그외';
+    return (
+      Object.keys(categoryMasterData).find(
+        (name) => categoryMasterData[name].id === categoryId
+      ) || '그외'
+    );
   };
 
   const getCategoryColorByName = (categoryName) => {
@@ -216,20 +224,23 @@ export const useExpensesStore = defineStore('expenses', () => {
   // 차트 데이터 계산 (Home.vue에서 사용)
   const chartData = computed(() => {
     const categoryMap = new Map();
-    
+
     currentMonthTransactions.value
       .filter((transaction) => transaction.category !== '수입')
       .forEach((transaction) => {
         const categoryName = transaction.category || '기타';
         const amount = transaction.amount || 0;
-        categoryMap.set(categoryName, (categoryMap.get(categoryName) || 0) + amount);
+        categoryMap.set(
+          categoryName,
+          (categoryMap.get(categoryName) || 0) + amount
+        );
       });
 
     return Array.from(categoryMap.entries())
-      .map(([name, amount]) => ({ 
-        name, 
-        amount, 
-        color: getCategoryColorByName(name) 
+      .map(([name, amount]) => ({
+        name,
+        amount,
+        color: getCategoryColorByName(name),
       }))
       .sort((a, b) => b.amount - a.amount);
   });
@@ -247,7 +258,7 @@ export const useExpensesStore = defineStore('expenses', () => {
   const formatCurrency = (amount, options = {}) => {
     const { showSign = false, showPlus = false } = options;
     const formattedAmount = Math.abs(amount).toLocaleString();
-    
+
     if (showSign && amount < 0) return `-${formattedAmount}원`;
     if (showPlus && amount > 0) return `+${formattedAmount}원`;
     if (showSign || showPlus) return `${formattedAmount}원`;
@@ -273,7 +284,9 @@ export const useExpensesStore = defineStore('expenses', () => {
 
   // API 데이터 변환 함수들
   const transformApiResponseToTransaction = (apiItem) => {
-    const dateObj = apiItem.expenditureDate ? new Date(apiItem.expenditureDate) : new Date();
+    const dateObj = apiItem.expenditureDate
+      ? new Date(apiItem.expenditureDate)
+      : new Date();
     return {
       id: apiItem.expenditureId,
       name: apiItem.description || '거래내역',
@@ -285,11 +298,15 @@ export const useExpensesStore = defineStore('expenses', () => {
   };
 
   const transformTransactionToApiFormat = (formData) => {
+    // 날짜와 시간이 없으면 현재 값으로 대체하지 않고 그대로 사용
+    const date = formData.date;
+    const time = formData.time;
+
     return {
       amount: parseFloat(formData.amount),
       categoryId: getCategoryIdByName(formData.category),
-      description: formData.name || '거래내역',
-      expenditureDate: `${formData.date} ${formData.time || '00:00'}:00`,
+      description: formData.name, // 기본값 제거
+      expenditureDate: `${date} ${time}:00`,
       // assetId는 백엔드에서 자동으로 main 계좌 ID 설정
     };
   };
@@ -316,7 +333,7 @@ export const useExpensesStore = defineStore('expenses', () => {
     const day = String(now.getDate()).padStart(2, '0');
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
-    
+
     return {
       date: `${year}-${month}-${day}`,
       time: `${hours}:${minutes}`,
@@ -330,26 +347,33 @@ export const useExpensesStore = defineStore('expenses', () => {
   // 거래 내역 유효성 검사
   const validateTransaction = (data) => {
     const errors = [];
-    
+
     if (!data.name?.trim()) {
       errors.push('거래처명을 입력해주세요.');
     }
-    
+
     if (!data.amount || data.amount <= 0) {
       errors.push('올바른 금액을 입력해주세요.');
     }
-    
+
     if (!data.category) {
       errors.push('카테고리를 선택해주세요.');
     }
-    
-    if (!data.date) {
+
+    // 날짜 검증 강화 (undefined, null, 빈 문자열 체크)
+    if (!data.date || data.date === 'undefined' || data.date.trim() === '') {
       errors.push('날짜를 선택해주세요.');
     }
-    
+
+    // 날짜 형식 검증 (YYYY-MM-DD)
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+    if (data.date && !datePattern.test(data.date)) {
+      errors.push('올바른 날짜 형식이 아닙니다.');
+    }
+
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   };
 
