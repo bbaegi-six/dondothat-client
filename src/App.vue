@@ -17,14 +17,16 @@ import Nav from '@/components/layout/Nav.vue';
 const route = useRoute();
 const shouldShowNav = computed(() => {
   const noNavRoutes = [
-    '/login',
-    '/register',
-    '/forgot-password',
-    '/account',
-    '/profile/edit',
-    '/profile/mychallenge',
+    'Login',
+    'Register',
+    'ForgotPassword',
+    'Account',
+    'ProfileEdit',
+    'MyChallenge',
+    'ChallengeSelection',
+    'ChallengeDaysInput',
   ];
-  return !noNavRoutes.includes(route.path);
+  return !noNavRoutes.includes(route.name);
 });
 </script>
 

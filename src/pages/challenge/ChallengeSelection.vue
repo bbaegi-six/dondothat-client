@@ -1,14 +1,42 @@
 <template>
     <div class="flex flex-col h-screen bg-default">
-      <!-- Header -->
-      <Header 
-        :show-logo="true" 
-        :show-points="true" 
-        :points="1250" 
-      />
   
-      <!-- Main Title -->
+      <!-- Timer Circle - Top Section -->
       <div class="flex flex-col items-center pt-[120px] pb-4 flex-grow">
+        <div class="relative mb-6">
+          <div class="w-20 h-20 relative">
+            <!-- Background Circle -->
+            <svg class="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80">
+              <circle 
+                cx="40" 
+                cy="40" 
+                r="36.5" 
+                stroke="#414141" 
+                stroke-width="7" 
+                fill="none"
+              />
+              <!-- Progress Circle -->
+              <circle 
+                cx="40" 
+                cy="40" 
+                r="36.5" 
+                stroke="#FF5555" 
+                stroke-width="7" 
+                fill="none"
+                :stroke-dasharray="circumference"
+                :stroke-dashoffset="dashOffset"
+                stroke-linecap="round"
+                class="transition-all duration-1000 ease-linear"
+              />
+            </svg>
+            <!-- Timer Number -->
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-white text-2xl font-normal font-pretendard">{{ timeLeft }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Title -->
         <h1 class="text-white text-xl font-bold text-center mb-2 font-pretendard">
           원하는 챌린지를 선택해주세요
         </h1>
@@ -40,7 +68,7 @@
       </div>
   
       <!-- Selection Button - Just above nav -->
-      <div class="px-8 pb-[90px]">
+      <div class="px-8">
         <button
           :disabled="!selectedChallenge"
           @click="startChallenge"
@@ -58,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import Header from '@/components/layout/Header.vue';
 import { useRecommendedChallengesStore } from '@/stores/recommendedChallenges';
 import { useExpensesStore } from '@/stores/expenses';
@@ -66,6 +94,32 @@ import { useExpensesStore } from '@/stores/expenses';
 const recommendedChallengesStore = useRecommendedChallengesStore();
 const expensesStore = useExpensesStore();
 const selectedChallenge = ref(null);
+
+// Timer related state and logic
+const timeLeft = ref(30);
+const timerInterval = ref(null);
+const circumference = 2 * Math.PI * 36.5; // 2πr for the circle
+
+const dashOffset = computed(() => {
+  const progress = timeLeft.value / 30;
+  return circumference * (1 - progress);
+});
+
+const startTimer = () => {
+  timerInterval.value = setInterval(() => {
+    timeLeft.value--;
+    if (timeLeft.value <= 0) {
+      clearInterval(timerInterval.value);
+      // Handle timer expiration here, e.g., select a default challenge or navigate
+      console.log('Timer expired! No challenge selected.');
+      // Optionally, you could automatically select the first challenge or navigate away
+      // if (!selectedChallenge.value && recommendedChallengesStore.challenges.length > 0) {
+      //   selectChallenge(recommendedChallengesStore.challenges[0]);
+      //   startChallenge();
+      // }
+    }
+  }, 1000);
+};
 
 const getCategoryIcon = (categoryId) => {
   if (!expensesStore.categoryMasterData) return 'fas fa-question-circle';
@@ -85,4 +139,14 @@ const startChallenge = () => {
     // For example: router.push({ name: 'ChallengeDaysInput', params: { challengeId: selectedChallenge.value.challengeId } });
   }
 };
+
+onMounted(() => {
+  startTimer();
+});
+
+onUnmounted(() => {
+  if (timerInterval.value) {
+    clearInterval(timerInterval.value);
+  }
+});
 </script>
