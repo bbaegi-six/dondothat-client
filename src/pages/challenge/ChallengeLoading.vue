@@ -117,18 +117,36 @@
 
 <script setup>
 import { onMounted } from 'vue';
+import challengeService from '@/services/challengeService';
 
-// Emit 이벤트 정의
 const emit = defineEmits(['loading-complete']);
 
-onMounted(() => {
-  console.log('⏳ 챌린지 로딩 시작 - 3초 대기');
+const fetchRecommendations = async () => {
+  try {
+    // .data를 제거하여 서비스에서 반환된 데이터 배열을 직접 사용합니다.
+    const challenges = await challengeService.getRecommendations();
+    return challenges;
+  } catch (error) {
+    console.error('추천 챌린지 조회 실패:', error);
+    // API 실패 시 기본 챌린지 목록 반환
+    return [
+      { challengeId: 1, title: '배달음식 금지 챌린지', summary: '배달 대신 직접 요리!' },
+      { challengeId: 3, title: '쇼핑 금지 챌린지', summary: '불필요한 소비 줄이기!' },
+      { challengeId: 7, title: '술 금지 챌린지', summary: '금주 도전!' },
+    ];
+  }
+};
 
-  // 3초 후 로딩 완료하고 부모에게 신호 전달
-  setTimeout(() => {
-    console.log('✅ 로딩 완료 - 챌린지 목록 조회 완료');
-    emit('loading-complete');
-  }, 3000);
+onMounted(async () => {
+  console.log('⏳ 챌린지 로딩 시작 - API 호출 및 최소 1.5초 대기');
+
+  const minLoadingTime = new Promise(resolve => setTimeout(resolve, 1500));
+  const fetchPromise = fetchRecommendations();
+
+  const [, challenges] = await Promise.all([minLoadingTime, fetchPromise]);
+
+  console.log('✅ 로딩 완료 - 챌린지 목록 조회 완료:', challenges);
+  emit('loading-complete', challenges);
 });
 </script>
 
