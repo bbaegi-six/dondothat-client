@@ -408,18 +408,20 @@ onMounted(() => {
   padding: 20px;
   text-align: center;
   background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  border-radius: 12px;
+  margin: 8px 0;
 }
 .connect-btn {
   margin-top: 10px;
   padding: 8px 16px;
-  background-color: #007bff;
+  background-color: #ff5555;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 14px;
 }
 .connect-btn:hover {
-  background-color: #0056b3;
+  background-color: #e04545;
 }
 </style>
