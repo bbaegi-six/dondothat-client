@@ -383,7 +383,6 @@
 
 <script setup>
 import { computed, ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { useExpensesStore } from '../../stores/expenses.js';
 import { useSavingStore } from '../../stores/saving.js';
 import Header from '../../components/layout/Header.vue';
