@@ -327,63 +327,14 @@
 
     <!-- 저금통 거래내역 리스트 -->
     <div v-if="activeTab === 'savings'">
-      <div v-if="Object.keys(groupedSavingsData).length > 0">
-        <!-- 날짜별 그룹 -->
-        <div v-for="(group, date) in groupedSavingsData" :key="date">
-          <!-- 날짜와 금액 -->
-          <div
-            style="
-              margin-top: 28px;
-              width: 328px;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-            "
-          >
-            <div
-              style="
-                font-family: 'Pretendard';
-                font-style: normal;
-                font-weight: 500;
-                font-size: 16px;
-                line-height: 32px;
-                color: #ffffff;
-              "
-            >
-              {{ formatDate(date) }}
-            </div>
-            <div
-              style="
-                font-family: 'Pretendard';
-                font-style: normal;
-                font-weight: 600;
-                font-size: 16px;
-                line-height: 24px;
-                color: #ffffff;
-              "
-            >
-              {{ getDailySavingsTotal(group) }}
-            </div>
-          </div>
-
-          <!-- 구분선 -->
-          <div
-            style="
-              width: 328px;
-              height: 0px;
-              border: 1px solid #414141;
-              margin-top: 0px;
-            "
-          ></div>
-
-          <!-- 저금통 아이템들 -->
-          <div>
-            <TransactionCard
-              v-for="item in group"
-              :key="item.id"
-              :transaction="item"
-            />
-          </div>
+      <div v-if="savingStore.history.length > 0" style="margin-top: 28px">
+        <!-- 단순 리스트 -->
+        <div>
+          <TransactionCard
+            v-for="item in savingStore.history"
+            :key="item.categoryId + item.date"
+            :transaction="item"
+          />
         </div>
       </div>
 
@@ -431,12 +382,15 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useExpensesStore } from '../../stores/expenses.js';
+import { useSavingStore } from '../../stores/saving.js';
 import Header from '../../components/layout/Header.vue';
 import TransactionCard from '../../components/expenses/TransactionCard.vue';
 
 const expensesStore = useExpensesStore();
+const savingStore = useSavingStore();
 
 // 탭 상태 관리
 const activeTab = ref('account'); // 'account' 또는 'savings'
@@ -446,9 +400,13 @@ const switchTab = (tab) => {
   activeTab.value = tab;
 };
 
-// 저금통 관련 계산된 속성들 (스토어에서 가져옴)
-const totalSavings = computed(() => expensesStore.totalSavings);
-const groupedSavingsData = computed(() => expensesStore.groupedSavingsData);
+// 최초 진입 시 데이터 로드
+onMounted(async () => {
+  await Promise.all([
+    expensesStore.fetchExpensesFromAPI(),
+    savingStore.fetchAll(),
+  ]);
+});
 
 // 계산된 속성들 (스토어에서 가져옴)
 const currentMonthDisplay = computed(() => expensesStore.currentMonth);
@@ -457,6 +415,9 @@ const currentMonthTransactions = computed(
 );
 const groupedTransactions = computed(() => expensesStore.groupedTransactions);
 const monthlyExpense = computed(() => expensesStore.monthlyExpense);
+
+// ✅ 저금통 계산값 연결
+const totalSavings = computed(() => savingStore.total);
 
 // 메서드들 (스토어 액션 사용)
 const previousMonth = () => {
@@ -475,10 +436,6 @@ const formatDate = (dateString) => {
 
 const getDailyTotal = (transactions) => {
   return expensesStore.getDailyTotal(transactions);
-};
-
-const getDailySavingsTotal = (items) => {
-  return expensesStore.getDailySavingsTotal(items);
 };
 
 const editTransaction = (transaction) => {
