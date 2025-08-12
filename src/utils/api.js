@@ -109,20 +109,6 @@ export const challengeAPI = {
 
   // 추천 챌린지 조회
   getRecommendations: async () => {
-    if (process.env.NODE_ENV === 'development') {
-      // Mock 데이터
-      return Promise.resolve({
-        data: [
-          { id: 'CAFE_CHALLENGE', name: '카페 금지 챌린지', type: 'cafe' },
-          {
-            id: 'DELIVERY_CHALLENGE',
-            name: '배달음식 금지 챌린지',
-            type: 'delivery',
-          },
-          { id: 'TAXI_CHALLENGE', name: '택시 금지 챌린지', type: 'taxi' },
-        ],
-      });
-    }
     return api.get('/challenges/recommendations');
   },
 

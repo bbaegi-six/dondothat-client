@@ -74,6 +74,11 @@ const routes = [
     component: () => import('@/pages/challenge/ChallengeFlow.vue'),
   },
   {
+    path: '/challenge/selection',
+    name: 'ChallengeSelection',
+    component: () => import('../pages/challenge/ChallengeSelection.vue'),
+  },
+  {
     path: '/challenge/days-input',
     name: 'ChallengeDaysInput',
     component: () => import('../pages/challenge/ChallengeDaysInput.vue'),

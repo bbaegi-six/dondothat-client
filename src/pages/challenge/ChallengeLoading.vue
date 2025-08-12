@@ -84,94 +84,24 @@
   </template>
   
   <script setup>
-  import { ref, computed, onMounted } from 'vue';
+  import { onMounted } from 'vue';
+  import { useRouter } from 'vue-router';
   import Header from '@/components/layout/Header.vue';
+  import { useRecommendedChallengesStore } from '@/stores/recommendedChallenges';
   
-  // Props
-  const props = defineProps({
-    selectedChallenge: {
-      type: String,
-      required: true
+  const router = useRouter();
+  const recommendedChallengesStore = useRecommendedChallengesStore();
+  
+  onMounted(async () => {
+    const success = await recommendedChallengesStore.fetchRecommendations();
+    if (success) {
+      router.push('/challenge/selection');
+    } else {
+      // Handle error, maybe show a message or redirect to an error page
+      console.error("Failed to load recommendations, staying on loading page or redirecting to an error page.");
+      // Optionally, you could redirect to a generic challenge page or an error page
+      // router.push('/error');
     }
-  });
-  
-  // Emits
-  const emit = defineEmits(['loadingComplete']);
-  
-  // 챌린지 정보 매핑
-  const challengeInfo = {
-    cafe: {
-      title: '카페 금지 챌린지',
-      description: '카페에서 결제하지 않기',
-      icon: 'fas fa-coffee',
-      iconColor: 'text-cafe'
-    },
-    delivery: {
-      title: '배달음식 금지 챌린지', 
-      description: '배달음식 시키지 않기',
-      icon: 'DeliveryIcon',
-      iconColor: 'text-delivery'
-    },
-    taxi: {
-      title: '택시 금지 챌린지',
-      description: '택시 타지 않기', 
-      icon: 'TaxiIcon',
-      iconColor: 'text-taxi'
-    }
-  };
-  
-  // Computed
-  const selectedChallengeTitle = computed(() => {
-    return challengeInfo[props.selectedChallenge]?.title || '';
-  });
-  
-  const selectedChallengeDescription = computed(() => {
-    return challengeInfo[props.selectedChallenge]?.description || '';
-  });
-  
-  const challengeIcon = computed(() => {
-    return challengeInfo[props.selectedChallenge]?.icon || 'CafeIcon';
-  });
-  
-  const challengeIconColor = computed(() => {
-    return challengeInfo[props.selectedChallenge]?.iconColor || 'text-cafe';
-  });
-  
-  // 아이콘 컴포넌트들
-  const CafeIcon = {
-    template: `
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M2,21V19H20V21H2M20,8V5L18,5V8H20M20,3A2,2 0 0,1 22,5V8A2,2 0 0,1 20,10H18V13A4,4 0 0,1 14,17H8A4,4 0 0,1 4,13V3H20M16,5H6V13A2,2 0 0,0 8,15H14A2,2 0 0,0 16,13V5Z"/>
-      </svg>
-    `
-  };
-  
-  const DeliveryIcon = {
-    template: `
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M19,7C19.74,7 20.38,7.37 20.73,7.93L23.73,12.93C23.9,13.21 24,13.53 24,13.86V18A1,1 0 0,1 23,19H21A3,3 0 0,1 18,22A3,3 0 0,1 15,19H9A3,3 0 0,1 6,22A3,3 0 0,1 3,19H1A1,1 0 0,1 0,18V6A1,1 0 0,1 1,5H17A1,1 0 0,1 18,6V7H19M18,9.5V13H22V13.86L19.5,9.5H18M6,17.5A1.5,1.5 0 0,0 4.5,19A1.5,1.5 0 0,0 6,20.5A1.5,1.5 0 0,0 7.5,19A1.5,1.5 0 0,0 6,17.5M18,17.5A1.5,1.5 0 0,0 16.5,19A1.5,1.5 0 0,0 18,20.5A1.5,1.5 0 0,0 19.5,19A1.5,1.5 0 0,0 18,17.5Z"/>
-      </svg>
-    `
-  };
-  
-  const TaxiIcon = {
-    template: `
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M18.92,6.01C18.72,5.42 18.16,5 17.5,5H15V4A2,2 0 0,0 13,2H11A2,2 0 0,0 9,4V5H6.5C5.84,5 5.28,5.42 5.08,6.01L3,12V20A1,1 0 0,0 4,21H5A1,1 0 0,0 6,20V19H18V20A1,1 0 0,0 19,21H20A1,1 0 0,0 21,20V12L18.92,6.01M6.5,7H17.5L19,11H5L6.5,7M7.5,16A1.5,1.5 0 0,1 6,14.5A1.5,1.5 0 0,1 7.5,13A1.5,1.5 0 0,1 9,14.5A1.5,1.5 0 0,1 7.5,16M16.5,16A1.5,1.5 0 0,1 15,14.5A1.5,1.5 0 0,1 16.5,13A1.5,1.5 0 0,1 18,14.5A1.5,1.5 0 0,1 16.5,16Z"/>
-      </svg>
-    `
-  };
-  
-  onMounted(() => {
-    // 3초 후 로딩 완료하고 다음 화면으로 이동
-    setTimeout(() => {
-      console.log('챌린지 로딩 완료');
-      // 라우터를 사용한 페이지 이동 (실제 프로젝트에서는 router.push 사용)
-      // router.push('/challenge/start');
-      
-      // 또는 emit을 통해 부모 컴포넌트에 완료 신호 전달
-      emit('loadingComplete', props.selectedChallenge);
-    }, 3000);
   });
   </script>
   
