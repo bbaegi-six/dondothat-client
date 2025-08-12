@@ -308,6 +308,74 @@ export const useExpensesStore = defineStore('expenses', () => {
     return transactions.value.find((transaction) => transaction.id == id);
   };
 
+  // 날짜 유틸리티 함수들
+  const formatDisplayDate = (dateString) => {
+    const date = new Date(dateString);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+    const dayName = dayNames[date.getDay()];
+    return `${month}월 ${day}일 (${dayName})`;
+  };
+
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+    return {
+      date: `${year}-${month}-${day}`,
+      time: `${hours}:${minutes}`,
+    };
+  };
+
+  const formatDateForApi = (date, time = '00:00') => {
+    return `${date} ${time}:00`;
+  };
+
+  // 거래 내역 유효성 검사
+  const validateTransaction = (data) => {
+    const errors = [];
+    
+    if (!data.name?.trim()) {
+      errors.push('거래처명을 입력해주세요.');
+    }
+    
+    if (!data.amount || data.amount <= 0) {
+      errors.push('올바른 금액을 입력해주세요.');
+    }
+    
+    if (!data.category) {
+      errors.push('카테고리를 선택해주세요.');
+    }
+    
+    if (!data.date) {
+      errors.push('날짜를 선택해주세요.');
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  };
+
+  // 새 거래 템플릿 생성
+  const createNewTransactionTemplate = () => {
+    const { date, time } = getCurrentDateTime();
+    return {
+      id: 'new',
+      name: '',
+      type: 'expense',
+      amount: 0,
+      category: '그외',
+      date,
+      time,
+    };
+  };
+
   return {
     transactions,
     currentMonth,
@@ -343,5 +411,10 @@ export const useExpensesStore = defineStore('expenses', () => {
     transformApiResponseToTransaction,
     transformTransactionToApiFormat,
     getTransactionById,
+    formatDisplayDate,
+    getCurrentDateTime,
+    formatDateForApi,
+    validateTransaction,
+    createNewTransactionTemplate,
   };
 });
