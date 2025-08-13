@@ -8,10 +8,10 @@
     >
       <!-- Success Icon -->
       <div
-        class="w-12 h-12 rounded-full flex items-center justify-center mb-8"
+        class="w-20 h-20 rounded-full flex items-center justify-center mb-8"
         style="background-color: #ff5555"
       >
-        <i class="fas fa-check text-xl text-white"></i>
+        <i class="fas fa-check text-3xl text-white"></i>
       </div>
 
       <!-- Amount -->
@@ -40,15 +40,15 @@
       <!-- Challenge Icon & Title -->
       <div class="flex items-center justify-center mt-[70px] mb-4">
         <div
-          class="w-12 h-12 rounded-full flex items-center justify-center mr-4"
+          class="w-20 h-20 rounded-full flex items-center justify-center"
           :class="isCompleted ? '' : 'bg-gray-1'"
           :style="isCompleted ? { backgroundColor: '#FF5555' } : {}"
         >
-          <i v-if="isCompleted" class="fas fa-check text-xl text-white"></i>
+          <i v-if="isCompleted" class="fas fa-check text-4xl text-white"></i>
           <i
             v-else
             :class="challengeIcon"
-            class="text-xl"
+            class="text-3xl"
             :style="{ color: challengeIconColor }"
           ></i>
         </div>
@@ -147,6 +147,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useExpensesStore } from '@/stores/expenses';
 
 // Props - 백엔드 데이터 받기
 const props = defineProps({
@@ -173,28 +174,7 @@ const props = defineProps({
 
 // Reactive data
 const isSavingCompleted = ref(false);
-
-// Challenge metadata (기존 데이터 - 아이콘/색상용)
-const challengeMetadata = {
-  '카페 금지 챌린지': {
-    type: 'cafe',
-    icon: 'fas fa-coffee',
-    color: '#FF9595',
-    categoryText: '카페',
-  },
-  '배달음식 금지 챌린지': {
-    type: 'delivery',
-    icon: 'fas fa-motorcycle',
-    color: '#FF7376',
-    categoryText: '배달음식',
-  },
-  '택시 금지 챌린지': {
-    type: 'taxi',
-    icon: 'fas fa-taxi',
-    color: '#FFC457',
-    categoryText: '택시',
-  },
-};
+const expensesStore = useExpensesStore();
 
 // Computed properties
 const isCompleted = computed(() => {
@@ -210,14 +190,29 @@ const progressStatusText = computed(() => {
 });
 
 const currentMetadata = computed(() => {
-  return (
-    challengeMetadata[props.challengeData.title] || {
-      type: 'default',
-      icon: 'fas fa-circle',
-      color: '#888888',
-      categoryText: '챌린지',
-    }
+  const categoryName = Object.keys(expensesStore.categoryMasterData).find(
+    (name) =>
+      expensesStore.categoryMasterData[name].id ===
+      props.challengeData.challengeId
   );
+  const categoryData = categoryName
+    ? expensesStore.categoryMasterData[categoryName]
+    : null;
+
+  if (categoryData) {
+    return {
+      icon: categoryData.icon,
+      color: categoryData.color,
+      categoryText: categoryName,
+    };
+  }
+
+  // Default metadata if not found
+  return {
+    icon: 'fas fa-circle',
+    color: '#888888',
+    categoryText: '챌린지',
+  };
 });
 
 const challengeIcon = computed(() => {
