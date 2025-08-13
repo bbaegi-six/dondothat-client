@@ -14,9 +14,16 @@
         <FontAwesomeIcon
           :icon="farCircleQuestion"
           class="text-[#c9c9c9] ml-1 mr-auto"
+          @click="
+            isSavingGuideModalOpen = true;
+            console.log(
+              'isSavingGuideModalOpen (on click):',
+              isSavingGuideModalOpen.value
+            );
+          "
         />
         <div class="font-pretendard font-bold text-lg text-white mr-2">
-          12,000원
+          {{ savingStore.total.toLocaleString() }}원
         </div>
         <FontAwesomeIcon :icon="faAngleRight" class="text-white w-[10px] h-4" />
       </div>
@@ -30,6 +37,7 @@
       <FontAwesomeIcon
         :icon="farCircleQuestion"
         class="text-[#c9c9c9] ml-1 mr-auto"
+        @click.stop="isSavingGuideModalOpen = true"
       />
       <div class="font-pretendard font-medium text-base text-white mr-2">
         연결하기
@@ -53,7 +61,7 @@
           "
           :style="
             challengeStore.userChallengeData.status === 'completed'
-              ? { backgroundColor: '#FF5555' }
+              ? { backgroundColor: '#414141' }
               : {}
           "
         >
@@ -69,13 +77,17 @@
               {{ challengeStore.userChallengeData.title }}
             </div>
             <div class="font-pretendard font-medium text-sm text-white ml-auto">
-              {{ challengeStore.userChallengeData.progress }}/{{ challengeStore.userChallengeData.period }}일
+              {{ challengeStore.userChallengeData.progress }}/{{
+                challengeStore.userChallengeData.period
+              }}일
             </div>
           </div>
           <div class="w-full bg-gray-1 rounded-full h-2 mt-1">
             <div
               class="bg-brand h-2 rounded-full"
-              :style="{ width: `${(challengeStore.userChallengeData.progress / challengeStore.userChallengeData.period) * 100}%` }"
+              :style="{
+                width: `${(challengeStore.userChallengeData.progress / challengeStore.userChallengeData.period) * 100}%`,
+              }"
             ></div>
           </div>
         </div>
@@ -121,16 +133,20 @@
     <!-- 이번 달 지출 요약 박스 -->
     <div class="w-[328px] bg-[#414141] rounded-2xl p-6">
       <!-- 카테고리별 지출 리스트 -->
-      <div v-if="categoryData && categoryData.length > 0">
+      <div v-if="expensesStore.chartData && expensesStore.chartData.length > 0">
         <div
-          v-for="(category, index) in categoryData"
+          v-for="(category, index) in expensesStore.chartData"
           :key="category.name"
           class="flex items-center justify-between mb-2 last:mb-0"
         >
           <div class="flex items-center">
             <div
               class="w-5 h-5 rounded-full mr-3"
-              :style="{ backgroundColor: getCategoryColor(category.name) }"
+              :style="{
+                backgroundColor: expensesStore.getCategoryColorByName(
+                  category.name
+                ),
+              }"
             ></div>
             <div class="font-pretendard font-medium text-sm text-white">
               {{ category.name }}
@@ -147,6 +163,11 @@
         <p class="text-[#c6c6c6] text-sm">이번 달 지출 내역이 없습니다.</p>
       </div>
     </div>
+    <!-- 저금통 사용 방법 모달 -->
+    <SavingGuideModal
+      :modelValue="isSavingGuideModalOpen"
+      @close="isSavingGuideModalOpen = false"
+    />
   </div>
 </template>
 
@@ -165,10 +186,15 @@ import {
 import { useExpensesStore } from '@/stores/expenses';
 import { useAccountStore } from '@/stores/account';
 import { useAuthStore } from '@/stores/auth';
+import SavingGuideModal from '@/components/modals/SavingGuideModal.vue';
 import { useChallengeStore } from '@/stores/challenge';
+import { useSavingStore } from '@/stores/saving';
 
 const authStore = useAuthStore();
 const accountStore = useAccountStore();
+const savingStore = useSavingStore();
+
+const isSavingGuideModalOpen = ref(false);
 const router = useRouter();
 const chartCanvas = ref(null);
 const expensesStore = useExpensesStore();
