@@ -4,6 +4,7 @@ import challengeService from '@/services/challengeService';
 
 export const useChallengeStore = defineStore('challenge', () => {
   // --- 상태 (State) ---
+  const userChallengeData = ref(null);
   const currentChallenge = ref(null);
   const challengeHistory = ref([]);
   const isLoading = ref(false);
@@ -67,9 +68,7 @@ export const useChallengeStore = defineStore('challenge', () => {
     };
   });
 
-  // --- 액션 (Actions) ---
-  
-// 챌린지 참여
+  // 챌린지 참여
 const joinChallenge = async (challengeType, days) => {
   try {
     isLoading.value = true;
@@ -249,8 +248,51 @@ const failChallenge = async (failureReason = 'TRANSACTION_DETECTED') => {
     return monitoringInterval;
   };
 
+  // 사용자 챌린지 진행 정보 조회 (Home.vue에서 사용)
+  async function fetchChallengeProgress() {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const data = await challengeService.getChallengeProgress();
+      userChallengeData.value = data; // 챌린지 정보가 없으면 null이 할당됨
+
+      // activeChallenge 업데이트
+      if (data) {
+        activeChallenge.value = {
+          id: data.user_challenge_id,
+          type: data.challenge_id, // challenge_id를 type으로 사용 (예: CAFE_CHALLENGE)
+          title: data.title,
+          days: data.period,
+          currentDay: data.progress, // progress를 currentDay로 사용
+          status: data.status,
+          savedAmount: data.saving,
+          potentialSavedAmount: 0, // 이 값은 백엔드에서 오지 않으므로 0으로 설정하거나 계산 필요
+          startDate: null, // 백엔드에서 오지 않으므로 null
+          endDate: null, // 백엔드에서 오지 않으므로 null
+          failedTransactionId: null, // 백엔드에서 오지 않으므로 null
+          dailyProgress: [] // 백엔드에서 오지 않으므로 빈 배열
+        };
+      } else {
+        // 챌린지가 없는 경우 activeChallenge 초기화
+        activeChallenge.value = {
+          id: null, type: null, title: '', days: 0, currentDay: 1,
+          status: 'NONE', savedAmount: 0, potentialSavedAmount: 0,
+          startDate: null, endDate: null, failedTransactionId: null, dailyProgress: []
+        };
+      }
+
+      console.log('사용자 챌린지 진행 정보 로드 성공:', data);
+    } catch (err) {
+      error.value = err.message;
+      console.error('사용자 챌린지 진행 정보 로드 실패:', err);
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   return {
     // State
+    userChallengeData,
     currentChallenge,
     challengeHistory,
     activeChallenge,
@@ -273,6 +315,7 @@ const failChallenge = async (failureReason = 'TRANSACTION_DETECTED') => {
     retryChallenge,
     resetChallenge,
     clearError,
-    startMonitoring
+    startMonitoring,
+    fetchChallengeProgress
   };
 });

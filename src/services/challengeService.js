@@ -37,11 +37,15 @@ export const challengeService = {
   },
 
   // 챌린지 진척도 조회
-  async getProgress() {
+  async getChallengeProgress() {
     try {
       const response = await challengeAPI.getProgress();
       return response;
     } catch (error) {
+      // 404 에러는 참여중인 챌린지가 없는 경우이므로 에러로 처리하지 않음
+      if (error.response && error.response.status === 404) {
+        return null;
+      }
       console.error('진척도 조회 실패:', error);
       throw new Error(`진척도 조회 실패: ${this.getErrorMessage(error)}`);
     }
