@@ -121,9 +121,8 @@ export const useExpensesStore = defineStore('expenses', () => {
   async function addTransaction(transactionData) {
     try {
       // 스토어에서 직접 데이터 변환
-      const apiData = this.transformTransactionToApiFormat(transactionData);
+      const apiData = transformTransactionToApiFormat(transactionData);
       await expensesService.createExpense(apiData);
-      await this.fetchExpensesFromAPI(); // 데이터 변경 후 전체 내역 다시 로드
       return true;
     } catch (error) {
       console.error('거래내역 추가 실패:', error);
@@ -135,9 +134,8 @@ export const useExpensesStore = defineStore('expenses', () => {
   async function updateTransaction(id, updatedData) {
     try {
       // 스토어에서 직접 데이터 변환
-      const apiData = this.transformTransactionToApiFormat(updatedData);
+      const apiData = transformTransactionToApiFormat(updatedData);
       await expensesService.updateExpense(id, apiData);
-      await this.fetchExpensesFromAPI(); // 데이터 변경 후 전체 내역 다시 로드
       return true;
     } catch (error) {
       console.error('거래내역 수정 실패:', error);
@@ -149,7 +147,6 @@ export const useExpensesStore = defineStore('expenses', () => {
   async function deleteTransaction(id) {
     try {
       await expensesService.deleteExpense(id);
-      await fetchExpensesFromAPI(); // 데이터 변경 후 전체 내역 다시 로드
       return true;
     } catch (error) {
       console.error('거래내역 삭제 실패:', error);
