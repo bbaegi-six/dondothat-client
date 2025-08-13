@@ -99,6 +99,24 @@ export const useExpensesStore = defineStore('expenses', () => {
     }
   }
 
+  // Codef 거래내역 새로고침
+  async function refreshFromCodef() {
+    loading.value = true;
+    error.value = null;
+    try {
+      await expensesService.refreshExpensesFromCodef();
+      // 새로고침 후 데이터 다시 로드
+      await fetchExpensesFromAPI();
+      return true;
+    } catch (err) {
+      error.value = err.message;
+      console.error('Codef 새로고침 실패:', err);
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   // 지출 내역 추가
   async function addTransaction(transactionData) {
     try {
@@ -405,6 +423,7 @@ export const useExpensesStore = defineStore('expenses', () => {
     categoryMasterData, // Exposed for external use
     chartData,
     fetchExpensesFromAPI,
+    refreshFromCodef,
     addTransaction,
     updateTransaction,
     deleteTransaction,
