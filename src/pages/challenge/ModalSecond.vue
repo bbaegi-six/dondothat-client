@@ -8,12 +8,7 @@
     <div class="text-center h-full flex flex-col justify-between p-6 relative">
       <!-- 헤더 -->
       <div class="mb-6">
-        <p
-          class="text-white text-[24px] font-bold mb-2"
-          v-if="isUserInfoLoaded"
-        >
-          🎉 티어 업!!!
-        </p>
+        <p class="text-white text-[24px] font-bold mb-2">🎉 티어 업!</p>
         <p class="text-white text-[14px] opacity-80">
           축하합니다! 새로운 등급에 도달했습니다
         </p>
@@ -21,7 +16,7 @@
 
       <!-- 현재 티어 이미지 -->
       <div class="flex-1 flex items-center justify-center">
-        <div class="text-center" v-if="isUserInfoLoaded">
+        <div class="text-center">
           <div class="w-24 h-24 mb-4 tier-upgrade-animation">
             <img
               :src="getCurrentTierImage()"
@@ -32,16 +27,6 @@
           <p class="text-white text-[18px] font-bold">
             {{ getCurrentTierName() }}
           </p>
-        </div>
-
-        <!-- 로딩 상태 -->
-        <div class="text-center" v-else>
-          <div class="w-24 h-24 mb-4 flex items-center justify-center">
-            <div
-              class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"
-            ></div>
-          </div>
-          <p class="text-white text-[18px] font-bold">로딩 중...</p>
         </div>
       </div>
 
@@ -56,7 +41,7 @@
 </template>
 
 <script setup>
-import { computed, watch, ref } from 'vue';
+import { computed, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '../../stores/auth';
 import Modal from '../../components/Modal.vue';
@@ -80,9 +65,6 @@ const emit = defineEmits(['update:modelValue', 'next', 'close']);
 // auth store에서 사용자 정보 가져오기
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
-
-// 사용자 정보 로딩 상태
-const isUserInfoLoaded = ref(false);
 
 // 티어 이미지 매핑
 const tierImages = {
@@ -144,28 +126,23 @@ const getCurrentTierName = () => {
   return tierName;
 };
 
-// 모달이 열릴 때 사용자 정보 새로고침
+// 모달이 열릴 때 백그라운드에서 사용자 정보 새로고침
 watch(
   () => props.modelValue,
   async (newValue) => {
     if (newValue) {
-      isUserInfoLoaded.value = false; // 로딩 상태로 설정
       console.log(
-        'ModalSecond - 모달이 열렸습니다. 사용자 정보 새로고침 중...'
+        'ModalSecond - 모달이 열렸습니다. 백그라운드에서 사용자 정보 새로고침...'
       );
+
       try {
-        await authStore.checkAuth(true); // 강제로 사용자 정보 갱신
+        // 백그라운드에서 사용자 정보 새로고침 (모달은 기존 정보로 즉시 표시)
+        await authStore.checkAuth(true);
         console.log('ModalSecond - 사용자 정보 새로고침 완료:', user.value);
         console.log('ModalSecond - 새로고침 후 tierId:', user.value?.tierId);
-
-        // 사용자 정보 로딩 완료
-        isUserInfoLoaded.value = true;
       } catch (error) {
         console.error('ModalSecond - 사용자 정보 새로고침 실패:', error);
-        isUserInfoLoaded.value = true; // 실패해도 UI는 표시
       }
-    } else {
-      isUserInfoLoaded.value = false; // 모달이 닫히면 리셋
     }
   }
 );
