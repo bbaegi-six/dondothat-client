@@ -72,6 +72,7 @@ export const authAPI = {
   fetchMe: () => api.get('/user/me'),
   // 마이페이지 관련 API 추가
   getMyPageAccounts: () => api.get('/mypage/accounts'),
+  getMyPageTier: () => api.get('/mypage/tier'),
 };
 
 export const expensesAPI = {
