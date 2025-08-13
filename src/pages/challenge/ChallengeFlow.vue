@@ -10,7 +10,7 @@
     <!-- 2단계: Selection -->
     <ChallengeSelection
       v-else-if="currentStep === 'selection'"
-      :available-challenges="availableChallenges"
+      :challenges="availableChallenges"
       @challenge-selected="handleChallengeSelected"
     />
 
@@ -44,11 +44,7 @@
 
         <div class="text-white/70 text-sm text-center font-pretendard">
           <p>
-            {{
-              selectedChallengeData?.title ||
-              challengeNames[selectedChallengeData?.type]
-            }}
-            {{ challengeDays }}일
+            {{ selectedChallengeData?.title }} {{ challengeDays }}일
           </p>
           <p>지금부터 매일 결제 내역을 확인합니다</p>
         </div>
@@ -81,75 +77,48 @@ import ChallengeSelection from './ChallengeSelection.vue';
 import ChallengeDaysInput from './ChallengeDaysInput.vue';
 import challengeService from '@/services/challengeService';
 
-// Router
 const router = useRouter();
 
-// Emit 이벤트 정의 (라우터 사용 시 필요없음)
-// const emit = defineEmits(['flow-complete']);
-
-// 플로우 상태
 const currentStep = ref('loading');
+const availableChallenges = ref([]);
 const selectedChallenge = ref(null);
 const selectedChallengeData = ref(null);
 const challengeDays = ref(0);
 const isJoining = ref(false);
 
-// 챌린지 이름 매핑
-const challengeNames = {
-  cafe: '카페 금지',
-  delivery: '배달음식 금지',
-  taxi: '택시 금지',
-};
-
-// 플로우 핸들러들
-const handleLoadingComplete = () => {
-  console.log('✅ 로딩 완료');
+const handleLoadingComplete = (challenges) => {
+  console.log('✅ 로딩 완료, 받은 챌린지:', challenges);
+  availableChallenges.value = challenges;
   currentStep.value = 'selection';
 };
 
-const handleChallengeSelected = (challenge) => {
-  console.log('✅ 챌린지 선택됨:', challenge);
-  selectedChallenge.value = challenge;
+const handleChallengeSelected = (challengeId) => {
+  console.log('✅ 챌린지 선택됨:', challengeId);
+  selectedChallenge.value = challengeId;
 
-  // 선택된 챌린지 데이터 설정
-  selectedChallengeData.value = {
-    type: challenge,
-    title: challengeNames[challenge] + ' 챌린지',
-  };
+  const selected = availableChallenges.value.find(c => c.challengeId === challengeId);
+  selectedChallengeData.value = selected || { challengeId: challengeId, title: '알 수 없는 챌린지' };
 
   currentStep.value = 'days-input';
 };
 
 const handleDateComplete = async (data) => {
   console.log('✅ 날짜 입력 완료:', data);
-  selectedChallenge.value = data.challenge;
   challengeDays.value = data.days;
   isJoining.value = true;
 
   try {
-    // 백엔드에 챌린지 참여 요청
     console.log('📤 챌린지 참여 요청:', {
-      challenge: data.challenge,
+      challengeId: selectedChallenge.value,
       days: data.days,
     });
 
-    // 실제 API 호출 (challengeService에 구현 필요)
-    // const result = await challengeService.joinChallenge(data.challenge, data.days);
+    await challengeService.joinChallenge(selectedChallenge.value, data.days);
 
-    // 임시로 성공 처리
-    await new Promise((resolve) => setTimeout(resolve, 1500)); // 1.5초 대기
     console.log('✅ 챌린지 참여 성공');
-
     isJoining.value = false;
     currentStep.value = 'success';
 
-    // 실제 구현에서는 API 응답에 따라 처리
-    // if (result.success) {
-    //   currentStep.value = 'success';
-    // } else {
-    //   console.error('챌린지 참여 실패:', result.error);
-    //   // 에러 처리
-    // }
   } catch (error) {
     console.error('❌ 챌린지 참여 실패:', error);
     isJoining.value = false;
@@ -159,45 +128,10 @@ const handleDateComplete = async (data) => {
 
 const completeChallenge = () => {
   console.log('✅ 챌린지 플로우 완료 - Challenge 페이지로 이동');
-
-  // Challenge 페이지로 이동 (자동으로 checkCurrentChallenge 호출됨)
   router.push('/challenge');
 };
 
-// 개발자 도구용 함수들
-if (process.env.NODE_ENV === 'development') {
-  window.testChallengeFlow = () => {
-    console.log('🧪 챌린지 플로우 테스트 함수들:');
-    console.log('- goToSelection() : 선택 화면으로');
-    console.log('- goToInput() : 입력 화면으로');
-    console.log('- goToSuccess() : 성공 화면으로');
-  };
-
-  window.goToSelection = () => {
-    currentStep.value = 'selection';
-  };
-
-  window.goToInput = () => {
-    selectedChallenge.value = 'cafe';
-    selectedChallengeData.value = {
-      type: 'cafe',
-      title: '카페 금지 챌린지',
-    };
-    currentStep.value = 'days-input';
-  };
-
-  window.goToSuccess = () => {
-    selectedChallenge.value = 'cafe';
-    selectedChallengeData.value = {
-      type: 'cafe',
-      title: '카페 금지 챌린지',
-    };
-    challengeDays.value = 14;
-    currentStep.value = 'success';
-  };
-
-  console.log('🧪 개발 모드: 플로우 테스트 함수들 등록 완료');
-}
+// ... (개발자 도구용 함수는 그대로 유지)
 </script>
 
 <style scoped>

@@ -2,11 +2,11 @@
 <template>
   <div class="flex flex-col h-screen bg-default">
     <!-- Timer Circle - Top Section -->
-    <div class="flex flex-col items-center pt-[60px] pb-4">
+    <div class="flex flex-col items-center pt-[120px] pb-4">
       <div class="relative mb-6">
-        <div class="w-20 h-20 relative">
+        <div class="w-24 h-24 relative">
           <!-- Background Circle -->
-          <svg class="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80">
+          <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 80 80">
             <circle
               cx="40"
               cy="40"
@@ -31,7 +31,7 @@
           </svg>
           <!-- Timer Number -->
           <div class="absolute inset-0 flex items-center justify-center">
-            <span class="text-white text-2xl font-normal font-pretendard">{{
+            <span class="text-white text-4xl font-normal font-pretendard">{{
               timeLeft
             }}</span>
           </div>
@@ -51,7 +51,7 @@
     </div>
 
     <!-- Middle Content - 날짜 입력 중앙 배치 -->
-    <div class="flex-1 flex flex-col items-center justify-center">
+    <div class="flex-1 flex flex-col items-center justify-center fade-in">
       <!-- Date Input Field -->
       <div class="flex items-baseline justify-center mb-8">
         <input
@@ -59,10 +59,11 @@
           type="number"
           min="7"
           max="35"
-          class="text-white text-6xl font-semibold font-pretendard bg-transparent border-none outline-none text-center w-32"
+          class="text-white text-6xl font-semibold font-pretendard bg-transparent border-none outline-none text-center w-24"
           @input="validateInput"
           @blur="handleBlur"
           placeholder=""
+          ref="daysInputRef"
         />
         <span class="text-white text-3xl font-semibold font-pretendard ml-2"
           >일</span
@@ -76,7 +77,7 @@
     </div>
 
     <!-- Complete Button -->
-    <div class="px-8 pb-[90px]">
+    <div class="px-8 pb-[90px] fade-in fade-in-delay-1">
       <button
         @click="completeInput"
         :disabled="!isValidInput"
@@ -99,7 +100,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 // Props
 const props = defineProps({
   selectedChallenge: {
-    type: String,
+    type: Object, // Changed from String to Object
     required: true,
   },
 });
@@ -111,6 +112,7 @@ const emit = defineEmits(['dateComplete']);
 const selectedDays = ref(''); // 빈 문자열로 시작
 const timeLeft = ref(30);
 const timerInterval = ref(null);
+const daysInputRef = ref(null); // Ref for the input element
 
 // Timer calculations
 const circumference = 2 * Math.PI * 36.5; // 2πr
@@ -129,7 +131,12 @@ const isValidInput = computed(() => {
 // Methods
 const validateInput = () => {
   // 숫자가 아닌 문자 제거
-  selectedDays.value = selectedDays.value.replace(/[^0-9]/g, '');
+  let value = selectedDays.value.replace(/[^0-9]/g, '');
+  // 두 자리로 제한
+  if (value.length > 2) {
+    value = value.slice(0, 2);
+  }
+  selectedDays.value = value;
 };
 
 const handleBlur = () => {
@@ -143,7 +150,7 @@ const handleBlur = () => {
 const completeInput = () => {
   if (isValidInput.value) {
     emit('dateComplete', {
-      challenge: props.selectedChallenge,
+      challengeId: props.selectedChallenge.challengeId, // Access challengeId from the object
       days: Number(selectedDays.value),
     });
   }
@@ -170,6 +177,10 @@ const startTimer = () => {
 
 onMounted(() => {
   startTimer();
+  // Auto-focus the input field
+  if (daysInputRef.value) {
+    daysInputRef.value.focus();
+  }
 });
 
 onUnmounted(() => {
@@ -195,5 +206,25 @@ input[type='number']::-webkit-inner-spin-button {
 input[type='number']:focus {
   outline: none;
   border-bottom: 2px solid #ff5555;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  opacity: 0; /* Ensure it starts invisible */
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.fade-in-delay-1 {
+  animation-delay: 0.3s;
 }
 </style>

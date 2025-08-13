@@ -1,17 +1,23 @@
 <!-- ChallengeLoading.vue -->
 <template>
-  <div class="flex flex-col h-screen bg-default">
+  <div
+    :class="[
+      'flex flex-col h-screen bg-default',
+      { 'fade-out': isFadingOut, 'fade-in': !isFadingOut },
+    ]"
+    ref="loadingContainer"
+  >
     <!-- Title Section - 타이머와 동일한 위치에서 제거 -->
-    <div class="flex flex-col items-center pt-[60px] pb-4">
+    <div class="flex flex-col items-center pt-[30px] pb-4">
       <!-- 빈 공간 유지 -->
     </div>
 
     <!-- Loading Content - 중앙 배치 -->
     <div class="flex-1 flex flex-col items-center justify-center px-8">
       <!-- Loading Icon -->
-      <div class="w-16 h-16 mb-8">
+      <div class="w-28 h-28 mb-8">
         <svg
-          class="w-16 h-16 text-white animate-spin-slow"
+          class="w-28 h-28 text-white animate-spin-slow"
           viewBox="0 0 24 24"
           fill="currentColor"
         >
@@ -27,13 +33,13 @@
       </h2>
 
       <div class="text-white/70 text-sm text-center font-pretendard">
-        <p>지난 소비내역을 기준으로</p>
+        <p>최근 소비내역을 기반으로</p>
         <p>과소비를 판단합니다</p>
       </div>
     </div>
 
     <!-- Blurred Challenge Cards - 원본과 동일한 위치 -->
-    <div class="px-4 pb-4">
+    <div class="px-4 pb-4 mt-[-16]">
       <div class="space-y-4 flex flex-col items-center blur-sm opacity-50">
         <!-- 카페 금지 챌린지 -->
         <div
@@ -116,19 +122,55 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
+import challengeService from '@/services/challengeService';
 
-// Emit 이벤트 정의
 const emit = defineEmits(['loading-complete']);
 
-onMounted(() => {
-  console.log('⏳ 챌린지 로딩 시작 - 3초 대기');
+const loadingContainer = ref(null);
+const isFadingOut = ref(false);
 
-  // 3초 후 로딩 완료하고 부모에게 신호 전달
+const fetchRecommendations = async () => {
+  try {
+    // .data를 제거하여 서비스에서 반환된 데이터 배열을 직접 사용합니다.
+    const challenges = await challengeService.getRecommendations();
+    return challenges;
+  } catch (error) {
+    console.error('추천 챌린지 조회 실패:', error);
+    // API 실패 시 기본 챌린지 목록 반환
+    return [
+      {
+        challengeId: 1,
+        title: '배달음식 금지 챌린지',
+        summary: '배달 대신 직접 요리!',
+      },
+      {
+        challengeId: 3,
+        title: '쇼핑 금지 챌린지',
+        summary: '불필요한 소비 줄이기!',
+      },
+      { challengeId: 7, title: '술 금지 챌린지', summary: '금주 도전!' },
+    ];
+  }
+};
+
+onMounted(async () => {
+  console.log('⏳ 챌린지 로딩 시작 - API 호출 및 최소 5초 대기');
+
+  const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 5000));
+  const fetchPromise = fetchRecommendations();
+
+  const [, challenges] = await Promise.all([minLoadingTime, fetchPromise]);
+
+  console.log('✅ 로딩 완료 - 챌린지 목록 조회 완료:', challenges);
+
+  // Start fade-out animation
+  isFadingOut.value = true;
+
+  // Wait for fade-out animation to complete before emitting
   setTimeout(() => {
-    console.log('✅ 로딩 완료 - 챌린지 목록 조회 완료');
-    emit('loading-complete');
-  }, 3000);
+    emit('loading-complete', challenges);
+  }, 500); // Match this duration with the fade-out animation duration
 });
 </script>
 
@@ -141,5 +183,31 @@ onMounted(() => {
 
 .animate-spin-slow {
   animation: spin-slow 2s linear infinite;
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-out {
+  animation: fadeOut 0.5s ease-out forwards;
 }
 </style>

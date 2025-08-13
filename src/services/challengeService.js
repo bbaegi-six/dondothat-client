@@ -26,16 +26,9 @@ export const challengeService = {
   },
 
   // 챌린지 참여
-  async joinChallenge(challengeType, days) {
+  async joinChallenge(challengeId, period) {
     try {
-      // this.getChallengeIdByType() 사용
-      const challengeId = this.getChallengeIdByType(challengeType);
-      const data = {
-        duration: days,
-        type: challengeType
-      };
-  
-      const response = await challengeAPI.joinChallenge(challengeId, data);
+      const response = await challengeAPI.joinChallengeByIdAndPeriod(challengeId, period);
       return response;
     } catch (error) {
       console.error('챌린지 참여 실패:', error);

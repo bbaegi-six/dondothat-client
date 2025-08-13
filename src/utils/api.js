@@ -111,8 +111,8 @@ export const challengeAPI = {
   getRecommendations: () => api.get('/challenges/recommendations'),
 
   // 챌린지 참여
-  joinChallenge: (challengeId, data) =>
-    api.post(`/challenges/${challengeId}/join`, data),
+  joinChallengeByIdAndPeriod: (challengeId, period) =>
+    api.post(`/challenges/join/${challengeId}/${period}`),
 
   // 진척도 조회 - 새로 추가된 API
   getProgress: () => api.get('/challenges/progress'),

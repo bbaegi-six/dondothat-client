@@ -402,6 +402,7 @@ export const useExpensesStore = defineStore('expenses', () => {
     totalSavings,
     groupedSavingsData,
     categories,
+    categoryMasterData, // Exposed for external use
     chartData,
     fetchExpensesFromAPI,
     addTransaction,
