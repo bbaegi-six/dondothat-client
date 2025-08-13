@@ -1,95 +1,102 @@
 <!-- challengeDaysInput.vue -->
 <template>
   <div class="flex flex-col h-screen bg-default">
-    <!-- Timer Circle - Top Section -->
-    <div class="flex flex-col items-center pt-[120px] pb-4">
-      <div class="relative mb-6">
-        <div class="w-24 h-24 relative">
-          <!-- Background Circle -->
-          <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 80 80">
-            <circle
-              cx="40"
-              cy="40"
-              r="36.5"
-              stroke="#414141"
-              stroke-width="7"
-              fill="none"
-            />
-            <!-- Progress Circle -->
-            <circle
-              cx="40"
-              cy="40"
-              r="36.5"
-              stroke="#FF5555"
-              stroke-width="7"
-              fill="none"
-              :stroke-dasharray="circumference"
-              :stroke-dashoffset="dashOffset"
-              stroke-linecap="round"
-              class="transition-all duration-1000 ease-linear"
-            />
-          </svg>
-          <!-- Timer Number -->
-          <div class="absolute inset-0 flex items-center justify-center">
-            <span class="text-white text-4xl font-normal font-pretendard">{{
-              timeLeft
-            }}</span>
+    <div
+      class="flex flex-col flex-1 h-full"
+      :class="{ 'fade-out': isFadingOut }"
+    >
+      <!-- Timer Circle - Top Section -->
+      <div class="flex flex-col items-center pt-[120px] pb-4">
+        <div class="relative mb-6">
+          <div class="w-24 h-24 relative">
+            <!-- Background Circle -->
+            <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 80 80">
+              <circle
+                cx="40"
+                cy="40"
+                r="36.5"
+                stroke="#414141"
+                stroke-width="7"
+                fill="none"
+              />
+              <!-- Progress Circle -->
+              <circle
+                cx="40"
+                cy="40"
+                r="36.5"
+                stroke="#FF5555"
+                stroke-width="7"
+                fill="none"
+                :stroke-dasharray="circumference"
+                :stroke-dashoffset="dashOffset"
+                stroke-linecap="round"
+                class="transition-all duration-1000 ease-linear"
+              />
+            </svg>
+            <!-- Timer Number -->
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-white text-4xl font-normal font-pretendard">{{
+                timeLeft
+              }}</span>
+            </div>
           </div>
+        </div>
+
+        <!-- Main Title -->
+        <h1
+          class="text-white text-xl font-bold text-center mb-2 font-pretendard"
+        >
+          원하는 날짜를 입력해주세요
+        </h1>
+
+        <!-- Subtitle -->
+        <div class="text-white/90 text-sm text-center font-pretendard">
+          <p>30초 후에 선택하지 않으면</p>
+          <p>랜덤으로 배정됩니다</p>
         </div>
       </div>
 
-      <!-- Main Title -->
-      <h1 class="text-white text-xl font-bold text-center mb-2 font-pretendard">
-        원하는 날짜를 입력해주세요
-      </h1>
+      <!-- Middle Content - 날짜 입력 중앙 배치 -->
+      <div class="flex-1 flex flex-col items-center justify-center fade-in">
+        <!-- Date Input Field -->
+        <div class="flex items-baseline justify-center mb-8">
+          <input
+            v-model="selectedDays"
+            type="number"
+            min="7"
+            max="35"
+            class="text-white text-6xl font-semibold font-pretendard bg-transparent border-none outline-none text-center w-24"
+            @input="validateInput"
+            @blur="handleBlur"
+            placeholder=""
+            ref="daysInputRef"
+          />
+          <span class="text-white text-3xl font-semibold font-pretendard ml-2"
+            >일</span
+          >
+        </div>
 
-      <!-- Subtitle -->
-      <div class="text-white/90 text-sm text-center font-pretendard">
-        <p>30초 후에 선택하지 않으면</p>
-        <p>랜덤으로 배정됩니다</p>
+        <!-- Date Constraints -->
+        <div class="text-gray-3 text-xs text-center font-pretendard">
+          * 최소 7일, 최대 35일
+        </div>
       </div>
-    </div>
 
-    <!-- Middle Content - 날짜 입력 중앙 배치 -->
-    <div class="flex-1 flex flex-col items-center justify-center fade-in">
-      <!-- Date Input Field -->
-      <div class="flex items-baseline justify-center mb-8">
-        <input
-          v-model="selectedDays"
-          type="number"
-          min="7"
-          max="35"
-          class="text-white text-6xl font-semibold font-pretendard bg-transparent border-none outline-none text-center w-24"
-          @input="validateInput"
-          @blur="handleBlur"
-          placeholder=""
-          ref="daysInputRef"
-        />
-        <span class="text-white text-3xl font-semibold font-pretendard ml-2"
-          >일</span
+      <!-- Complete Button -->
+      <div class="px-8 pb-[90px] fade-in fade-in-delay-1">
+        <button
+          @click="completeInput"
+          :disabled="!isValidInput"
+          :class="[
+            'w-[328px] h-[56px] rounded-2xl font-normal transition font-pretendard',
+            isValidInput
+              ? 'bg-brand text-white hover:bg-red-600'
+              : 'bg-gray-5 text-gray-2 cursor-not-allowed',
+          ]"
         >
+          입력 완료
+        </button>
       </div>
-
-      <!-- Date Constraints -->
-      <div class="text-gray-3 text-xs text-center font-pretendard">
-        * 최소 7일, 최대 35일
-      </div>
-    </div>
-
-    <!-- Complete Button -->
-    <div class="px-8 pb-[90px] fade-in fade-in-delay-1">
-      <button
-        @click="completeInput"
-        :disabled="!isValidInput"
-        :class="[
-          'w-[328px] h-[56px] rounded-2xl font-normal transition font-pretendard',
-          isValidInput
-            ? 'bg-brand text-white hover:bg-red-600'
-            : 'bg-gray-5 text-gray-2 cursor-not-allowed',
-        ]"
-      >
-        입력 완료
-      </button>
     </div>
   </div>
 </template>
@@ -113,6 +120,7 @@ const selectedDays = ref(''); // 빈 문자열로 시작
 const timeLeft = ref(30);
 const timerInterval = ref(null);
 const daysInputRef = ref(null); // Ref for the input element
+const isFadingOut = ref(false);
 
 // Timer calculations
 const circumference = 2 * Math.PI * 36.5; // 2πr
@@ -149,10 +157,13 @@ const handleBlur = () => {
 
 const completeInput = () => {
   if (isValidInput.value) {
-    emit('dateComplete', {
-      challengeId: props.selectedChallenge.challengeId, // Access challengeId from the object
-      days: Number(selectedDays.value),
-    });
+    isFadingOut.value = true;
+    setTimeout(() => {
+      emit('dateComplete', {
+        challengeId: props.selectedChallenge.challengeId, // Access challengeId from the object
+        days: Number(selectedDays.value),
+      });
+    }, 500); // 500ms delay to match the fade-out duration
   }
 };
 
@@ -226,5 +237,18 @@ input[type='number']:focus {
 
 .fade-in-delay-1 {
   animation-delay: 0.3s;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-out {
+  animation: fadeOut 0.5s ease-out forwards;
 }
 </style>

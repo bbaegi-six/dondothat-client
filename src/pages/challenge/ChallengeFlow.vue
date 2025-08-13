@@ -30,28 +30,30 @@
       <div class="flex-1 flex flex-col items-center justify-center px-8">
         <!-- Success Icon -->
         <div
-          class="w-16 h-16 mb-8 bg-brand rounded-full flex items-center justify-center"
+          class="w-16 h-16 mb-8 bg-brand rounded-full flex items-center justify-center slide-up-item"
+          style="animation-delay: 0.1s"
         >
           <i class="fas fa-check text-white text-2xl"></i>
         </div>
 
         <!-- Success Message -->
         <h2
-          class="text-white text-xl font-bold text-center mb-4 font-pretendard"
+          class="text-white text-xl font-bold text-center mb-4 font-pretendard slide-up-item"
+          style="animation-delay: 0.2s"
         >
           챌린지 참여가 완료되었습니다!
         </h2>
 
-        <div class="text-white/70 text-sm text-center font-pretendard">
-          <p>
-            {{ selectedChallengeData?.title }} {{ challengeDays }}일
-          </p>
-          <p>지금부터 매일 결제 내역을 확인합니다</p>
+        <div
+          class="text-white/70 text-sm text-center font-pretendard slide-up-item"
+          style="animation-delay: 0.3s"
+        >
+          <p>지금부터 {{ challengeDays }}일 동안 매일 결제 내역을 확인합니다</p>
         </div>
       </div>
 
       <!-- Complete Button -->
-      <div class="px-8 pb-[90px]">
+      <div class="px-8 pb-[90px] slide-up-item" style="animation-delay: 0.4s">
         <button
           @click="completeChallenge"
           :disabled="isJoining"
@@ -96,8 +98,13 @@ const handleChallengeSelected = (challengeId) => {
   console.log('✅ 챌린지 선택됨:', challengeId);
   selectedChallenge.value = challengeId;
 
-  const selected = availableChallenges.value.find(c => c.challengeId === challengeId);
-  selectedChallengeData.value = selected || { challengeId: challengeId, title: '알 수 없는 챌린지' };
+  const selected = availableChallenges.value.find(
+    (c) => c.challengeId === challengeId
+  );
+  selectedChallengeData.value = selected || {
+    challengeId: challengeId,
+    title: '알 수 없는 챌린지',
+  };
 
   currentStep.value = 'days-input';
 };
@@ -118,7 +125,6 @@ const handleDateComplete = async (data) => {
     console.log('✅ 챌린지 참여 성공');
     isJoining.value = false;
     currentStep.value = 'success';
-
   } catch (error) {
     console.error('❌ 챌린지 참여 실패:', error);
     isJoining.value = false;
@@ -135,5 +141,19 @@ const completeChallenge = () => {
 </script>
 
 <style scoped>
-/* 페이지 전환 애니메이션 등 기존 스타일 */
+@keyframes slide-up-item {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up-item {
+  animation: slide-up-item 0.5s ease-out forwards;
+  opacity: 0;
+}
 </style>
