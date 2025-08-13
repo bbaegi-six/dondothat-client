@@ -6,7 +6,7 @@
       <!-- Challenge Icon & Title -->
       <div class="flex items-center justify-center mt-[70px] mb-4">
         <div
-          class="w-12 h-12 rounded-full flex items-center justify-center"
+          class="w-20 h-20 rounded-full flex items-center justify-center"
           :class="isCompleted ? '' : 'bg-gray-1'"
           :style="isCompleted ? { backgroundColor: '#FF5555' } : {}"
         >
@@ -14,7 +14,7 @@
           <i
             v-else
             :class="challengeIcon"
-            class="text-xl"
+            class="text-4xl"
             :style="{ color: challengeIconColor }"
           ></i>
         </div>
@@ -44,7 +44,7 @@
             style="width: 296px; height: auto; gap: 12px"
           >
             <div
-              v-for="day in challengeData.period"
+              v-for="day in challengeData.days"
               :key="day"
               :class="getDayBoxClass(day)"
               :style="getDayBoxStyle(day)"
@@ -70,9 +70,7 @@
           지금까지 아낀 금액
         </p>
         <p class="text-white text-4xl font-bold text-center font-pretendard">
-          {{
-            (challengeData.saving * challengeData.progress).toLocaleString()
-          }}원
+          {{ challengeData.savedAmount.toLocaleString() }}원
         </p>
         <div class="absolute top-4 right-4">
           <i class="fas fa-info-circle text-gray-3 text-sm"></i>
@@ -131,8 +129,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+
 import { useRouter } from 'vue-router';
 import { useSavingStore } from '@/stores/saving';
+import { useExpensesStore } from '@/stores/expenses';
 import ModalFirst from './ModalFirst.vue';
 import ModalSecond from './ModalSecond.vue';
 import ModalThird from './ModalThird.vue';
@@ -147,13 +147,13 @@ const props = defineProps({
     required: true,
     validator: (value) => {
       const requiredFields = [
-        'userChallengeId',
-        'challengeId',
+        'id',
+        'type',
         'title',
         'status',
-        'period',
-        'progress',
-        'saving',
+        'days',
+        'currentDay',
+        'savedAmount',
       ];
       return requiredFields.every(
         (field) => value && value.hasOwnProperty(field)
@@ -189,6 +189,9 @@ const challengeMetadata = {
   },
 };
 
+const expensesStore = useExpensesStore();
+
+
 // Computed properties
 const isCompleted = computed(() => {
   return props.challengeData.status === 'completed';
@@ -198,19 +201,34 @@ const progressStatusText = computed(() => {
   if (props.challengeData.status === 'completed') {
     return '도전 성공';
   } else {
-    return `${props.challengeData.progress + 1}일차 도전 중`;
+    return `${props.challengeData.currentDay + 1}일차 도전 중`;
   }
 });
 
 const currentMetadata = computed(() => {
-  return (
-    challengeMetadata[props.challengeData.title] || {
-      type: 'default',
-      icon: 'fas fa-circle',
-      color: '#888888',
-      categoryText: '챌린지',
-    }
+  const categoryName = Object.keys(expensesStore.categoryMasterData).find(
+    (name) =>
+      expensesStore.categoryMasterData[name].id === props.challengeData.type
   );
+
+  const categoryData = categoryName
+    ? expensesStore.categoryMasterData[categoryName]
+    : null;
+
+  if (categoryData) {
+    return {
+      icon: categoryData.icon,
+      color: categoryData.color,
+      categoryText: categoryName, // Use the found categoryName (the key)
+    };
+  }
+
+  // Default metadata if not found
+  return {
+    icon: 'fas fa-circle',
+    color: '#888888',
+    categoryText: '챌린지',
+  };
 });
 
 const challengeIcon = computed(() => {
@@ -222,16 +240,16 @@ const challengeIconColor = computed(() => {
 });
 
 const challengeStatusText = computed(() => {
-  if (props.challengeData.progress === 1) {
+  if (props.challengeData.currentDay === 1) {
     return '지금부터 챌린지를 시작합니다';
   } else {
-    return `${props.challengeData.progress}일까지 성공`;
+    return `${props.challengeData.currentDay}일까지 성공`;
   }
 });
 
 const challengeDescriptionText = computed(() => {
   const categoryText = currentMetadata.value.categoryText;
-  if (props.challengeData.progress === 1) {
+  if (props.challengeData.currentDay === 1) {
     return `매일 ${categoryText} 결제내역을 체크합니다`;
   } else {
     return `지금까지 ${categoryText} 결제 내역이 없습니다`;
@@ -240,9 +258,11 @@ const challengeDescriptionText = computed(() => {
 
 // Methods
 const getDayBoxClass = (day) => {
-  if (isCompleted.value && day <= props.challengeData.period) {
+  if (isCompleted.value && day <= props.challengeData.days) {
+    // 완료된 챌린지는 모든 날이 성공 (빨간색)
     return 'bg-brand';
-  } else if (day <= props.challengeData.progress) {
+  } else if (day <= props.challengeData.currentDay) {
+    // 현재 진행된 일차까지는 성공 (빨간색)
     return 'bg-brand';
   } else {
     return '';
@@ -250,9 +270,9 @@ const getDayBoxClass = (day) => {
 };
 
 const getDayBoxStyle = (day) => {
-  if (isCompleted.value && day <= props.challengeData.period) {
+  if (isCompleted.value && day <= props.challengeData.days) {
     return {};
-  } else if (day > props.challengeData.progress) {
+  } else if (day > props.challengeData.currentDay) {
     return { backgroundColor: '#626262' };
   }
   return {};
