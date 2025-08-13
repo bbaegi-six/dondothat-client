@@ -383,6 +383,7 @@
 
 <script setup>
 import { computed, ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { useExpensesStore } from '../../stores/expenses.js';
 import { useSavingStore } from '../../stores/saving.js';
 import Header from '../../components/layout/Header.vue';
@@ -401,6 +402,12 @@ const switchTab = (tab) => {
 
 // 최초 진입 시 데이터 로드
 onMounted(async () => {
+  // 쿼리 파라미터 확인해서 탭 설정
+  const route = useRoute();
+  if (route.query.tab === 'savings') {
+    activeTab.value = 'savings';
+  }
+  
   await Promise.all([
     expensesStore.fetchExpensesFromAPI(),
     savingStore.fetchAll(),

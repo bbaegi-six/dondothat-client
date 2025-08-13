@@ -289,11 +289,6 @@ const handleThirdModalClose = () => {
   isThirdModal.value = false;
   router.push('/');
 };
-
-onMounted(() => {
-  console.log('✅ ChallengeProgress 마운트됨');
-  console.log('📊 챌린지 데이터:', props.challengeData);
-});
 </script>
 
 <style scoped>
