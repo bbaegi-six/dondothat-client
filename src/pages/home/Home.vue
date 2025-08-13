@@ -23,7 +23,7 @@
           "
         />
         <div class="font-pretendard font-bold text-lg text-white mr-2">
-          {{ savingStore.totalSavingAmount.toLocaleString() }}원
+          {{ savingStore.total.toLocaleString() }}원
         </div>
         <FontAwesomeIcon :icon="faAngleRight" class="text-white w-[10px] h-4" />
       </div>
