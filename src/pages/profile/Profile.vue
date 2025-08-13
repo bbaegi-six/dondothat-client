@@ -2,15 +2,27 @@
   <Header title="마이페이지"></Header>
   <div class="page-container">
     <div class="info">
-      <div class="flex">
-        <p class="font-semibold" style="font-size: 20px">{{ nickname }} 님</p>
-        <button class="px-2" @click="router.push('/profile/edit')">
-          <i class="fa-solid fa-pencil"></i>
-        </button>
+      <div class="info-content">
+        <!-- <div class="tier-image">
+          <img :src="getTierImage()" alt="티어" />
+        </div> -->
+        <div class="user-details">
+          <div class="flex">
+            <p class="font-semibold" style="font-size: 20px">
+              {{ nickname }} 님
+            </p>
+            <button class="px-2" @click="router.push('/profile/edit')">
+              <i class="fa-solid fa-pencil"></i>
+            </button>
+          </div>
+          <p class="font-light" style="font-size: 10px">
+            {{ email }}
+          </p>
+        </div>
+        <div class="tier-image">
+          <img :src="getTierImage()" alt="티어" />
+        </div>
       </div>
-      <p class="font-light" style="font-size: 10px">
-        {{ email }}
-      </p>
     </div>
 
     <div class="account1">
@@ -100,6 +112,15 @@ import scLogo from '@/assets/logo/sc.svg';
 import shinhanLogo from '@/assets/logo/shinhan.svg';
 import suhyupLogo from '@/assets/logo/suhyup.svg';
 import wooriLogo from '@/assets/logo/woori.svg';
+
+// 티어 이미지 임포트
+import tier00 from '@/assets/tier/tier_00.png';
+import tier01 from '@/assets/tier/tier_01.png';
+import tier02 from '@/assets/tier/tier_02.png';
+import tier03 from '@/assets/tier/tier_03.png';
+import tier04 from '@/assets/tier/tier_04.png';
+import tier05 from '@/assets/tier/tier_05.png';
+import tier06 from '@/assets/tier/tier_06.png';
 
 const authStore = useAuthStore(); // auth 스토어 사용
 const { user } = storeToRefs(authStore); // auth 스토어에서 user 정보 가져오기
@@ -280,6 +301,30 @@ function getBankLogo(bankName) {
   return logo;
 }
 
+// 티어 이미지 매핑
+const tierImages = {
+  0: tier00,
+  1: tier01,
+  2: tier02,
+  3: tier03,
+  4: tier04,
+  5: tier05,
+  6: tier06,
+};
+
+// 티어 이미지 가져오기 함수
+function getTierImage() {
+  const tierId = user.value?.tier_id;
+
+  // tier_id가 null이면 tier_00 사용
+  if (tierId === null || tierId === undefined) {
+    return tier00;
+  }
+
+  // 해당 tier_id에 맞는 이미지 반환, 없으면 기본값
+  return tierImages[tierId] || tier00;
+}
+
 // 금액 포맷팅 함수
 function formatAmount(amount) {
   if (!amount && amount !== 0) return '0';
@@ -421,5 +466,25 @@ onMounted(async () => {
 }
 .connect-btn:hover {
   background-color: #e04545;
+}
+
+.info-content {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tier-image {
+  flex-shrink: 0;
+}
+
+.tier-image img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.user-details {
+  flex: 1;
 }
 </style>
