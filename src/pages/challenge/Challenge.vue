@@ -74,12 +74,15 @@ const challengeData = ref(null);
 const startChallenge = () => {
   isLeaving.value = true; // Trigger leaving animation
   setTimeout(() => {
+    // 저금통 계좌가 연결되지 않은 경우
     if (!authStore.user.savingConnected) {
+      // 저금통 계좌 연결 페이지로 이동 (connectsub.vue)
       router.push('/challenge/connectsub');
     } else {
+      // 저금통 계좌가 연결된 경우 바로 챌린지 플로우로 이동
       router.push('/challenge/flow');
     }
-  }, 500); // Match animation duration
+  }, 500);
 };
 
 // 페이지 로드 시 진척도 확인

@@ -142,7 +142,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAccountStore } from '../../../stores/account';
 import { useExpensesStore } from '../../../stores/expenses';
@@ -188,6 +188,13 @@ const getErrorMessage = (errorCode) => {
   }
 };
 
+const handleGlobalKeydown = (event) => {
+  if (event.key === 'Enter' && isError.value) {
+    event.preventDefault();
+    retryConnection();
+  }
+};
+
 // 마운트 시 Step4에서 받은 API 응답 결과 확인
 onMounted(() => {
   const connectionResult = props.flowData?.connectionResult;
@@ -210,6 +217,11 @@ onMounted(() => {
     isError.value = true;
     errorMessage.value = getErrorMessage(null, '연결 중 오류가 발생했습니다.');
   }
+  document.addEventListener('keydown', handleGlobalKeydown);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleGlobalKeydown);
 });
 
 // 계좌 타입에 따른 제목들

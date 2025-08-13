@@ -97,7 +97,9 @@ export const accountAPI = {
   updateConnected: (assetConnected) =>
     api.put(`/user/update-assetConnected?assetConnected=${assetConnected}`),
   updateSubConnected: (assetSubConnected) =>
-    api.put(`/user/update-savingConnected?assetConnected=${assetSubConnected}`),
+    api.put(
+      `/user/update-savingConnected?savingConnected=${assetSubConnected}`
+    ),
 };
 
 // 챌린지 API - API 호출만 담당
