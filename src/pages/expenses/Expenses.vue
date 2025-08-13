@@ -457,12 +457,16 @@ const addTransaction = () => {
 const loading = computed(() => expensesStore.loading);
 
 const refreshExpenses = async () => {
-  console.log('지출 내역 새로고침 시작');
+  console.log('Codef 거래내역 새로고침 시작');
   try {
-    await expensesStore.fetchExpensesFromAPI();
-    console.log('지출 내역 새로고침 완료');
+    const success = await expensesStore.refreshFromCodef();
+    if (success) {
+      console.log('Codef 거래내역 새로고침 완료');
+    } else {
+      console.error('Codef 거래내역 새로고침 실패');
+    }
   } catch (error) {
-    console.error('지출 내역 새로고침 실패:', error);
+    console.error('Codef 거래내역 새로고침 오류:', error);
   }
 };
 </script>
