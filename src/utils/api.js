@@ -82,6 +82,8 @@ export const expensesAPI = {
   update: (id, data) => api.put(`/expenses/${id}`, data),
   delete: (id) => api.delete(`/expenses/${id}`),
   getCategories: () => api.get('/expenses/categories'),
+  refresh: () => api.post('/expenses/refresh'),
+  getCurrentMonthSummary: () => api.get('/expenses/current-month-summary'),
 };
 
 export const savingAPI = {
