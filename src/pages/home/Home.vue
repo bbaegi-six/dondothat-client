@@ -40,29 +40,50 @@
     <!-- 참여 중인 챌린지 섹션 -->
     <div
       v-if="challengeStore.userChallengeData"
-      class="w-[328px] h-24 bg-[#414141] rounded-2xl mt-4 flex items-center px-6 cursor-pointer"
+      class="w-[328px] h-24 rounded-2xl mt-4 flex flex-col justify-center px-6 cursor-pointer border-2 border-[#414141]"
       @click="goToChallenges"
     >
-      <div
-        class="w-12 h-12 rounded-full flex items-center justify-center mr-4"
-        :class="challengeStore.userChallengeData.status === 'completed' ? '' : 'bg-gray-1'"
-        :style="challengeStore.userChallengeData.status === 'completed' ? { backgroundColor: '#FF5555' } : {}"
-      >
+      <div class="flex items-center">
+        <div
+          class="w-12 h-12 rounded-full flex items-center justify-center mr-4"
+          :class="
+            challengeStore.userChallengeData.status === 'completed'
+              ? ''
+              : 'bg-gray-1'
+          "
+          :style="
+            challengeStore.userChallengeData.status === 'completed'
+              ? { backgroundColor: '#FF5555' }
+              : {}
+          "
+        >
+          <FontAwesomeIcon
+            :icon="challengeIconClass"
+            class="text-xl"
+            :style="{ color: challengeIconColor }"
+          />
+        </div>
+        <div class="flex-1 flex flex-col justify-center">
+          <div class="flex items-center justify-between">
+            <div class="font-pretendard font-medium text-base text-white">
+              {{ challengeStore.userChallengeData.title }}
+            </div>
+            <div class="font-pretendard font-medium text-sm text-white ml-auto">
+              {{ challengeStore.userChallengeData.progress }}/{{ challengeStore.userChallengeData.period }}일
+            </div>
+          </div>
+          <div class="w-full bg-gray-1 rounded-full h-2 mt-1">
+            <div
+              class="bg-brand h-2 rounded-full"
+              :style="{ width: `${(challengeStore.userChallengeData.progress / challengeStore.userChallengeData.period) * 100}%` }"
+            ></div>
+          </div>
+        </div>
         <FontAwesomeIcon
-          :icon="challengeIconClass"
-          class="text-xl"
-          :style="{ color: challengeIconColor }"
+          :icon="faAngleRight"
+          class="text-[#c6c6c6] w-[10px] h-4 ml-2"
         />
       </div>
-      <div class="font-pretendard font-medium text-base text-white flex-1">
-        {{ challengeStore.userChallengeData.title }} ({{
-          challengeStore.userChallengeData.progress
-        }}% 달성)
-      </div>
-      <FontAwesomeIcon
-        :icon="faAngleRight"
-        class="text-[#c6c6c6] w-[10px] h-4"
-      />
     </div>
 
     <!-- 참여 중인 챌린지가 없습니다 섹션 -->
