@@ -53,11 +53,11 @@ const innerModel = computed({
 });
 
 const formattedAmount = computed(() => {
-  try {
-    return props.amount.toLocaleString();
-  } catch {
-    return String(props.amount);
+  const amount = props.amount;
+  if (amount == null || isNaN(amount)) {
+    return '0';
   }
+  return Number(amount).toLocaleString();
 });
 
 const emitNext = () => emit('next');

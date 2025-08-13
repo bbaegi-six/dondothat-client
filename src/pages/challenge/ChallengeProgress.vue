@@ -110,7 +110,7 @@
     <!-- First Modal -->
     <ModalFirst
       v-model="isSavingCompleted"
-      :amount="challengeData.saving * challengeData.progress"
+      :amount="challengeData.savedAmount * challengeData.days"
       @next="handleNextClick"
       @close="handleModalClose"
     />
@@ -167,30 +167,7 @@ const isSavingCompleted = ref(false);
 const isSecondModal = ref(false);
 const isThirdModal = ref(false);
 
-// Challenge metadata (기존 데이터 - 아이콘/색상용)
-const challengeMetadata = {
-  '카페 금지 챌린지': {
-    type: 'cafe',
-    icon: 'fas fa-coffee',
-    color: '#FF9595',
-    categoryText: '카페',
-  },
-  '배달음식 금지 챌린지': {
-    type: 'delivery',
-    icon: 'fas fa-motorcycle',
-    color: '#FF7376',
-    categoryText: '배달음식',
-  },
-  '택시 금지 챌린지': {
-    type: 'taxi',
-    icon: 'fas fa-taxi',
-    color: '#FFC457',
-    categoryText: '택시',
-  },
-};
-
 const expensesStore = useExpensesStore();
-
 
 // Computed properties
 const isCompleted = computed(() => {
@@ -280,7 +257,8 @@ const getDayBoxStyle = (day) => {
 
 const handleSaving = async () => {
   try {
-    await savingStore.save(props.challengeData.userChallengeId);
+    console.log('challengeData:', props.challengeData);
+    await savingStore.save(props.challengeData.id);
     isSavingCompleted.value = true;
   } catch (error) {
     console.error('저금 처리 중 오류:', error);
