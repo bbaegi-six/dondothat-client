@@ -45,9 +45,8 @@
 </template>
 
 <script setup>
-import { computed, watch } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useAuthStore } from '../../stores/auth';
+import { computed, watch, ref } from 'vue';
+import { authAPI } from '../../utils/api';
 import Modal from '../../components/Modal.vue';
 import Button from '../../components/Button.vue';
 
@@ -66,9 +65,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'next', 'close']);
 
-// auth store에서 사용자 정보 가져오기
-const authStore = useAuthStore();
-const { user } = storeToRefs(authStore);
+// 티어 정보 상태
+const tierInfo = ref(null);
 
 // 티어 이미지 매핑
 const tierImages = {
@@ -80,16 +78,6 @@ const tierImages = {
   6: tier06,
 };
 
-// 티어 이름 매핑
-const tierNames = {
-  1: '브론즈',
-  2: '실버',
-  3: '골드',
-  4: '플래티넘',
-  5: '루비',
-  6: '에메랄드',
-};
-
 const innerModel = computed({
   get: () => props.modelValue,
   set: (v) => emit('update:modelValue', v),
@@ -97,9 +85,9 @@ const innerModel = computed({
 
 // 현재 티어 이미지 가져오기
 const getCurrentTierImage = () => {
-  const tierId = user.value?.tierId;
+  const tierId = tierInfo.value?.tierId;
 
-  console.log('ModalSecond - 사용자 정보:', user.value);
+  console.log('ModalSecond - 티어 정보:', tierInfo.value);
   console.log('ModalSecond - tier_id:', tierId, '타입:', typeof tierId);
 
   if (!tierId || tierId === null) {
@@ -114,38 +102,36 @@ const getCurrentTierImage = () => {
   return selectedImage;
 };
 
-// 현재 티어 이름 가져오기
+// 현재 티어 이름 가져오기 (백엔드에서 실제 tierName 사용)
 const getCurrentTierName = () => {
-  const tierId = user.value?.tierId;
+  const tierName = tierInfo.value?.tierName;
 
-  console.log('ModalSecond - 티어 이름 조회, tier_id:', tierId);
+  console.log('ModalSecond - 백엔드 tierName:', tierName);
 
-  if (!tierId || tierId === null) {
-    console.log('ModalSecond - tier_id가 null/undefined이므로 미등급 반환');
+  if (!tierName) {
+    console.log('ModalSecond - tierName이 없으므로 미등급 반환');
     return '미등급';
   }
-
-  const tierName = tierNames[tierId] || '미등급';
+  
   console.log('ModalSecond - 선택된 티어 이름:', tierName);
   return tierName;
 };
 
-// 모달이 열릴 때 백그라운드에서 사용자 정보 새로고침
+// 모달이 열릴 때 마이페이지 티어 API 호출
 watch(
   () => props.modelValue,
   async (newValue) => {
     if (newValue) {
-      console.log(
-        'ModalSecond - 모달이 열렸습니다. 백그라운드에서 사용자 정보 새로고침...'
-      );
+      console.log('ModalSecond - 모달이 열렸습니다. 티어 정보 로딩 중...');
 
       try {
-        // 백그라운드에서 사용자 정보 새로고침 (모달은 기존 정보로 즉시 표시)
-        await authStore.checkAuth(true);
-        console.log('ModalSecond - 사용자 정보 새로고침 완료:', user.value);
-        console.log('ModalSecond - 새로고침 후 tierId:', user.value?.tierId);
+        // 마이페이지 티어 API 호출
+        const tierData = await authAPI.getMyPageTier();
+        tierInfo.value = tierData;
+        console.log('ModalSecond - 티어 정보 로딩 완료:', tierData);
       } catch (error) {
-        console.error('ModalSecond - 사용자 정보 새로고침 실패:', error);
+        console.error('ModalSecond - 티어 정보 로딩 실패:', error);
+        tierInfo.value = null;
       }
     }
   }
