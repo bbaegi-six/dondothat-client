@@ -12,7 +12,7 @@ export const useSavingStore = defineStore('savings', () => {
   // 카테고리 ID -> 카테고리명 매핑
   const categoryIdMap = {
     1: '배달음식',
-    2: '카페', 
+    2: '카페',
     3: '쇼핑',
     4: '택시',
     5: '편의점',
@@ -22,7 +22,7 @@ export const useSavingStore = defineStore('savings', () => {
     9: '의료',
     10: '생활',
     11: '식비',
-    12: '그외'
+    12: '그외',
   };
 
   // getters
@@ -43,26 +43,29 @@ export const useSavingStore = defineStore('savings', () => {
     const end = dto.endDate ? new Date(dto.endDate) : null;
     const base = end || start || new Date();
     const categoryName = categoryIdMap[dto.categoryId] || '그외';
-    
+    const saving = dto.saving ? Number(dto.saving) : 0;
+    const period = dto.period ? Number(dto.period) : 0;
+    const amount = saving * period;
+
     // endDate를 month/date 형태로 포맷팅 (예: 12/25)
-    const endDateFormatted = end 
+    const endDateFormatted = end
       ? `${end.getMonth() + 1}/${end.getDate()}`
       : '';
-    
+
     // 시간을 24시간 형식으로 포맷팅 (예: 14:30)
-    const timeFormatted = base.toLocaleTimeString('ko-KR', { 
-      hour12: false, 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    const timeFormatted = base.toLocaleTimeString('ko-KR', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
     });
-    
+
     return {
       categoryId: dto.categoryId,
       title: dto.title,
       name: dto.title, // TransactionCard에서 사용
       category: categoryName, // 아이콘 결정용 - 실제 카테고리명으로 복원
       categoryDisplay: endDateFormatted, // 화면 표시용 - endDate (month/date)
-      amount: dto.saving ?? 0,
+      amount: amount,
       isSaving: true, // 저금통 데이터임을 표시
       time: timeFormatted, // 24시간 형식
       startDate: start,

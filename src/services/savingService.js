@@ -6,6 +6,7 @@ const mapSavingDTO = (dto) => ({
   startDate: dto.startDate ? new Date(dto.startDate) : null,
   endDate: dto.endDate ? new Date(dto.endDate) : null,
   saving: dto.saving, // Long
+  period: dto.period, // Long
 });
 
 const unwrap = (res) => res;
