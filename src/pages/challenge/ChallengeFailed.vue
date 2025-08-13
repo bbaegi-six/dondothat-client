@@ -4,7 +4,7 @@
     <!-- Challenge Icon & Title -->
     <div class="flex items-center justify-center mt-[70px] mb-4">
       <div
-        class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-gray-1"
+        class="w-12 h-12 rounded-full flex items-center justify-center bg-gray-1"
       >
         <i class="fas fa-times text-xl text-white"></i>
       </div>
@@ -72,31 +72,58 @@
         {{ challengeCategoryText }} 결제 내역이 있습니다
       </p>
 
-      <!-- Failed transaction display -->
-      <div class="bg-gray-1 rounded-xl p-4 mb-6">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center">
-            <div
-              class="w-10 h-10 rounded-full flex items-center justify-center mr-3"
-              :style="{ backgroundColor: challengeIconColor }"
-            >
-              <i :class="challengeIcon" class="text-white text-sm"></i>
+      <!-- Loading state -->
+      <div v-if="loading" class="bg-gray-1 rounded-xl p-4 mb-6">
+        <div class="flex items-center justify-center">
+          <p class="text-white text-sm">지출 내역을 불러오는 중...</p>
+        </div>
+      </div>
+
+      <!-- Error state -->
+      <div v-else-if="error" class="bg-gray-1 rounded-xl p-4 mb-6">
+        <div class="flex items-center justify-center">
+          <p class="text-red-400 text-sm">{{ error }}</p>
+        </div>
+      </div>
+
+      <!-- Failed transactions display -->
+      <div v-else-if="failedTransactions.length > 0" class="space-y-3 mb-6">
+        <div
+          v-for="transaction in failedTransactions"
+          :key="transaction.expenditureDate + transaction.amount"
+          class="rounded-xl p-2"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div
+                class="w-10 h-10 rounded-full flex items-center justify-center mr-3"
+                :style="{ backgroundColor: challengeIconColor }"
+              >
+                <i :class="challengeIcon" class="text-white text-sm"></i>
+              </div>
+              <div class="text-left">
+                <p class="text-white font-semibold text-sm">
+                  {{ transaction.description }}
+                </p>
+                <p class="text-gray-3 text-xs">{{ challengeCategoryText }}</p>
+                <p class="text-gray-3 text-xs">
+                  {{ formatDateTime(transaction.expenditureDate) }}
+                </p>
+              </div>
             </div>
-            <div class="text-left">
-              <p class="text-white font-semibold text-sm">
-                {{ mockFailedTransaction.merchant }}
-              </p>
-              <p class="text-gray-3 text-xs">{{ challengeCategoryText }}</p>
-              <p class="text-gray-3 text-xs">
-                {{ mockFailedTransaction.time }}
+            <div class="text-right">
+              <p class="text-brand font-bold text-base">
+                {{ transaction.amount.toLocaleString() }}원
               </p>
             </div>
           </div>
-          <div class="text-right">
-            <p class="text-brand font-bold text-base">
-              {{ mockFailedTransaction.amount.toLocaleString() }}원
-            </p>
-          </div>
+        </div>
+      </div>
+
+      <!-- No transactions found -->
+      <div v-else class="bg-gray-1 rounded-xl p-4 mb-6">
+        <div class="flex items-center justify-center">
+          <p class="text-gray-3 text-sm">지출 내역이 없습니다</p>
         </div>
       </div>
     </div>
@@ -121,6 +148,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useExpensesStore } from '@/stores/expenses';
+import { challengeService } from '@/services/challengeService';
 
 // Props
 const props = defineProps({
@@ -133,9 +161,14 @@ const props = defineProps({
 // Router
 const router = useRouter();
 
+// Stores
+const expensesStore = useExpensesStore();
+
 // Reactive data
 const potentialSavedAmount = ref(0);
-const expensesStore = useExpensesStore();
+const failedTransactions = ref([]);
+const loading = ref(false);
+const error = ref(null);
 
 // Computed properties
 const currentMetadata = computed(() => {
@@ -148,7 +181,6 @@ const currentMetadata = computed(() => {
       icon: categoryData.icon,
       color: categoryData.color,
       categoryText: categoryData.name,
-      mockTransaction: categoryData.mockTransaction || { merchant: '상점명', amount: -10000, time: '12:00' },
       dailyAverage: categoryData.dailyAverage || 5000,
     };
   }
@@ -158,7 +190,6 @@ const currentMetadata = computed(() => {
     icon: 'fas fa-circle',
     color: '#888888',
     categoryText: '챌린지',
-    mockTransaction: { merchant: '상점명', amount: -10000, time: '12:00' },
     dailyAverage: 5000,
   };
 });
@@ -173,10 +204,6 @@ const challengeIconColor = computed(() => {
 
 const challengeCategoryText = computed(() => {
   return currentMetadata.value.categoryText;
-});
-
-const mockFailedTransaction = computed(() => {
-  return currentMetadata.value.mockTransaction;
 });
 
 const currentDay = computed(() => {
@@ -200,20 +227,61 @@ const getDayBoxStyle = (day) => {
   return {};
 };
 
+const formatDateTime = (dateTimeString) => {
+  try {
+    const date = new Date(dateTimeString);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  } catch (e) {
+    return dateTimeString;
+  }
+};
+
 const handleNewChallenge = () => {
   // 다른 챌린지 선택하러 가기
   console.log('새로운 챌린지 선택');
-  router.push('/challenge');
+  router.push('/challenge/flow');
 };
 
 const calculatePotentialSavings = () => {
   potentialSavedAmount.value =
     props.challengeData.savedAmount * props.challengeData.days;
-  // console.log('Calculated Potential Savings:', potentialSavedAmount.value);
 };
 
-onMounted(() => {
+const fetchFailedTransactions = async () => {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    // challengeData에서 challengeId를 가져옵니다 (props에 id가 있다고 가정)
+    const challengeId = props.challengeData.type;
+
+    if (!challengeId) {
+      throw new Error('챌린지 ID를 찾을 수 없습니다');
+    }
+
+    // console.log(challengeId);
+    const response = await challengeService.failChallenge(challengeId);
+    // console.log(response);
+
+    if (response && Array.isArray(response)) {
+      failedTransactions.value = response;
+    } else {
+      failedTransactions.value = [];
+    }
+  } catch (err) {
+    console.error('실패 내역 조회 오류:', err);
+    error.value = '지출 내역을 불러올 수 없습니다';
+    failedTransactions.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(async () => {
   calculatePotentialSavings();
+  await fetchFailedTransactions();
 });
 </script>
 
