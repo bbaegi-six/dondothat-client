@@ -375,7 +375,7 @@ const validateInput = () => {
   const validation = expensesStore.validateTransaction(editableData);
 
   if (!validation.isValid) {
-    alert(validation.errors[0]); // 첫 번째 에러 메시지 표시
+    console.error('입력 유효성 검사 실패:', validation.errors[0]);
     return false;
   }
 
@@ -400,14 +400,14 @@ const saveTransaction = async () => {
   }
 
   if (success) {
-    alert(
+    console.log(
       isNewTransaction.value
         ? '거래내역이 추가되었습니다.'
         : '거래내역이 수정되었습니다.'
     );
     router.back();
   } else {
-    alert('저장에 실패했습니다. 다시 시도해주세요.');
+    console.error('저장에 실패했습니다.');
   }
 };
 
@@ -431,10 +431,10 @@ const deleteTransaction = async () => {
     const success = await expensesStore.deleteTransaction(transactionId.value);
     if (success) {
       console.log('삭제할 거래내역 ID:', transactionId.value);
-      alert('거래내역이 삭제되었습니다.');
+      console.log('거래내역이 삭제되었습니다.');
       router.back();
     } else {
-      alert('삭제에 실패했습니다. 다시 시도해주세요.');
+      console.error('삭제에 실패했습니다.');
     }
   }
 };
