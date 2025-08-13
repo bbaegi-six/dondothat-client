@@ -60,6 +60,24 @@ export const expensesService = {
       throw new Error(`카테고리 조회 실패: ${error.message}`);
     }
   },
+
+  // Codef 거래내역 새로고침
+  async refreshExpensesFromCodef() {
+    try {
+      return await expensesAPI.refresh();
+    } catch (error) {
+      throw new Error(`거래내역 새로고침 실패: ${error.message}`);
+    }
+  },
+
+  // 현재월 지출 집계 조회
+  async fetchCurrentMonthSummary() {
+    try {
+      return await expensesAPI.getCurrentMonthSummary();
+    } catch (error) {
+      throw new Error(`현재월 지출 집계 조회 실패: ${error.message}`);
+    }
+  },
 };
 
 export default expensesService;
