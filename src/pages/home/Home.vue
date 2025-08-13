@@ -14,9 +14,16 @@
         <FontAwesomeIcon
           :icon="farCircleQuestion"
           class="text-[#c9c9c9] ml-1 mr-auto"
+          @click="
+            isSavingGuideModalOpen = true;
+            console.log(
+              'isSavingGuideModalOpen (on click):',
+              isSavingGuideModalOpen.value
+            );
+          "
         />
         <div class="font-pretendard font-bold text-lg text-white mr-2">
-          12,000원
+          {{ savingStore.totalSavingAmount.toLocaleString() }}원
         </div>
         <FontAwesomeIcon :icon="faAngleRight" class="text-white w-[10px] h-4" />
       </div>
@@ -30,6 +37,7 @@
       <FontAwesomeIcon
         :icon="farCircleQuestion"
         class="text-[#c9c9c9] ml-1 mr-auto"
+        @click.stop="isSavingGuideModalOpen = true"
       />
       <div class="font-pretendard font-medium text-base text-white mr-2">
         연결하기
@@ -53,7 +61,7 @@
           "
           :style="
             challengeStore.userChallengeData.status === 'completed'
-              ? { backgroundColor: '#FF5555' }
+              ? { backgroundColor: '#414141' }
               : {}
           "
         >
@@ -69,13 +77,17 @@
               {{ challengeStore.userChallengeData.title }}
             </div>
             <div class="font-pretendard font-medium text-sm text-white ml-auto">
-              {{ challengeStore.userChallengeData.progress }}/{{ challengeStore.userChallengeData.period }}일
+              {{ challengeStore.userChallengeData.progress }}/{{
+                challengeStore.userChallengeData.period
+              }}일
             </div>
           </div>
           <div class="w-full bg-gray-1 rounded-full h-2 mt-1">
             <div
               class="bg-brand h-2 rounded-full"
-              :style="{ width: `${(challengeStore.userChallengeData.progress / challengeStore.userChallengeData.period) * 100}%` }"
+              :style="{
+                width: `${(challengeStore.userChallengeData.progress / challengeStore.userChallengeData.period) * 100}%`,
+              }"
             ></div>
           </div>
         </div>
@@ -121,16 +133,20 @@
     <!-- 이번 달 지출 요약 박스 -->
     <div class="w-[328px] bg-[#414141] rounded-2xl p-6">
       <!-- 카테고리별 지출 리스트 -->
-      <div v-if="categoryData && categoryData.length > 0">
+      <div v-if="expensesStore.chartData && expensesStore.chartData.length > 0">
         <div
-          v-for="(category, index) in categoryData"
+          v-for="(category, index) in expensesStore.chartData"
           :key="category.name"
           class="flex items-center justify-between mb-2 last:mb-0"
         >
           <div class="flex items-center">
             <div
               class="w-5 h-5 rounded-full mr-3"
-              :style="{ backgroundColor: getCategoryColor(category.name) }"
+              :style="{
+                backgroundColor: expensesStore.getCategoryColorByName(
+                  category.name
+                ),
+              }"
             ></div>
             <div class="font-pretendard font-medium text-sm text-white">
               {{ category.name }}
@@ -147,6 +163,53 @@
         <p class="text-[#c6c6c6] text-sm">이번 달 지출 내역이 없습니다.</p>
       </div>
     </div>
+    <!-- 저금통 사용 방법 모달 -->
+    <Modal
+      :modelValue="isSavingGuideModalOpen"
+      @close="isSavingGuideModalOpen = false"
+      :showCloseButton="false"
+    >
+      <template #title>저금통 사용 방법</template>
+      <template #content>
+        <h2 class="text-xl font-semibold text-white text-center mb-4">
+          저금통 기능이란?
+        </h2>
+        <div class="flex justify-center items-center space-x-4 mb-4">
+          <img
+            src="/images/help/screenshot_1.png"
+            alt="저금통 스크린샷 1"
+            class="w-1/2 h-auto object-contain rounded-2xl"
+          />
+          <img
+            src="/images/help/screenshot_2.png"
+            alt="저금통 스크린샷 2"
+            class="w-1/2 h-auto object-contain rounded-2xl"
+          />
+        </div>
+        <p class="text-center text-white mb-4">
+          저금통은 여러분의 절약 습관을 형성하고 재정 목표를 달성하도록 돕는
+          기능입니다.
+        </p>
+        <p class="text-center text-white mb-4">
+          이 기능을 사용하려면 먼저 추가 계좌를 등록해야 합니다. 등록된 계좌를
+          통해 챌린지에서 아낀 금액을 저금통으로 옮겨 저축할 수 있습니다.
+        </p>
+        <p class="text-center text-white">
+          예를 들어, '커피 안 마시기 챌린지'를 통해 50,000원을 아꼈다면, 이
+          금액을 저금통에 바로 저금할 수 있습니다.
+        </p>
+      </template>
+      <template #actions>
+        <div class="p-6 bg-[#414141]">
+          <button
+            @click="isSavingGuideModalOpen = false"
+            class="w-full py-3 bg-[#ff5555] text-white rounded-2xl font-semibold"
+          >
+            확인
+          </button>
+        </div>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -165,10 +228,15 @@ import {
 import { useExpensesStore } from '@/stores/expenses';
 import { useAccountStore } from '@/stores/account';
 import { useAuthStore } from '@/stores/auth';
+import Modal from '@/components/Modal.vue';
 import { useChallengeStore } from '@/stores/challenge';
+import { useSavingStore } from '@/stores/saving';
 
 const authStore = useAuthStore();
 const accountStore = useAccountStore();
+const savingStore = useSavingStore();
+
+const isSavingGuideModalOpen = ref(false);
 const router = useRouter();
 const chartCanvas = ref(null);
 const expensesStore = useExpensesStore();
