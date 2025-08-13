@@ -32,11 +32,11 @@ const buttonClass = computed(() => {
   }
   switch (props.variant) {
     case 'secondary':
-      return 'bg-gray-1 text-white hover:bg-gray-700';
+      return 'bg-gray-1 text-white';
     case 'tertiary':
-      return 'bg-gray-5 text-gray-1 hover:bg-gray-200';
+      return 'bg-gray-5 text-gray-1';
     default:
-      return 'bg-brand text-white hover:bg-red-600'; // Primary
+      return 'bg-brand text-white'; // Primary
   }
 });
 </script>

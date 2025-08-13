@@ -1,42 +1,8 @@
 <!-- ChallengeProgress.vue -->
 <template>
   <div class="flex flex-col h-screen bg-default">
-    <!-- 저금 완료 상태 -->
-    <div
-      v-if="isSavingCompleted"
-      class="flex flex-col items-center justify-center flex-1"
-    >
-      <!-- Success Icon -->
-      <div
-        class="w-12 h-12 rounded-full flex items-center justify-center mb-8"
-        style="background-color: #ff5555"
-      >
-        <i class="fas fa-check text-xl text-white"></i>
-      </div>
-
-      <!-- Amount -->
-      <p class="text-white text-3xl font-bold text-center mb-2 font-pretendard">
-        {{ challengeData.savedAmount.toLocaleString() }}원
-      </p>
-
-      <!-- Status Text -->
-      <p class="text-white text-xl font-medium text-center font-pretendard">
-        저금 완료
-      </p>
-    </div>
-
-    <!-- Next Button - 네비게이션 바로 위 -->
-    <div v-if="isSavingCompleted" class="mx-8 mb-6" style="width: 328px">
-      <button
-        class="w-full bg-brand text-white text-lg font-medium py-4 rounded-2xl font-pretendard"
-        @click="handleNext"
-      >
-        다음
-      </button>
-    </div>
-
     <!-- 기존 챌린지 화면 -->
-    <div v-else>
+    <div>
       <!-- Challenge Icon & Title -->
       <div class="flex items-center justify-center mt-[70px] mb-4">
         <div
@@ -140,12 +106,39 @@
 
     <!-- Navigation Space -->
     <div class="pb-[90px]"></div>
+
+    <!-- First Modal -->
+    <ModalFirst
+      v-model="isSavingCompleted"
+      :amount="challengeData.saving * challengeData.progress"
+      @next="handleNextClick"
+      @close="handleModalClose"
+    />
+
+    <!-- Second Modal -->
+    <ModalSecond
+      v-model="isSecondModal"
+      @next="handleSecondNextClick"
+      @close="handleSecondModalClose"
+    />
+
+    <!-- Third Modal -->
+    <ModalThird v-model="isThirdModal" @close="handleThirdModalClose" />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+
+import { useRouter } from 'vue-router';
+import { useSavingStore } from '@/stores/saving';
 import { useExpensesStore } from '@/stores/expenses';
+import ModalFirst from './ModalFirst.vue';
+import ModalSecond from './ModalSecond.vue';
+import ModalThird from './ModalThird.vue';
+
+const router = useRouter();
+const savingStore = useSavingStore();
 
 // Props - 백엔드 데이터 받기
 const props = defineProps({
@@ -153,7 +146,6 @@ const props = defineProps({
     type: Object,
     required: true,
     validator: (value) => {
-      // 필수 필드 검증
       const requiredFields = [
         'id',
         'type',
@@ -172,7 +164,33 @@ const props = defineProps({
 
 // Reactive data
 const isSavingCompleted = ref(false);
+const isSecondModal = ref(false);
+const isThirdModal = ref(false);
+
+// Challenge metadata (기존 데이터 - 아이콘/색상용)
+const challengeMetadata = {
+  '카페 금지 챌린지': {
+    type: 'cafe',
+    icon: 'fas fa-coffee',
+    color: '#FF9595',
+    categoryText: '카페',
+  },
+  '배달음식 금지 챌린지': {
+    type: 'delivery',
+    icon: 'fas fa-motorcycle',
+    color: '#FF7376',
+    categoryText: '배달음식',
+  },
+  '택시 금지 챌린지': {
+    type: 'taxi',
+    icon: 'fas fa-taxi',
+    color: '#FFC457',
+    categoryText: '택시',
+  },
+};
+
 const expensesStore = useExpensesStore();
+
 
 // Computed properties
 const isCompleted = computed(() => {
@@ -247,7 +265,6 @@ const getDayBoxClass = (day) => {
     // 현재 진행된 일차까지는 성공 (빨간색)
     return 'bg-brand';
   } else {
-    // 아직 진행되지 않은 날은 회색
     return '';
   }
 };
@@ -261,15 +278,38 @@ const getDayBoxStyle = (day) => {
   return {};
 };
 
-const handleSaving = () => {
-  // 저금 하기 버튼 클릭 시 저금 완료 화면으로 전환
-  isSavingCompleted.value = true;
+const handleSaving = async () => {
+  try {
+    await savingStore.save(props.challengeData.userChallengeId);
+    isSavingCompleted.value = true;
+  } catch (error) {
+    console.error('저금 처리 중 오류:', error);
+    // 에러가 발생해도 모달은 열어줌
+    isSavingCompleted.value = true;
+  }
 };
 
-const handleNext = () => {
-  // 다음 버튼 클릭 시 처리 (예: 다른 페이지로 이동)
-  console.log('저금 완료 - 다음 단계로 이동');
-  // 실제로는 router.push('/') 등으로 메인 페이지로 이동
+const handleModalClose = () => {
+  isSavingCompleted.value = false;
+};
+
+const handleNextClick = () => {
+  isSavingCompleted.value = false;
+  isSecondModal.value = true;
+};
+
+const handleSecondModalClose = () => {
+  isSecondModal.value = false;
+};
+
+const handleSecondNextClick = () => {
+  isSecondModal.value = false;
+  isThirdModal.value = true;
+};
+
+const handleThirdModalClose = () => {
+  isThirdModal.value = false;
+  router.push('/');
 };
 
 onMounted(() => {
