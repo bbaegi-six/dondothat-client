@@ -130,9 +130,9 @@
     <!-- 이번 달 지출 요약 박스 -->
     <div class="w-[328px] bg-[#414141] rounded-2xl p-6">
       <!-- 카테고리별 지출 리스트 -->
-      <div v-if="expensesStore.chartData && expensesStore.chartData.length > 0">
+      <div v-if="chartData && chartData.length > 0">
         <div
-          v-for="(category, index) in expensesStore.chartData"
+          v-for="(category, index) in chartData"
           :key="category.name"
           class="flex items-center justify-between mb-2 last:mb-0"
         >
@@ -140,9 +140,7 @@
             <div
               class="w-5 h-5 rounded-full mr-3"
               :style="{
-                backgroundColor: expensesStore.getCategoryColorByName(
-                  category.name
-                ),
+                backgroundColor: category.color,
               }"
             ></div>
             <div class="font-pretendard font-medium text-sm text-white">
@@ -187,6 +185,7 @@ import SavingGuideModal from '@/components/modals/SavingGuideModal.vue';
 import { useChallengeStore } from '@/stores/challenge';
 import { useSavingStore } from '@/stores/saving';
 import { authAPI } from '@/utils/api';
+import { expensesService } from '@/services/expensesService';
 
 const authStore = useAuthStore();
 const accountStore = useAccountStore();
@@ -201,6 +200,10 @@ const chartInstance = ref(null);
 
 // 저금통 계좌 정보
 const subAccount = ref(null);
+
+// 독립적인 현재월 지출 데이터
+const currentMonthSummary = ref({});
+const chartLoading = ref(false);
 
 const challengeIconClass = computed(() => {
   if (!challengeStore.userChallengeData) return '';
@@ -227,9 +230,38 @@ const challengeIconColor = computed(() => {
   return foundEntry ? foundEntry[1].color : ''; // Return the color property
 });
 
+// 현재월 지출 집계 로드
+const loadCurrentMonthSummary = async () => {
+  chartLoading.value = true;
+  try {
+    const summary = await expensesService.fetchCurrentMonthSummary();
+    currentMonthSummary.value = summary || {};
+  } catch (error) {
+    console.error('현재월 지출 집계 조회 오류:', error);
+    currentMonthSummary.value = {};
+  } finally {
+    chartLoading.value = false;
+  }
+};
+
+// 집계 데이터를 차트 데이터로 변환
+const chartData = computed(() => {
+  if (!currentMonthSummary.value || Object.keys(currentMonthSummary.value).length === 0) {
+    return [];
+  }
+
+  return Object.entries(currentMonthSummary.value)
+    .map(([name, amount]) => ({
+      name,
+      amount,
+      color: expensesStore.getCategoryColorByName(name),
+    }))
+    .sort((a, b) => b.amount - a.amount);
+});
+
 // 차트 생성
 const createChart = () => {
-  if (!chartCanvas.value || !expensesStore.chartData.length) return;
+  if (!chartCanvas.value || !chartData.value.length) return;
 
   // 기존 차트 인스턴스가 있다면 제거
   if (chartInstance.value) {
@@ -239,15 +271,15 @@ const createChart = () => {
   const ctx = chartCanvas.value.getContext('2d');
 
   // 카테고리별 색상 배열
-  const colors = expensesStore.chartData.map((item) => item.color);
+  const colors = chartData.value.map((item) => item.color);
 
   chartInstance.value = new Chart(ctx, {
     type: 'pie',
     data: {
-      labels: expensesStore.chartData.map((item) => item.name),
+      labels: chartData.value.map((item) => item.name),
       datasets: [
         {
-          data: expensesStore.chartData.map((item) => item.amount),
+          data: chartData.value.map((item) => item.amount),
           backgroundColor: colors,
           borderWidth: 0,
         },
@@ -305,21 +337,17 @@ const loadSavingAccount = async () => {
   }
 };
 
+// chartData가 변경될 때 차트 재생성
+watch(chartData, () => {
+  nextTick(() => {
+    createChart();
+  });
+}, { deep: true });
+
 onMounted(async () => {
-  // 스토어의 데이터가 로드될 때까지 기다립니다.
-  if (expensesStore.loading) {
-    await new Promise((resolve) => {
-      const unwatch = watch(
-        () => expensesStore.loading,
-        (loading) => {
-          if (!loading) {
-            unwatch();
-            resolve();
-          }
-        }
-      );
-    });
-  }
+  // 독립적으로 현재월 지출 집계 로드
+  await loadCurrentMonthSummary();
+  
   await nextTick(); // DOM 업데이트 완료 대기
   createChart();
 
