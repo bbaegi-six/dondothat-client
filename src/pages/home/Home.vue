@@ -4,26 +4,23 @@
     class="min-h-screen w-[390px] mx-auto bg-[#2f2f2f] pt-[88px] px-[31px] pb-[90px]"
   >
     <!-- 저금통 섹션 -->
-    <div v-if="authStore.user && authStore.user.savingConnected">
+    <div v-if="subAccount">
       <div
         class="w-[328px] h-[56px] bg-[#414141] rounded-2xl flex items-center px-6 cursor-pointer"
       >
         <div class="font-pretendard font-medium text-base text-white">
-          지금까지 아낀 금액
+          지금까지 저금한 금액
         </div>
         <FontAwesomeIcon
           :icon="farCircleQuestion"
           class="text-[#c9c9c9] ml-1 mr-auto"
-          @click="
-            isSavingGuideModalOpen = true;
-            console.log(
-              'isSavingGuideModalOpen (on click):',
-              isSavingGuideModalOpen.value
-            );
-          "
+          @click.stop="isSavingGuideModalOpen = true"
         />
-        <div class="font-pretendard font-bold text-lg text-white mr-2">
-          {{ savingStore.total.toLocaleString() }}원
+        <div
+          class="font-pretendard font-medium text-base text-white ml-auto mr-2"
+          @click="goToSavingTab"
+        >
+          {{ subAccount.balance.toLocaleString() }}원
         </div>
         <FontAwesomeIcon :icon="faAngleRight" class="text-white w-[10px] h-4" />
       </div>
@@ -189,6 +186,7 @@ import { useAuthStore } from '@/stores/auth';
 import SavingGuideModal from '@/components/modals/SavingGuideModal.vue';
 import { useChallengeStore } from '@/stores/challenge';
 import { useSavingStore } from '@/stores/saving';
+import { authAPI } from '@/utils/api';
 
 const authStore = useAuthStore();
 const accountStore = useAccountStore();
@@ -200,6 +198,9 @@ const chartCanvas = ref(null);
 const expensesStore = useExpensesStore();
 const challengeStore = useChallengeStore();
 const chartInstance = ref(null);
+
+// 저금통 계좌 정보
+const subAccount = ref(null);
 
 const challengeIconClass = computed(() => {
   if (!challengeStore.userChallengeData) return '';
@@ -289,6 +290,21 @@ const goToChallenges = () => {
   router.push('/challenge');
 };
 
+const goToSavingTab = () => {
+  router.push('/expenses?tab=savings');
+};
+
+// 저금통 계좌 정보 로드
+const loadSavingAccount = async () => {
+  try {
+    const response = await authAPI.getMyPageAccounts();
+    subAccount.value = response.subAccount;
+  } catch (error) {
+    console.error('저금통 계좌 정보 조회 오류:', error);
+    subAccount.value = null;
+  }
+};
+
 onMounted(async () => {
   // 스토어의 데이터가 로드될 때까지 기다립니다.
   if (expensesStore.loading) {
@@ -307,8 +323,9 @@ onMounted(async () => {
   await nextTick(); // DOM 업데이트 완료 대기
   createChart();
 
-  // 챌린지 정보 로드
+  // 저금통 계좌 정보 로드
   if (authStore.isLoggedIn) {
+    await loadSavingAccount();
     await challengeStore.fetchChallengeProgress();
   }
 });
