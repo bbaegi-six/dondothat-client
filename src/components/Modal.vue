@@ -1,58 +1,46 @@
 <template>
   <Teleport to="body">
-    <div
-      v-if="modelValue"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75"
-      @click="handleOverlayClick"
+    <Transition
+      name="modal"
+      enter-active-class="transition-opacity duration-200"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition-opacity duration-200"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
     >
       <div
-        :class="[
-          'bg-[#414141] rounded-2xl shadow-xl w-full max-h-[90vh] overflow-hidden',
-          sizeClasses[size],
-          customClass,
-        ]"
-        @click.stop
+        v-if="modelValue"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+        @click="handleOverlayClick"
       >
-        <!-- 헤더 -->
-        <header
-          v-if="title || showCloseButton || $slots.header"
-          class="flex items-center justify-between p-6 border-b border-gray-200"
+        <Transition
+          name="modal-content"
+          enter-active-class="transition-all duration-200"
+          enter-from-class="opacity-0 scale-95"
+          enter-to-class="opacity-100 scale-100"
+          leave-active-class="transition-all duration-200"
+          leave-from-class="opacity-100 scale-100"
+          leave-to-class="opacity-0 scale-95"
         >
-          <slot name="header">
-            <h2 class="text-xl font-semibold text-gray-900">
-              {{ title }}
-            </h2>
-          </slot>
-
-          <button
-            v-if="showCloseButton"
-            @click="closeModal"
-            class="p-1 rounded-full hover:bg-gray-100 transition-colors"
-            aria-label="모달 닫기"
+          <div
+            v-if="modelValue"
+            :class="[
+              'bg-gray-1 rounded-16 shadow-xl overflow-hidden',
+              customClass || `w-full max-h-[90vh] ${sizeClasses[size]}`,
+            ]"
+            @click.stop
           >
-            <X :size="20" class="text-gray-500" />
-          </button>
-        </header>
-
-        <!-- 내용 -->
-        <main class="px-6 pt-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          <slot name="content" />
-        </main>
-
-        <!-- 푸터 -->
-        <footer
-          v-if="$slots.actions"
-          class="bg-[#f1f1f1]"
-        >
-          <slot name="actions" />
-        </footer>
+            <slot />
+          </div>
+        </Transition>
       </div>
-    </div>
+    </Transition>
   </Teleport>
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, watch, toRefs } from 'vue';
+import { computed, onMounted, onUnmounted, toRefs, watch } from 'vue';
 import { X } from 'lucide-vue-next';
 
 // Props 정의
@@ -88,8 +76,6 @@ const props = defineProps({
     default: false,
   },
 });
-
-console.log('Modal setup - initial modelValue:', props.modelValue);
 
 // Emits 정의
 const emit = defineEmits(['update:modelValue', 'close']);
@@ -143,8 +129,8 @@ onUnmounted(() => {
 });
 
 // 모달 상태 변경 감지
-watch(() => props.modelValue, (newValue) => {
-  console.log('Modal watch - modelValue changed to:', newValue);
+const { modelValue } = toRefs(props);
+watch(modelValue, (newValue) => {
   toggleBodyScroll(newValue);
 });
 </script>
