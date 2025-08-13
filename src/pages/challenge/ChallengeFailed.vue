@@ -30,7 +30,7 @@
           style="width: 296px; height: auto; gap: 12px"
         >
           <div
-            v-for="day in challengeData.period"
+            v-for="day in challengeData.days"
             :key="day"
             :class="getDayBoxClass(day)"
             :style="getDayBoxStyle(day)"
@@ -120,6 +120,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useExpensesStore } from '@/stores/expenses';
 
 // Props
 const props = defineProps({
@@ -134,71 +135,52 @@ const router = useRouter();
 
 // Reactive data
 const potentialSavedAmount = ref(0);
-
-// Challenge type mapping
-const challengeMetadata = {
-  카페: {
-    icon: 'fas fa-coffee',
-    color: '#FF9595',
-    categoryText: '카페',
-    mockTransaction: {
-      merchant: '스타벅스 강남점',
-      amount: -4500,
-      time: '14:32',
-    },
-    dailyAverage: 4500,
-  },
-  배달: {
-    icon: 'fas fa-motorcycle',
-    color: '#FF7376',
-    categoryText: '배달음식',
-    mockTransaction: { merchant: '배달의민족', amount: -18000, time: '18:59' },
-    dailyAverage: 12000,
-  },
-  택시: {
-    icon: 'fas fa-taxi',
-    color: '#FFC457',
-    categoryText: '택시',
-    mockTransaction: { merchant: '카카오T', amount: -8200, time: '23:15' },
-    dailyAverage: 8000,
-  },
-};
+const expensesStore = useExpensesStore();
 
 // Computed properties
-const challengeType = computed(() => {
-  const title = props.challengeData.title || '';
-  if (title.includes('카페')) return '카페';
-  if (title.includes('배달')) return '배달';
-  if (title.includes('택시')) return '택시';
-  return '카페'; // default
+const currentMetadata = computed(() => {
+  const categoryData = Object.values(expensesStore.categoryMasterData).find(
+    (category) => category.id === props.challengeData.type
+  );
+
+  if (categoryData) {
+    return {
+      icon: categoryData.icon,
+      color: categoryData.color,
+      categoryText: categoryData.name,
+      mockTransaction: categoryData.mockTransaction || { merchant: '상점명', amount: -10000, time: '12:00' },
+      dailyAverage: categoryData.dailyAverage || 5000,
+    };
+  }
+
+  // Default metadata if not found
+  return {
+    icon: 'fas fa-circle',
+    color: '#888888',
+    categoryText: '챌린지',
+    mockTransaction: { merchant: '상점명', amount: -10000, time: '12:00' },
+    dailyAverage: 5000,
+  };
 });
 
 const challengeIcon = computed(() => {
-  return challengeMetadata[challengeType.value]?.icon || 'fas fa-circle';
+  return currentMetadata.value.icon;
 });
 
 const challengeIconColor = computed(() => {
-  return challengeMetadata[challengeType.value]?.color || '#888888';
+  return currentMetadata.value.color;
 });
 
 const challengeCategoryText = computed(() => {
-  return (
-    challengeMetadata[challengeType.value]?.categoryText || '해당 카테고리'
-  );
+  return currentMetadata.value.categoryText;
 });
 
 const mockFailedTransaction = computed(() => {
-  return (
-    challengeMetadata[challengeType.value]?.mockTransaction || {
-      merchant: '상점명',
-      amount: -10000,
-      time: '12:00',
-    }
-  );
+  return currentMetadata.value.mockTransaction;
 });
 
 const currentDay = computed(() => {
-  return props.challengeData.progress;
+  return props.challengeData.currentDay;
 });
 
 // Methods
@@ -226,7 +208,7 @@ const handleNewChallenge = () => {
 
 const calculatePotentialSavings = () => {
   potentialSavedAmount.value =
-    props.challengeData.saving * props.challengeData.period;
+    props.challengeData.savedAmount * props.challengeData.days;
   // console.log('Calculated Potential Savings:', potentialSavedAmount.value);
 };
 

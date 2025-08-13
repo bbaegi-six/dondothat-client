@@ -10,9 +10,39 @@ import { faCircleQuestion as farCircleQuestion } from '@fortawesome/free-regular
 import {
   faCircleQuestion as fasCircleQuestion,
   faAngleRight,
+  faMotorcycle,
+  faMugSaucer,
+  faBagShopping,
+  faTaxi,
+  faStore,
+  faClapperboard,
+  faWineBottle,
+  faTrainSubway,
+  faSuitcaseMedical,
+  faHome,
+  faUtensils,
+  faEllipsis,
+  faCoins,
 } from '@fortawesome/free-solid-svg-icons';
 
-library.add(farCircleQuestion, fasCircleQuestion, faAngleRight);
+library.add(
+  farCircleQuestion,
+  fasCircleQuestion,
+  faAngleRight,
+  faMotorcycle,
+  faMugSaucer,
+  faBagShopping,
+  faTaxi,
+  faStore,
+  faClapperboard,
+  faWineBottle,
+  faTrainSubway,
+  faSuitcaseMedical,
+  faHome,
+  faUtensils,
+  faEllipsis,
+  faCoins
+);
 
 const app = createApp(App);
 const pinia = createPinia();

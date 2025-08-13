@@ -37,8 +37,37 @@
       <FontAwesomeIcon :icon="faAngleRight" class="text-white w-[10px] h-4" />
     </div>
 
+    <!-- 참여 중인 챌린지 섹션 -->
+    <div
+      v-if="challengeStore.userChallengeData"
+      class="w-[328px] h-24 bg-[#414141] rounded-2xl mt-4 flex items-center px-6 cursor-pointer"
+      @click="goToChallenges"
+    >
+      <div
+        class="w-12 h-12 rounded-full flex items-center justify-center mr-4"
+        :class="challengeStore.userChallengeData.status === 'completed' ? '' : 'bg-gray-1'"
+        :style="challengeStore.userChallengeData.status === 'completed' ? { backgroundColor: '#FF5555' } : {}"
+      >
+        <FontAwesomeIcon
+          :icon="challengeIconClass"
+          class="text-xl"
+          :style="{ color: challengeIconColor }"
+        />
+      </div>
+      <div class="font-pretendard font-medium text-base text-white flex-1">
+        {{ challengeStore.userChallengeData.title }} ({{
+          challengeStore.userChallengeData.progress
+        }}% 달성)
+      </div>
+      <FontAwesomeIcon
+        :icon="faAngleRight"
+        class="text-[#c6c6c6] w-[10px] h-4"
+      />
+    </div>
+
     <!-- 참여 중인 챌린지가 없습니다 섹션 -->
     <div
+      v-else
       class="w-[328px] h-24 bg-[#2f2f2f] border-2 border-[#414141] rounded-2xl mt-4 flex items-center px-6 cursor-pointer"
       @click="goToChallenges"
     >
@@ -102,7 +131,7 @@
 
 <script setup>
 import Header from '@/components/layout/Header.vue';
-import { ref, onMounted, nextTick, watch } from 'vue';
+import { ref, onMounted, nextTick, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import Chart from 'chart.js/auto';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -115,13 +144,40 @@ import {
 import { useExpensesStore } from '@/stores/expenses';
 import { useAccountStore } from '@/stores/account';
 import { useAuthStore } from '@/stores/auth';
+import { useChallengeStore } from '@/stores/challenge';
 
 const authStore = useAuthStore();
 const accountStore = useAccountStore();
 const router = useRouter();
 const chartCanvas = ref(null);
 const expensesStore = useExpensesStore();
+const challengeStore = useChallengeStore();
 const chartInstance = ref(null);
+
+const challengeIconClass = computed(() => {
+  if (!challengeStore.userChallengeData) return '';
+  const categoryId = challengeStore.userChallengeData.challenge_id;
+
+  const foundEntry = Object.entries(expensesStore.categoryMasterData).find(
+    ([name, cat]) => cat.id === categoryId
+  );
+
+  let iconClass = '';
+  if (foundEntry) {
+    const categoryData = foundEntry[1];
+    iconClass = categoryData.icon;
+  }
+  return iconClass;
+});
+
+const challengeIconColor = computed(() => {
+  if (!challengeStore.userChallengeData) return '';
+  const categoryId = challengeStore.userChallengeData.challenge_id;
+  const foundEntry = Object.entries(expensesStore.categoryMasterData).find(
+    ([name, cat]) => cat.id === categoryId
+  );
+  return foundEntry ? foundEntry[1].color : ''; // Return the color property
+});
 
 // 차트 생성
 const createChart = () => {
@@ -203,6 +259,11 @@ onMounted(async () => {
   }
   await nextTick(); // DOM 업데이트 완료 대기
   createChart();
+
+  // 챌린지 정보 로드
+  if (authStore.isLoggedIn) {
+    await challengeStore.fetchChallengeProgress();
+  }
 });
 </script>
 

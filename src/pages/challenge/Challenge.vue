@@ -2,10 +2,10 @@
 <template>
   <div>
     <!-- 진행 중인 챌린지가 있는 경우 -->
-    <ChallengeProgress v-if="showProgress" :challenge-data="challengeData" />
+    <ChallengeProgress v-if="showProgress" :challenge-data="challengeStore.activeChallenge" />
 
     <!-- 실패한 챌린지가 있는 경우 -->
-    <ChallengeFailed v-else-if="showFailed" :challenge-data="challengeData" />
+    <ChallengeFailed v-else-if="showFailed" :challenge-data="challengeStore.activeChallenge" />
 
     <!-- 참여 중인 챌린지가 없는 경우 (기본 화면) -->
     <div v-else :class="['flex flex-col h-screen pt-[10vh]', { 'is-leaving': isLeaving }]">
@@ -54,6 +54,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { useChallengeStore } from '@/stores/challenge';
 import Button from '@/components/Button.vue';
 import ChallengeProgress from './ChallengeProgress.vue';
 import ChallengeFailed from './ChallengeFailed.vue';
@@ -61,14 +62,12 @@ import challengeService from '@/services/challengeService';
 
 const router = useRouter();
 const authStore = useAuthStore();
+const challengeStore = useChallengeStore();
 
 // 화면 상태 관리
 const showProgress = ref(false);
 const showFailed = ref(false);
 const isLeaving = ref(false); // New reactive variable for leaving animation
-
-// 백엔드에서 받아온 챌린지 데이터
-const challengeData = ref(null);
 
 // 새 챌린지 시작
 const startChallenge = () => {
@@ -86,48 +85,20 @@ const startChallenge = () => {
 };
 
 // 페이지 로드 시 진척도 확인
-const checkCurrentChallenge = async () => {
-  try {
-    console.log('📊 챌린지 진척도 조회 중...');
-    const result = await challengeService.getProgress();
+onMounted(async () => {
+  // 챌린지 정보 로드
+  await challengeStore.fetchChallengeProgress();
 
-    if (result && result.user_challenge_id) {
-      console.log('✅ 진행 중인 챌린지 발견:', result);
-
-      // 백엔드 데이터 저장
-      challengeData.value = {
-        userChallengeId: result.user_challenge_id,
-        challengeId: result.challenge_id,
-        title: result.title,
-        status: result.status,
-        period: result.period,
-        progress: result.progress,
-        saving: result.saving,
-      };
-
-      // 상태에 따른 화면 분기
-      if (result.status === 'failed') {
-        console.log('❌ 실패한 챌린지 - ChallengeFailed 표시');
-        showFailed.value = true;
-      } else if (result.status === 'ongoing' || result.status === 'completed') {
-        console.log('✅ 진행중/완료 챌린지 - ChallengeProgress 표시');
-        showProgress.value = true;
-      } else {
-        console.log('⚠️ 알 수 없는 상태:', result.status);
-        // 기본 화면 유지
-      }
-    } else {
-      console.log('📭 진행 중인 챌린지 없음 - 기본 화면 표시');
-      // 모든 상태를 false로 유지하여 기본 화면 표시
-    }
-  } catch (error) {
-    console.error('❌ 챌린지 상태 확인 실패:', error);
-    // 에러 시에도 기본 화면 유지
+  // 스토어의 activeChallenge를 기반으로 화면 상태 설정
+  if (challengeStore.activeChallenge.status === 'failed') {
+    showFailed.value = true;
+  } else if (challengeStore.activeChallenge.status === 'ongoing' || challengeStore.activeChallenge.status === 'completed') {
+    showProgress.value = true;
+  } else {
+    // 챌린지가 없는 경우 (NONE) 또는 알 수 없는 상태
+    showProgress.value = false;
+    showFailed.value = false;
   }
-};
-
-onMounted(() => {
-  checkCurrentChallenge();
 });
 
 // 개발자 도구용 함수들
@@ -142,7 +113,7 @@ if (process.env.NODE_ENV === 'development') {
   };
 
   window.testOngoing = () => {
-    challengeData.value = {
+    challengeStore.activeChallenge = {
       userChallengeId: 3,
       challengeId: 1,
       title: '배달음식 금지 챌린지',
@@ -157,7 +128,7 @@ if (process.env.NODE_ENV === 'development') {
   };
 
   window.testCompleted = () => {
-    challengeData.value = {
+    challengeStore.activeChallenge = {
       userChallengeId: 3,
       challengeId: 1,
       title: '배달음식 금지 챌린지',
@@ -172,7 +143,7 @@ if (process.env.NODE_ENV === 'development') {
   };
 
   window.testFailed = () => {
-    challengeData.value = {
+    challengeStore.activeChallenge = {
       userChallengeId: 3,
       challengeId: 1,
       title: '배달음식 금지 챌린지',
@@ -187,7 +158,11 @@ if (process.env.NODE_ENV === 'development') {
   };
 
   window.testEmpty = () => {
-    challengeData.value = null;
+    challengeStore.activeChallenge = {
+      id: null, type: null, title: '', days: 0, currentDay: 1,
+      status: 'NONE', savedAmount: 0, potentialSavedAmount: 0,
+      startDate: null, endDate: null, failedTransactionId: null, dailyProgress: []
+    };
     showProgress.value = false;
     showFailed.value = false;
     showChallengeFlow.value = false;
