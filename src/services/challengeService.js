@@ -1,8 +1,7 @@
 // services/challengeService.js
-import { challengeAPI} from '@/utils/api';
+import { challengeAPI } from '@/utils/api';
 
 export const challengeService = {
-    
   // 특정 챌린지 조회
   async getChallengeById(challengeId) {
     try {
@@ -28,7 +27,10 @@ export const challengeService = {
   // 챌린지 참여
   async joinChallenge(challengeId, period) {
     try {
-      const response = await challengeAPI.joinChallengeByIdAndPeriod(challengeId, period);
+      const response = await challengeAPI.joinChallengeByIdAndPeriod(
+        challengeId,
+        period
+      );
       return response;
     } catch (error) {
       console.error('챌린지 참여 실패:', error);
@@ -63,10 +65,9 @@ export const challengeService = {
   },
 
   // 챌린지 실패 처리
-  async failChallenge(challengeId, failureReason = 'TRANSACTION_DETECTED') {
+  async failChallenge(challengeId) {
     try {
-      const data = { reason: failureReason };
-      const response = await challengeAPI.failChallenge(challengeId, data);
+      const response = await challengeAPI.failChallenge(challengeId);
       return response;
     } catch (error) {
       console.error('챌린지 실패 처리 오류:', error);
@@ -76,14 +77,18 @@ export const challengeService = {
 
   // 에러 메시지 추출
   getErrorMessage(error) {
-    return error.response?.data?.message || error.message || '알 수 없는 오류가 발생했습니다.';
+    return (
+      error.response?.data?.message ||
+      error.message ||
+      '알 수 없는 오류가 발생했습니다.'
+    );
   },
 
-   // Helper 함수들
-   getChallengeIdByType(challengeType) {
+  // Helper 함수들
+  getChallengeIdByType(challengeType) {
     const challengeIdMap = {
       cafe: 'CAFE_CHALLENGE',
-      delivery: 'DELIVERY_CHALLENGE', 
+      delivery: 'DELIVERY_CHALLENGE',
       taxi: 'TAXI_CHALLENGE',
     };
     return challengeIdMap[challengeType] || 'DEFAULT_CHALLENGE';
@@ -105,7 +110,7 @@ export const challengeService = {
       TAXI_CHALLENGE: '택시 타지 않기',
     };
     return challengeDescriptions[challengeId] || '챌린지 설명';
-  }
+  },
 };
 
 export default challengeService;
