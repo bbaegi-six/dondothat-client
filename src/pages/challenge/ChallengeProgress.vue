@@ -73,7 +73,12 @@
           {{ challengeData.savedAmount.toLocaleString() }}원
         </p>
         <div class="absolute top-4 right-4">
-          <i class="fas fa-info-circle text-gray-3 text-sm"></i>
+          <FontAwesomeIcon
+            :icon="farCircleQuestion"
+            class="text-[#c9c9c9] ml-1 mr-auto"
+            @click.stop="savedAmountInfoModalOpen = true"
+          />
+          <!-- <i class="fas fa-info-circle text-gray-3 text-sm"></i> -->
         </div>
       </div>
 
@@ -124,6 +129,12 @@
 
     <!-- Third Modal -->
     <ModalThird v-model="isThirdModal" @close="handleThirdModalClose" />
+
+    <!-- SavedAmountInfoModal -->
+    <SavedAmountInfoModal
+      :modelValue="savedAmountInfoModalOpen"
+      @close="savedAmountInfoModalOpen = false"
+    />
   </div>
 </template>
 
@@ -136,6 +147,8 @@ import { useExpensesStore } from '@/stores/expenses';
 import ModalFirst from './ModalFirst.vue';
 import ModalSecond from './ModalSecond.vue';
 import ModalThird from './ModalThird.vue';
+import SavedAmountInfoModal from '@/components/modals/SavedAmountInfoModal.vue';
+import { faCircleQuestion as farCircleQuestion } from '@fortawesome/free-regular-svg-icons';
 
 const router = useRouter();
 const savingStore = useSavingStore();
@@ -166,6 +179,7 @@ const props = defineProps({
 const isSavingCompleted = ref(false);
 const isSecondModal = ref(false);
 const isThirdModal = ref(false);
+const savedAmountInfoModalOpen = ref(false);
 
 const expensesStore = useExpensesStore();
 
