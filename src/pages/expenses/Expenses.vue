@@ -13,6 +13,7 @@
       :showBack="false"
       title="내역"
       :showAddButton="true"
+      :showBorder="false"
       @add-click="refreshExpenses"
     />
 
