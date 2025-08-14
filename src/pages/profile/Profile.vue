@@ -1,5 +1,5 @@
 <template>
-  <Header title="마이페이지"></Header>
+  <Header title="마이페이지" :showBorder="false"></Header>
   <div class="page-container">
     <div class="info">
       <div class="info-content">
