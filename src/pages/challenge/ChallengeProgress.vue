@@ -10,7 +10,7 @@
           :class="isCompleted ? '' : 'bg-gray-1'"
           :style="isCompleted ? { backgroundColor: '#FF5555' } : {}"
         >
-          <i v-if="isCompleted" class="fas fa-check text-xl text-white"></i>
+          <i v-if="isCompleted" class="fas fa-check text-3xl text-white"></i>
           <i
             v-else
             :class="challengeIcon"
