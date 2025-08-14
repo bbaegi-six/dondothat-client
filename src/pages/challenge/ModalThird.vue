@@ -22,7 +22,19 @@
               "
             />
           </div>
-          <template v-for="(item, index) in savingsProducts" :key="index">
+          
+          <!-- 로딩 상태 -->
+          <div v-if="finproductStore.loading" class="flex justify-center py-8">
+            <div class="text-white text-sm">추천 상품을 불러오는 중...</div>
+          </div>
+          
+          <!-- 에러 상태 -->
+          <div v-else-if="finproductStore.error" class="flex justify-center py-8">
+            <div class="text-gray-400 text-sm">추천 상품을 불러올 수 없습니다</div>
+          </div>
+          
+          <!-- 상품 리스트 -->
+          <template v-else-if="savingsProducts.length > 0" v-for="(item, index) in savingsProducts" :key="index">
             <li>
               <div
                 class="flex items-center py-5 cursor-pointer hover:bg-gray-800 hover:bg-opacity-20 transition-colors duration-200 rounded-lg px-2 -mx-2"
@@ -44,14 +56,14 @@
                   </p>
                 </div>
                 <div class="flex-1"></div>
-                <div class="flex-shrink-0 w-[62px] text-right">
-                  <div
-                    class="text-brand font-bold text-[12px] flex items-center justify-end"
-                  >
-                    <p class="text-[12px]">최고&nbsp;</p>
-                    <p class="text-[16px]">{{ item.maxRate }}%</p>
+                <div class="flex-shrink-0 w-[80px] text-right">
+                  <div class="text-brand font-bold text-right leading-tight">
+                    <div class="flex items-baseline justify-end whitespace-nowrap">
+                      <span class="text-[12px] mr-1">최고</span>
+                      <span class="text-[16px]">{{ item.maxRate }}%</span>
+                    </div>
                   </div>
-                  <p class="text-gray-4 text-[12px]">
+                  <p class="text-gray-4 text-[12px] mt-1 leading-none">
                     기본 {{ item.baseRate }}%
                   </p>
                 </div>
@@ -72,6 +84,11 @@
               />
             </div>
           </template>
+          
+          <!-- 데이터 없음 상태 -->
+          <div v-else class="flex justify-center py-8">
+            <div class="text-gray-400 text-sm">추천할 상품이 없습니다</div>
+          </div>
         </ul>
       </div>
       <div class="absolute bottom-5 left-1/2 transform -translate-x-1/2">
@@ -88,11 +105,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Modal from '../../components/Modal.vue';
-import kbLogo from '@/assets/logo/kb.svg';
 import { useChallengeStore } from '@/stores/challenge';
+import { useFinproductStore } from '@/stores/finproduct';
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
@@ -102,38 +119,22 @@ const emit = defineEmits(['update:modelValue', 'close']);
 
 const challengeStore = useChallengeStore();
 const router = useRouter();
+const finproductStore = useFinproductStore();
 
 const innerModel = computed({
   get: () => props.modelValue,
   set: (v) => emit('update:modelValue', v),
 });
 
-const savingsProducts = [
-  {
-    logo: kbLogo,
-    name: 'KB 내맘대로적금',
-    bank: '국민은행',
-    maxRate: '13',
-    baseRate: '3.00',
-    url: 'https://obank.kbstar.com/quics?page=C025255',
-  },
-  {
-    logo: kbLogo,
-    name: 'KB Star*t 적금',
-    bank: '국민은행',
-    maxRate: '12',
-    baseRate: '2.80',
-    url: 'https://obank.kbstar.com/quics?page=C025256',
-  },
-  {
-    logo: kbLogo,
-    name: 'KB 청년희망적금',
-    bank: '국민은행',
-    maxRate: '15',
-    baseRate: '3.50',
-    url: 'https://obank.kbstar.com/quics?page=C025257',
-  },
-];
+// 스토어에서 변환된 상품 데이터 사용
+const savingsProducts = computed(() => finproductStore.transformedRecommendations);
+
+// 모달이 열릴 때마다 추천 상품 조회 (사용자별 개인화를 위해 매번 새로 호출)
+watch(() => props.modelValue, async (newValue) => {
+  if (newValue) {
+    await finproductStore.fetchRecommendedSavings(3);
+  }
+}, { immediate: true });
 
 const emitClose = async () => {
   // closeChallenge API 호출 - userChallengeData의 user_challenge_id 사용
