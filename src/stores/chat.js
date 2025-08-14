@@ -349,13 +349,17 @@ export const useChatStore = defineStore('chat', () => {
     }
 
     try {
+      // 한국 시간(KST) 생성 - UTC + 9시간
+      const now = new Date();
+      const kstTime = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+
       const message = {
         challengeId: challengeId.value,
         userId: currentUser.value.userId,
         userName: currentUser.value.userName,
         message: content.trim(),
         messageType: 'MESSAGE',
-        sentAt: new Date().toISOString(),
+        sentAt: kstTime.toISOString(),
       };
 
       const destination = `/app/chat/${challengeId.value}/send`;
@@ -398,9 +402,7 @@ export const useChatStore = defineStore('chat', () => {
       sentAt: message.sentAt, // 원본 타임스탬프 보존 (날짜 구분용)
     };
 
-    console.log('📝 포맷된 메시지:', formattedMessage);
     messages.value.push(formattedMessage);
-    console.log('✅ 메시지 추가 완료, 총 메시지 수:', messages.value.length);
   };
 
   /**
