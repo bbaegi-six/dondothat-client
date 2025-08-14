@@ -2,13 +2,22 @@
 <template>
   <div>
     <!-- 진행 중인 챌린지가 있는 경우 -->
-    <ChallengeProgress v-if="showProgress" :challenge-data="challengeStore.activeChallenge" />
+    <ChallengeProgress
+      v-if="showProgress"
+      :challenge-data="challengeStore.activeChallenge"
+    />
 
     <!-- 실패한 챌린지가 있는 경우 -->
-    <ChallengeFailed v-else-if="showFailed" :challenge-data="challengeStore.activeChallenge" />
+    <ChallengeFailed
+      v-else-if="showFailed"
+      :challenge-data="challengeStore.activeChallenge"
+    />
 
     <!-- 참여 중인 챌린지가 없는 경우 (기본 화면) -->
-    <div v-else :class="['flex flex-col h-screen pt-[10vh]', { 'is-leaving': isLeaving }]">
+    <div
+      v-else
+      :class="['flex flex-col h-screen pt-[10vh]', { 'is-leaving': isLeaving }]"
+    >
       <!-- Main Content Area -->
       <div
         class="flex-1 flex items-center justify-center pt-[60px] pb-[90px] px-5 slide-up-animation"
@@ -41,7 +50,10 @@
       </div>
 
       <!-- Start Challenge Button - 컨테이너 밖으로 분리 -->
-      <div class="px-8 pb-[90px] slide-up-animation" style="animation-delay: 0.2s;">
+      <div
+        class="px-8 pb-[90px] slide-up-animation"
+        style="animation-delay: 0.2s"
+      >
         <Button :disabled="false" @click="startChallenge" class="font-normal">
           챌린지 시작하기
         </Button>
@@ -92,7 +104,10 @@ onMounted(async () => {
   // 스토어의 activeChallenge를 기반으로 화면 상태 설정
   if (challengeStore.activeChallenge.status === 'failed') {
     showFailed.value = true;
-  } else if (challengeStore.activeChallenge.status === 'ongoing' || challengeStore.activeChallenge.status === 'completed') {
+  } else if (
+    challengeStore.activeChallenge.status === 'ongoing' ||
+    challengeStore.activeChallenge.status === 'completed'
+  ) {
     showProgress.value = true;
   } else {
     // 챌린지가 없는 경우 (NONE) 또는 알 수 없는 상태
@@ -159,9 +174,18 @@ if (process.env.NODE_ENV === 'development') {
 
   window.testEmpty = () => {
     challengeStore.activeChallenge = {
-      id: null, type: null, title: '', days: 0, currentDay: 1,
-      status: 'NONE', savedAmount: 0, potentialSavedAmount: 0,
-      startDate: null, endDate: null, failedTransactionId: null, dailyProgress: []
+      id: null,
+      type: null,
+      title: '',
+      days: 0,
+      currentDay: 1,
+      status: 'NONE',
+      savedAmount: 0,
+      potentialSavedAmount: 0,
+      startDate: null,
+      endDate: null,
+      failedTransactionId: null,
+      dailyProgress: [],
     };
     showProgress.value = false;
     showFailed.value = false;

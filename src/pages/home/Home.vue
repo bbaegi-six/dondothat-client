@@ -44,7 +44,10 @@
 
     <!-- 참여 중인 챌린지 섹션 -->
     <div
-      v-if="challengeStore.userChallengeData"
+      v-if="
+        challengeStore.userChallengeData &&
+        challengeStore.userChallengeData.status !== 'closed'
+      "
       class="w-[328px] h-24 rounded-2xl mt-4 flex flex-col justify-center px-6 cursor-pointer border-2 border-[#414141]"
       @click="goToChallenges"
     >
@@ -52,13 +55,15 @@
         <div
           class="w-12 h-12 rounded-full flex items-center justify-center mr-4"
           :class="
-            challengeStore.userChallengeData.status === 'completed'
+            challengeStore.userChallengeData.status === 'completed' || challengeStore.userChallengeData.status === 'failed'
               ? ''
               : 'bg-gray-1'
           "
           :style="
             challengeStore.userChallengeData.status === 'completed'
               ? { backgroundColor: '#414141' }
+              : challengeStore.userChallengeData.status === 'failed'
+              ? { backgroundColor: '#a1a1a1' }
               : {}
           "
         >
@@ -81,9 +86,18 @@
           </div>
           <div class="w-full bg-gray-1 rounded-full h-2 mt-1">
             <div
-              class="bg-brand h-2 rounded-full"
+              class="h-2 rounded-full"
+              :class="
+                challengeStore.userChallengeData.status === 'failed'
+                  ? ''
+                  : 'bg-brand'
+              "
               :style="{
                 width: `${(challengeStore.userChallengeData.progress / challengeStore.userChallengeData.period) * 100}%`,
+                backgroundColor:
+                  challengeStore.userChallengeData.status === 'failed'
+                    ? '#858585'
+                    : '',
               }"
             ></div>
           </div>
@@ -176,6 +190,7 @@ import { faCircleQuestion as farCircleQuestion } from '@fortawesome/free-regular
 import {
   faCircleQuestion as fasCircleQuestion,
   faAngleRight,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { useExpensesStore } from '@/stores/expenses';
@@ -207,6 +222,12 @@ const chartLoading = ref(false);
 
 const challengeIconClass = computed(() => {
   if (!challengeStore.userChallengeData) return '';
+  
+  // failed 상태일 때 xmark 아이콘 표시
+  if (challengeStore.userChallengeData.status === 'failed') {
+    return faXmark;
+  }
+  
   const categoryId = challengeStore.userChallengeData.challenge_id;
 
   const foundEntry = Object.entries(expensesStore.categoryMasterData).find(
@@ -223,6 +244,12 @@ const challengeIconClass = computed(() => {
 
 const challengeIconColor = computed(() => {
   if (!challengeStore.userChallengeData) return '';
+  
+  // failed 상태일 때 흰색 표시
+  if (challengeStore.userChallengeData.status === 'failed') {
+    return '#ffffff';
+  }
+  
   const categoryId = challengeStore.userChallengeData.challenge_id;
   const foundEntry = Object.entries(expensesStore.categoryMasterData).find(
     ([name, cat]) => cat.id === categoryId
@@ -246,7 +273,10 @@ const loadCurrentMonthSummary = async () => {
 
 // 집계 데이터를 차트 데이터로 변환
 const chartData = computed(() => {
-  if (!currentMonthSummary.value || Object.keys(currentMonthSummary.value).length === 0) {
+  if (
+    !currentMonthSummary.value ||
+    Object.keys(currentMonthSummary.value).length === 0
+  ) {
     return [];
   }
 
@@ -338,16 +368,20 @@ const loadSavingAccount = async () => {
 };
 
 // chartData가 변경될 때 차트 재생성
-watch(chartData, () => {
-  nextTick(() => {
-    createChart();
-  });
-}, { deep: true });
+watch(
+  chartData,
+  () => {
+    nextTick(() => {
+      createChart();
+    });
+  },
+  { deep: true }
+);
 
 onMounted(async () => {
   // 독립적으로 현재월 지출 집계 로드
   await loadCurrentMonthSummary();
-  
+
   await nextTick(); // DOM 업데이트 완료 대기
   createChart();
 
