@@ -144,8 +144,6 @@ export const useChatStore = defineStore('chat', () => {
       clearError(); // 연결 시도 전 에러 클리어
       challengeId.value = chatChallengeId;
 
-      console.log(`🚀 채팅방 연결 시도: challengeId=${chatChallengeId}`);
-
       // 1. 채팅 이력 로드 (현재 사용자 정보는 이미 확인됨)
       const historyCount = await loadChatHistory(chatChallengeId);
 
@@ -166,7 +164,6 @@ export const useChatStore = defineStore('chat', () => {
 
       // 4. 입장 메시지 처리 (이력이 없거나 최근 입장 메시지가 없을 때만)
       if (historyCount === 0 || !hasRecentJoinMessage()) {
-        console.log('📝 입장 메시지 전송');
         joinChatRoom();
       } else {
         console.log('🔇 입장 메시지 생략 (이전 이력 존재)');
@@ -188,7 +185,6 @@ export const useChatStore = defineStore('chat', () => {
     return new Promise((resolve, reject) => {
       try {
         const wsUrl = getWebSocketUrl();
-        console.log('🔌 WebSocket 연결 시도:', wsUrl);
 
         socket.value = new SockJS(wsUrl);
         stompClient.value = Stomp.over(socket.value);
@@ -286,9 +282,7 @@ export const useChatStore = defineStore('chat', () => {
         topic,
         (message) => {
           try {
-            console.log('📨 원본 메시지 수신:', message);
             const data = JSON.parse(message.body);
-            console.log('📨 파싱된 메시지:', data);
 
             // 접속자 수 업데이트 메시지인지 확인
             if (data.type === 'PARTICIPANT_COUNT') {
@@ -313,7 +307,6 @@ export const useChatStore = defineStore('chat', () => {
           console.error('❌ 메시지 구독 오류:', error);
         }
       );
-      console.log('✅ 메시지 구독 완료');
     } catch (error) {
       console.error('❌ 메시지 구독 설정 실패:', error);
     }
@@ -380,8 +373,6 @@ export const useChatStore = defineStore('chat', () => {
    * 메시지 추가 (중복 체크 옵션)
    */
   const addMessage = (message, checkDuplicate = true) => {
-    console.log('📥 addMessage 호출:', { message, checkDuplicate });
-
     // 중복 메시지 방지 (실시간 메시지만)
     if (
       checkDuplicate &&
