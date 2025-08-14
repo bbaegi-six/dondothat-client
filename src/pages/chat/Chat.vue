@@ -119,7 +119,6 @@ const connectToChat = async () => {
     // 이력 메시지가 있는지 확인
     hasHistoryMessages.value = chatStore.messages.length > 0;
 
-    console.log('✅ 채팅방 연결 완료');
 
     // 연결 완료 후 스크롤
     nextTick(() => {
@@ -159,7 +158,6 @@ const sendMessage = (messageText) => {
 
 const goBack = () => {
   // 🔑 핵심: 채팅방에서 나갈 때 연결을 끊지 않음
-  console.log('🔙 채팅방에서 나가기 (연결 유지)');
   router.push('/');
 };
 
@@ -198,10 +196,8 @@ const initializeChat = async () => {
 
     // 기존 연결이 없거나 다른 채팅방일 때만 상태 확인
     isCheckingStatus.value = true;
-    console.log('🚀 Chat 컴포넌트 초기화 시작');
 
     // 1. 사용자의 챌린지 상태 확인 (JWT 기반)
-    console.log('🔍 사용자 챌린지 상태 확인 중...');
     const status = await chatStore.checkUserChallengeStatus();
 
     // 🚨 핵심: 사용자가 실제로 바뀌었는지 확인
@@ -209,20 +205,13 @@ const initializeChat = async () => {
       chatStore.currentUser?.userId &&
       chatStore.currentUser.userId !== status.userId
     ) {
-      console.log('👤 사용자 변경 감지 - Chat Store 초기화');
-      console.log(
-        `이전 사용자: ${chatStore.currentUser.userId}, 새 사용자: ${status.userId}`
-      );
       chatStore.resetForNewUser();
     }
 
     if (!status.hasActiveChallenge) {
-      console.log('❌ 활성 챌린지가 없음, NoChat 페이지로 이동');
       router.push('/no-chat');
       return;
     }
-
-    console.log('✅ 활성 챌린지 확인:', status.challengeName);
 
     // 2. challengeId 설정
     challengeId.value = status.challengeId;
@@ -230,9 +219,6 @@ const initializeChat = async () => {
 
     // 3. URL 파라미터와 실제 챌린지 ID가 다른 경우에만 replace
     if (routeChallengeId && routeChallengeId !== status.challengeId) {
-      console.log(
-        `🔄 URL 업데이트: ${routeChallengeId} -> ${status.challengeId}`
-      );
       await router.replace({
         path: '/chat',
         query: {
@@ -249,7 +235,6 @@ const initializeChat = async () => {
 
     // 🔑 API 호출 후 다시 한번 기존 연결 상태 확인
     if (chatStore.isConnected && chatStore.challengeId === status.challengeId) {
-      console.log('✅ API 확인 후 기존 연결 재사용');
       hasHistoryMessages.value = chatStore.messages.length > 0;
       nextTick(() => {
         if (chatMessagesRef.value) {
@@ -258,8 +243,6 @@ const initializeChat = async () => {
       });
       return;
     }
-
-    console.log('✅ 챌린지 상태 확인 완료, 채팅방 연결 시작');
 
     // 5. 채팅방 연결 (기존 연결이 없거나 다른 채팅방인 경우에만)
     await connectToChat();
@@ -278,15 +261,11 @@ const initializeChat = async () => {
 
 // Lifecycle
 onMounted(async () => {
-  console.log('🚀 Chat 컴포넌트 마운트됨');
   await initializeChat();
 });
 
 onUnmounted(() => {
-  console.log('🔌 Chat 컴포넌트 언마운트됨');
   // 🔑 핵심: 언마운트 시에도 연결을 끊지 않음 (cleanup 호출하지 않음)
-  console.log('🔄 연결 유지됨 (cleanup 생략)');
-
   // 초기화 상태만 리셋
   isInitialized.value = false;
 });
@@ -294,7 +273,6 @@ onUnmounted(() => {
 // 🔑 완전히 다른 페이지로 이동할 때만 연결 해제
 // 브라우저 탭 종료나 새로고침 시에만 해제
 window.addEventListener('beforeunload', () => {
-  console.log('🌐 브라우저 종료/새로고침 - 연결 해제');
   chatStore.disconnect();
 });
 </script>
