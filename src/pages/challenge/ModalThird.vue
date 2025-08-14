@@ -24,7 +24,7 @@
           </div>
           <template v-for="(item, index) in savingsProducts" :key="index">
             <li>
-              <div 
+              <div
                 class="flex items-center py-5 cursor-pointer hover:bg-gray-800 hover:bg-opacity-20 transition-colors duration-200 rounded-lg px-2 -mx-2"
                 @click="navigateToProduct(item)"
               >
@@ -89,14 +89,19 @@
 
 <script setup>
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import Modal from '../../components/Modal.vue';
 import kbLogo from '@/assets/logo/kb.svg';
+import { useChallengeStore } from '@/stores/challenge';
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
 });
 
 const emit = defineEmits(['update:modelValue', 'close']);
+
+const challengeStore = useChallengeStore();
+const router = useRouter();
 
 const innerModel = computed({
   get: () => props.modelValue,
@@ -130,7 +135,26 @@ const savingsProducts = [
   },
 ];
 
-const emitClose = () => emit('close');
+const emitClose = async () => {
+  // closeChallenge API 호출 - userChallengeData의 user_challenge_id 사용
+  if (challengeStore.userChallengeData?.user_challenge_id) {
+    try {
+      await challengeStore.closeChallenge(
+        challengeStore.userChallengeData.user_challenge_id
+      );
+      console.log('챌린지 닫기 성공');
+    } catch (error) {
+      console.error('챌린지 닫기 실패:', error);
+    }
+  }
+
+  // 모달 닫기
+  emit('close');
+
+  // challenge 페이지로 이동 - 강제 새로고침을 위해 다른 경로를 거쳐서 이동
+  await router.push('/');
+  await router.push('/challenge');
+};
 
 const navigateToProduct = (product) => {
   // 외부 URL로 새 탭에서 열기

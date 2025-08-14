@@ -70,7 +70,7 @@
           지금까지 아낀 금액
         </p>
         <p class="text-white text-4xl font-bold text-center font-pretendard">
-          {{ challengeData.savedAmount.toLocaleString() }}원
+          {{ (challengeData.savedAmount * challengeData.currentDay).toLocaleString() }}원
         </p>
         <div class="absolute top-4 right-4">
           <i class="fas fa-info-circle text-gray-3 text-sm"></i>
