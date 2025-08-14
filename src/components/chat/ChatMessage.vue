@@ -112,15 +112,7 @@ const props = defineProps({
 
 // 내가 보낸 메시지인지 확인 - userId로 판단
 const isMyMessage = computed(() => {
-  const result = props.userId === props.currentUserId;
-  console.log('🔍 메시지 소유자 확인:', {
-    messageUserId: props.userId,
-    currentUserId: props.currentUserId,
-    isMyMessage: result,
-    username: props.username,
-    content: props.content,
-  });
-  return result;
+  return props.userId === props.currentUserId;
 });
 
 // 시간만 표시하는 함수 (HH:MM 형식)
@@ -144,14 +136,12 @@ const formatTimeOnly = (timestamp) => {
     }
     // 유효한 날짜인지 확인
     if (isNaN(date.getTime())) {
-      console.error('Invalid date:', timestamp);
       return getCurrentTime();
     }
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
   } catch (error) {
-    console.error('시간 형식 변환 오류:', error, 'timestamp:', timestamp);
     return getCurrentTime();
   }
 };
@@ -179,7 +169,6 @@ const formatDateSeparator = (timestamp) => {
 
     // 유효한 날짜인지 확인
     if (isNaN(date.getTime())) {
-      console.error('Invalid date for separator:', timestamp);
       return getCurrentDateString();
     }
 
@@ -203,9 +192,6 @@ const formatDateSeparator = (timestamp) => {
       const day = date.getDate();
       const weekDay = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
 
-      console.log('month', month);
-      console.log('day', day);
-      console.log('weekDay', weekDay);
 
       return `${month}월 ${day}일 ${weekDay}요일`;
     } else {
@@ -217,12 +203,6 @@ const formatDateSeparator = (timestamp) => {
       return `${year}년 ${month}월 ${day}일 ${weekDay}요일`;
     }
   } catch (error) {
-    console.error(
-      '날짜 구분선 형식 변환 오류:',
-      error,
-      'timestamp:',
-      timestamp
-    );
     return getCurrentDateString();
   }
 };

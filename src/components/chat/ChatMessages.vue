@@ -45,7 +45,7 @@ const props = defineProps({
     default: () => [],
   },
   currentUserId: {
-    type: String,
+    type: [String, Number],
     default: null,
   },
   isConnected: {
@@ -97,14 +97,8 @@ const shouldShowDateSeparator = (message, index) => {
 const getDateFromMessage = (message) => {
   const timestamp = message.sentAt || message.time;
 
-  console.log('🕐 날짜 추출 시도:', {
-    timestamp,
-    messageContent: message.content || message.message,
-    messageType: message.messageType,
-  });
 
   if (!timestamp) {
-    console.log('⚠️ 타임스탬프 없음 - 현재 날짜 사용');
     return new Date();
   }
 
@@ -119,16 +113,8 @@ const getDateFromMessage = (message) => {
         timestamp[4] || 0, // minute
         timestamp[5] || 0 // second
       );
-      console.log('📅 배열 형태 날짜 변환:', {
-        array: timestamp,
-        result: date.toDateString(),
-      });
     } else {
       date = new Date(timestamp);
-      console.log('📅 문자열 형태 날짜 변환:', {
-        string: timestamp,
-        result: date.toDateString(),
-      });
     }
 
     if (isNaN(date.getTime())) {
@@ -164,8 +150,7 @@ const scrollToBottom = () => {
 // 새 메시지가 추가될 때마다 자동 스크롤
 watch(
   () => props.messages.length,
-  (newLength, oldLength) => {
-    console.log('📊 메시지 개수 변화:', { oldLength, newLength });
+  () => {
     nextTick(() => {
       scrollToBottom();
     });
