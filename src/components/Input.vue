@@ -1,5 +1,5 @@
 <template>
-  <div :style="{ width: width }">
+  <div>
     <input
       :type="type"
       :placeholder="placeholder"
@@ -17,10 +17,6 @@ defineProps({
   type: {
     type: String,
     default: "text",
-  },
-  width: {
-    type: String,
-    default: "328px",
   },
 });
 defineEmits(["update:modelValue"]);
