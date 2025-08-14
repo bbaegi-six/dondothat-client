@@ -108,20 +108,30 @@
           </div>
         </div>
 
-        <div class="w-[328px] mx-auto">
-          <Input
-            v-model="age"
-            type="number"
-            placeholder="나이"
-            class="w-full"
-          />
-          <div class="h-1">
-            <span v-if="showErrors && !age" class="text-brand text-xs mt-1">
-              * 필수 항목입니다
-            </span>
-            <span v-else-if="ageError" class="text-brand text-xs mt-1">
-              {{ ageError }}
-            </span>
+        <div class="w-[328px] mx-auto flex gap-4">
+          <div class="flex-1">
+            <Input
+              v-model="age"
+              type="number"
+              placeholder="나이"
+              class="w-full"
+            />
+            <div class="h-1">
+              <span v-if="showErrors && !age" class="text-brand text-xs mt-1">
+                * 필수 항목입니다
+              </span>
+              <span v-else-if="ageError" class="text-brand text-xs mt-1">
+                {{ ageError }}
+              </span>
+            </div>
+          </div>
+          <div class="flex-1">
+            <Input
+              v-model="job"
+              type="text"
+              placeholder="직업"
+              class="w-full"
+            />
           </div>
         </div>
 
@@ -209,6 +219,7 @@ const password = ref('');
 const confirmPassword = ref('');
 const email = ref('');
 const age = ref(null);
+const job = ref('');
 const agreeTerms = ref(false);
 const agreePrivacy = ref(false);
 const agreeMarketing = ref(false);
@@ -335,6 +346,7 @@ const handleNext = async () => {
       password: password.value,
       email: email.value,
       age: age.value,
+      job: job.value,
       agreeTerms: agreeTerms.value,
       agreePrivacy: agreePrivacy.value,
       agreeMarketing: agreeMarketing.value,

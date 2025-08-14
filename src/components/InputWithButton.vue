@@ -1,11 +1,11 @@
 <template>
-  <div class="flex gap-1 items-center">
+  <div class="flex gap-4 items-center">
     <Input
       :modelValue="modelValue"
       @update:modelValue="$emit('update:modelValue', $event)"
       :placeholder="placeholder"
       :type="type"
-      width="260px"
+      class="flex-1"
     />
     <button
       @click="$emit('buttonClick')"
