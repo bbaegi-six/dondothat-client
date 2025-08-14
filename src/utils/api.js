@@ -127,6 +127,10 @@ export const challengeAPI = {
   // 챌린지 실패
   failChallenge: (challengeId, failureData) =>
     api.post(`/challenges/${challengeId}/fail`, failureData),
+
+  // 챌린지 닫기
+  closeChallenge: (userChallengeId) =>
+    api.post(`/challenges/close/${userChallengeId}`),
 };
 
 // export const chatAPI = {
