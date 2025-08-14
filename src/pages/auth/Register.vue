@@ -108,30 +108,43 @@
           </div>
         </div>
 
-        <div class="w-[328px] mx-auto flex gap-4">
-          <div class="flex-1">
-            <Input
-              v-model="age"
-              type="number"
-              placeholder="나이"
-              class="w-full"
-            />
-            <div class="h-1">
-              <span v-if="showErrors && !age" class="text-brand text-xs mt-1">
-                * 필수 항목입니다
-              </span>
-              <span v-else-if="ageError" class="text-brand text-xs mt-1">
-                {{ ageError }}
-              </span>
+        <div class="w-[328px] mx-auto">
+          <div class="flex gap-4">
+            <div class="flex-1">
+              <Input
+                v-model="age"
+                type="number"
+                placeholder="나이"
+                class="w-full"
+              />
+              <div class="h-1">
+                <span v-if="showErrors && !age" class="text-brand text-xs mt-1">
+                  * 필수 항목입니다
+                </span>
+                <span v-else-if="ageError" class="text-brand text-xs mt-1">
+                  {{ ageError }}
+                </span>
+              </div>
             </div>
-          </div>
-          <div class="flex-1">
-            <Input
-              v-model="job"
-              type="text"
-              placeholder="직업"
-              class="w-full"
-            />
+            <div class="flex-1">
+              <div
+                class="h-12 px-4 py-3 rounded-10 bg-white text-gray-800 placeholder-gray-400 focus:outline-none w-full flex items-center cursor-pointer"
+                @click="showJobSelectionModal = true"
+              >
+                <span :class="{ 'text-gray-400': !job, 'text-gray-800': job }">
+                  {{ job || '직업' }}
+                </span>
+              </div>
+              <div class="h-1">
+                <span v-if="showErrors && !job" class="text-brand text-xs mt-1">
+                  * 필수 항목입니다
+                </span>
+              </div>
+              <JobSelectionModal
+                v-model="showJobSelectionModal"
+                @selectJob="job = $event"
+              />
+            </div>
           </div>
         </div>
 
@@ -202,6 +215,7 @@ import Header from '../../components/layout/Header.vue';
 import Input from '../../components/Input.vue';
 import InputWithButton from '../../components/InputWithButton.vue';
 import Button from '../../components/Button.vue';
+import JobSelectionModal from '../../components/modals/JobSelectionModal.vue'; // New import
 
 import { authAPI } from '../../utils/api.js';
 
@@ -225,6 +239,7 @@ const agreePrivacy = ref(false);
 const agreeMarketing = ref(false);
 const showErrors = ref(false);
 const isSubmitting = ref(false); // 새로운 상태 변수
+const showJobSelectionModal = ref(false); // New ref
 
 const emailAvailable = ref(false);
 const emailDuplicate = ref(false);
@@ -320,6 +335,7 @@ const handleNext = async () => {
     !confirmPassword.value ||
     !email.value ||
     !age.value ||
+    !job.value ||
     passwordError.value ||
     confirmPasswordError.value ||
     emailError.value ||
