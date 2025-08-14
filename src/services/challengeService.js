@@ -75,6 +75,17 @@ export const challengeService = {
     }
   },
 
+  // 챌린지 닫기
+  async closeChallenge(userChallengeId) {
+    try {
+      const response = await challengeAPI.closeChallenge(userChallengeId);
+      return response;
+    } catch (error) {
+      console.error('챌린지 닫기 실패:', error);
+      throw new Error(`챌린지 닫기 실패: ${this.getErrorMessage(error)}`);
+    }
+  },
+
   // 에러 메시지 추출
   getErrorMessage(error) {
     return (

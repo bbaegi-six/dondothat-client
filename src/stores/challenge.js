@@ -215,6 +215,26 @@ const failChallenge = async (failureReason = 'TRANSACTION_DETECTED') => {
     error.value = null;
   };
 
+  // 챌린지 닫기
+  const closeChallenge = async (userChallengeId) => {
+    try {
+      isLoading.value = true;
+      const response = await challengeService.closeChallenge(userChallengeId);
+      
+      // 챌린지 상태 초기화
+      resetChallenge();
+      
+      console.log('✅ 챌린지 닫기 성공:', response);
+      return { success: true, data: response };
+    } catch (err) {
+      error.value = err.message;
+      console.error('❌ 챌린지 닫기 실패:', err);
+      return { success: false, error: err.message };
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   // 잠재적 저금액 계산
   const calculatePotentialSavings = (challengeType, days) => {
     const categoryAverages = {
@@ -314,6 +334,7 @@ const failChallenge = async (failureReason = 'TRANSACTION_DETECTED') => {
     failChallenge,
     retryChallenge,
     resetChallenge,
+    closeChallenge,
     clearError,
     startMonitoring,
     fetchChallengeProgress
