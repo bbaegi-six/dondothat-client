@@ -148,6 +148,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useExpensesStore } from '@/stores/expenses';
+import { useChallengeStore } from '@/stores/challenge';
 import { challengeService } from '@/services/challengeService';
 
 // Props
@@ -163,6 +164,7 @@ const router = useRouter();
 
 // Stores
 const expensesStore = useExpensesStore();
+const challengeStore = useChallengeStore();
 
 // Reactive data
 const potentialSavedAmount = ref(0);
@@ -238,7 +240,17 @@ const formatDateTime = (dateTimeString) => {
   }
 };
 
-const handleNewChallenge = () => {
+const handleNewChallenge = async () => {
+  // closeChallenge API 호출 - userChallengeData의 user_challenge_id 사용
+  if (challengeStore.userChallengeData?.user_challenge_id) {
+    try {
+      await challengeStore.closeChallenge(challengeStore.userChallengeData.user_challenge_id);
+      console.log('챌린지 닫기 성공');
+    } catch (error) {
+      console.error('챌린지 닫기 실패:', error);
+    }
+  }
+  
   // 다른 챌린지 선택하러 가기
   console.log('새로운 챌린지 선택');
   router.push('/challenge/flow');
