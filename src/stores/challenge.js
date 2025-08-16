@@ -161,6 +161,15 @@ export const useChallengeStore = defineStore('challenge', () => {
       });
 
       console.log('🎉 챌린지 완료:', response.data);
+      
+      // 챌린지 완료 시 저금통 캐시 무효화 (저금통 잔액이 변경됨)
+      try {
+        const { SavingCache } = await import('@/utils/savingCache');
+        SavingCache.invalidateOnChallengeComplete();
+      } catch (error) {
+        console.warn('저금통 캐시 무효화 실패:', error);
+      }
+      
       return { success: true, data: response.data };
     } catch (err) {
       error.value = err.message;
