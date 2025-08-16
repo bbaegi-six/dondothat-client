@@ -1,24 +1,24 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 
-// pages
-import Account from '../pages/account/Account.vue';
-import ForgotPassword from '../pages/auth/ForgotPassword.vue';
-import Login from '../pages/auth/Login.vue';
-import Register from '../pages/auth/Register.vue';
-import Challenge from '../pages/challenge/Challenge.vue'; // 챌린지 메인으로 직접 사용
-import Chat from '../pages/chat/Chat.vue';
-import Expenses from '../pages/expenses/Expenses.vue';
-import ExpenseEdit from '../pages/expenses/ExpenseEdit.vue';
-import NotFound from '../pages/error/NotFound.vue';
-import ServerError from '../pages/error/ServerError.vue';
-import Guide from '../pages/guide/Guide.vue';
-import Home from '../pages/home/Home.vue';
-import Profile from '../pages/profile/Profile.vue';
-import Edit from '../pages/profile/Edit.vue';
-import Terms from '../pages/profile/Terms.vue';
-import Policy from '../pages/profile/Policy.vue';
-import MyChallenge from '../pages/profile/MyChallenge.vue';
+// pages - 동적 import로 변경하여 번들 크기 최적화
+const Account = () => import('../pages/account/Account.vue');
+const ForgotPassword = () => import('../pages/auth/ForgotPassword.vue');
+const Login = () => import('../pages/auth/Login.vue');
+const Register = () => import('../pages/auth/Register.vue');
+const Challenge = () => import('../pages/challenge/Challenge.vue');
+const Chat = () => import('../pages/chat/Chat.vue');
+const Expenses = () => import('../pages/expenses/Expenses.vue');
+const ExpenseEdit = () => import('../pages/expenses/ExpenseEdit.vue');
+const NotFound = () => import('../pages/error/NotFound.vue');
+const ServerError = () => import('../pages/error/ServerError.vue');
+const Guide = () => import('../pages/guide/Guide.vue');
+const Home = () => import('../pages/home/Home.vue');
+const Profile = () => import('../pages/profile/Profile.vue');
+const Edit = () => import('../pages/profile/Edit.vue');
+const Terms = () => import('../pages/profile/Terms.vue');
+const Policy = () => import('../pages/profile/Policy.vue');
+const MyChallenge = () => import('../pages/profile/MyChallenge.vue');
 
 import OAuthRedirect from '../pages/auth/OAuthRedirect.vue';
 
