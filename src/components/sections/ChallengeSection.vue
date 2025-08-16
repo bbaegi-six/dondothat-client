@@ -87,6 +87,20 @@ const props = defineProps({
 
 defineEmits(['goToChallenge']);
 
+// 카테고리 정보를 한 번만 검색하는 최적화된 computed
+const challengeCategory = computed(() => {
+  if (!props.challengeData || !props.categoryMasterData) {
+    return null;
+  }
+  
+  const categoryId = props.challengeData.challenge_id;
+  const foundEntry = Object.entries(props.categoryMasterData).find(
+    ([name, cat]) => cat.id === categoryId
+  );
+  
+  return foundEntry ? foundEntry[1] : null;
+});
+
 const challengeIconClass = computed(() => {
   if (!props.challengeData) return '';
   
@@ -95,12 +109,7 @@ const challengeIconClass = computed(() => {
     return faXmark;
   }
   
-  const categoryId = props.challengeData.challenge_id;
-  const foundEntry = Object.entries(props.categoryMasterData).find(
-    ([name, cat]) => cat.id === categoryId
-  );
-
-  return foundEntry ? foundEntry[1].icon : '';
+  return challengeCategory.value?.icon || '';
 });
 
 const challengeIconColor = computed(() => {
@@ -111,11 +120,7 @@ const challengeIconColor = computed(() => {
     return '#ffffff';
   }
   
-  const categoryId = props.challengeData.challenge_id;
-  const foundEntry = Object.entries(props.categoryMasterData).find(
-    ([name, cat]) => cat.id === categoryId
-  );
-  return foundEntry ? foundEntry[1].color : '';
+  return challengeCategory.value?.color || '';
 });
 
 const challengeIconBackgroundStyle = computed(() => {
