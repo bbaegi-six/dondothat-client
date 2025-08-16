@@ -10,28 +10,14 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend
-} from 'chart.js';
-
-// Chart.js 필요한 컴포넌트만 등록
-ChartJS.register(ArcElement, Tooltip, Legend);
+import Chart from 'chart.js/auto';
 
 const props = defineProps({
   chartData: {
     type: Array,
     required: true,
   },
-  isInitialized: {
-    type: Boolean,
-    default: false,
-  },
 });
-
-const emit = defineEmits(['chart-initialized']);
 
 const chartCanvas = ref(null);
 const chartInstance = ref(null);
@@ -50,7 +36,7 @@ const createChart = () => {
   // 카테고리별 색상 배열
   const colors = props.chartData.map((item) => item.color);
 
-  chartInstance.value = new ChartJS(ctx, {
+  chartInstance.value = new Chart(ctx, {
     type: 'pie',
     data: {
       labels: props.chartData.map((item) => item.name),
@@ -88,31 +74,30 @@ const createChart = () => {
     },
   });
 
-  // 차트 초기화 완료 알림
-  emit('chart-initialized');
+  // 차트 생성 완료
 };
 
-// chartData가 변경될 때만 차트 재생성 (초기 로딩 제외)
+// chartData가 변경될 때 차트 재생성
 watch(
   () => props.chartData,
   (newData) => {
-    // 초기화가 완료된 후에만 watch 반응
-    if (!props.isInitialized) return;
-    
-    // 실제 데이터가 있을 때만 차트 재생성
+    // 데이터가 있을 때만 차트 생성
     if (newData && newData.length > 0) {
       nextTick(() => {
         createChart();
       });
     }
   },
-  { deep: true }
+  { deep: true, immediate: true }
 );
 
 onMounted(() => {
-  nextTick(() => {
-    createChart();
-  });
+  // chartData가 이미 있다면 차트 생성
+  if (props.chartData && props.chartData.length > 0) {
+    nextTick(() => {
+      createChart();
+    });
+  }
 });
 
 // 컴포넌트 언마운트 시 차트 인스턴스 정리로 메모리 누수 방지

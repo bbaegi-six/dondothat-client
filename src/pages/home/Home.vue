@@ -21,8 +21,6 @@
     <!-- 차트 섹션 -->
     <ExpenseChart
       :chart-data="chartData"
-      :is-initialized="isChartInitialized"
-      @chart-initialized="handleChartInitialized"
     />
 
     <!-- 지출 요약 섹션 -->
@@ -69,8 +67,6 @@ const subAccount = ref(null);
 const currentMonthSummary = ref({});
 const chartLoading = ref(false);
 
-// 차트 초기화 상태 관리
-const isChartInitialized = ref(false);
 
 // 현재월 지출 집계 로드
 const loadCurrentMonthSummary = async () => {
@@ -104,10 +100,6 @@ const chartData = computed(() => {
     .sort((a, b) => b.amount - a.amount);
 });
 
-// 차트 초기화 완료 핸들러
-const handleChartInitialized = () => {
-  isChartInitialized.value = true;
-};
 
 // 페이지 이동 함수들
 const goToAccountStep2 = () => {
