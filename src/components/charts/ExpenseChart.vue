@@ -10,7 +10,15 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import Chart from 'chart.js/auto';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend
+} from 'chart.js';
+
+// Chart.js 필요한 컴포넌트만 등록
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const props = defineProps({
   chartData: {
@@ -42,7 +50,7 @@ const createChart = () => {
   // 카테고리별 색상 배열
   const colors = props.chartData.map((item) => item.color);
 
-  chartInstance.value = new Chart(ctx, {
+  chartInstance.value = new ChartJS(ctx, {
     type: 'pie',
     data: {
       labels: props.chartData.map((item) => item.name),
