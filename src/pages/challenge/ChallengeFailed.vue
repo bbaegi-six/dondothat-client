@@ -149,6 +149,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useExpensesStore } from '@/stores/expenses';
 import { useChallengeStore } from '@/stores/challenge';
+import { calculatePotentialSavings } from '@/utils/challengeUtils';
 import { challengeService } from '@/services/challengeService';
 
 // Props
@@ -299,7 +300,9 @@ onMounted(async () => {
     ];
     
     // 즉시 실행 가능한 작업은 먼저 실행
-    calculatePotentialSavings();
+    const challengeType = props.challengeData.type;
+    const days = props.challengeData.days;
+    potentialSavings.value = calculatePotentialSavings(challengeType, days);
     
     // API 호출들을 병렬로 처리 (현재는 하나지만 확장 가능)
     await Promise.allSettled(tasks);

@@ -56,13 +56,7 @@ import Modal from '../../components/Modal.vue';
 import Button from '../../components/Button.vue';
 
 // 티어 이미지 임포트
-import tier00 from '@/assets/tier/tier_00.png';
-import tier01 from '@/assets/tier/tier_01.png';
-import tier02 from '@/assets/tier/tier_02.png';
-import tier03 from '@/assets/tier/tier_03.png';
-import tier04 from '@/assets/tier/tier_04.png';
-import tier05 from '@/assets/tier/tier_05.png';
-import tier06 from '@/assets/tier/tier_06.png';
+import { getTierImage } from '@/utils/challengeUtils';
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
@@ -74,15 +68,6 @@ const emit = defineEmits(['update:modelValue', 'next', 'close']);
 // 티어 정보 상태 (props로 받지 못한 경우 백업용)
 const tierInfo = ref(null);
 
-// 티어 이미지 매핑
-const tierImages = {
-  1: tier01,
-  2: tier02,
-  3: tier03,
-  4: tier04,
-  5: tier05,
-  6: tier06,
-};
 
 const innerModel = computed({
   get: () => {
@@ -107,8 +92,7 @@ const getCurrentTierImage = computed(() => {
 
 
   // 모달이 표시되는 상태에서는 항상 유효한 tier 데이터가 있어야 함
-  const selectedImage = tierImages[tierId] || tier00;
-  return selectedImage;
+  return getTierImage(tierId);
 });
 
 // 현재 티어 이름 (computed로 반응성 보장)
