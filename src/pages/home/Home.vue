@@ -42,7 +42,7 @@ import ExpenseChart from '@/components/charts/ExpenseChart.vue';
 import ExpenseSummary from '@/components/sections/ExpenseSummary.vue';
 import SavingGuideModal from '@/components/modals/SavingGuideModal.vue';
 
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useExpensesStore } from '@/stores/expenses';
@@ -127,8 +127,17 @@ const loadSavingAccount = async () => {
 };
 
 
+// 저금통 계좌 정보 업데이트 이벤트 리스너
+const handleSavingAccountUpdate = (event) => {
+  subAccount.value = event.detail;
+  console.log('홈페이지: 저금통 계좌 정보 업데이트됨');
+};
+
 onMounted(async () => {
   try {
+    // 저금통 업데이트 이벤트 리스너 등록
+    window.addEventListener('savingAccountUpdated', handleSavingAccountUpdate);
+    
     // 1. 중요한 차트 데이터를 우선적으로 로드 (사용자가 바로 볼 수 있는 데이터)
     await loadCurrentMonthSummary();
     
@@ -154,6 +163,11 @@ onMounted(async () => {
     // 차트 데이터 로딩 실패 시에도 빈 배열로 초기화하여 화면 표시
     currentMonthSummary.value = {};
   }
+});
+
+onBeforeUnmount(() => {
+  // 이벤트 리스너 제거
+  window.removeEventListener('savingAccountUpdated', handleSavingAccountUpdate);
 });
 
 // 차트 인스턴스 정리는 ExpenseChart 컴포넌트에서 처리됨
