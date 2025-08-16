@@ -381,21 +381,23 @@ watch(
 onMounted(async () => {
   try {
     // API 호출을 병렬로 처리하여 성능 개선 (Promise.allSettled 사용)
-    const promises = [loadCurrentMonthSummary()];
+    const apiCalls = [
+      { name: 'loadCurrentMonthSummary', fn: loadCurrentMonthSummary }
+    ];
     
     if (authStore.isLoggedIn) {
-      promises.push(loadSavingAccount());
-      promises.push(challengeStore.fetchChallengeProgress());
+      apiCalls.push({ name: 'loadSavingAccount', fn: loadSavingAccount });
+      apiCalls.push({ name: 'fetchChallengeProgress', fn: challengeStore.fetchChallengeProgress });
     }
     
     // 모든 API를 병렬로 실행 (개별 실패 허용)
+    const promises = apiCalls.map(api => api.fn());
     const results = await Promise.allSettled(promises);
     
     // 개별 API 실패 로깅
     results.forEach((result, index) => {
       if (result.status === 'rejected') {
-        const apiNames = ['loadCurrentMonthSummary', 'loadSavingAccount', 'fetchChallengeProgress'];
-        console.error(`${apiNames[index]} API 실패:`, result.reason);
+        console.error(`${apiCalls[index].name} API 실패:`, result.reason);
       }
     });
     
