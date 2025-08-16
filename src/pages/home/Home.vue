@@ -367,13 +367,22 @@ const loadSavingAccount = async () => {
   }
 };
 
-// chartData가 변경될 때 차트 재생성
+// 차트 초기화 상태 관리
+const isChartInitialized = ref(false);
+
+// chartData가 변경될 때만 차트 재생성 (초기 로딩 제외)
 watch(
   chartData,
-  () => {
-    nextTick(() => {
-      createChart();
-    });
+  (newData, oldData) => {
+    // 초기 로딩은 onMounted에서 처리하므로 watch에서는 제외
+    if (!isChartInitialized.value) return;
+    
+    // 실제 데이터 변경이 있을 때만 차트 재생성
+    if (newData && newData.length > 0) {
+      nextTick(() => {
+        createChart();
+      });
+    }
   },
   { deep: true }
 );
@@ -404,6 +413,9 @@ onMounted(async () => {
     // 차트 데이터 로딩 완료 후 차트 생성
     await nextTick();
     createChart();
+    
+    // 차트 초기화 완료 표시
+    isChartInitialized.value = true;
   } catch (error) {
     console.error('Home 화면 데이터 로딩 예상치 못한 오류:', error);
   }
@@ -415,6 +427,8 @@ onBeforeUnmount(() => {
     chartInstance.value.destroy();
     chartInstance.value = null;
   }
+  // 차트 초기화 상태도 리셋
+  isChartInitialized.value = false;
 });
 </script>
 
