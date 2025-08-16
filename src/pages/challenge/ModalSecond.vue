@@ -93,10 +93,6 @@ const innerModel = computed({
     const hasTierData =
       props.tierData?.tierId != null || tierInfo.value?.tierId != null;
 
-    console.log('innerModel computed - modelValue:', props.modelValue);
-    console.log('innerModel computed - hasTierData:', hasTierData);
-    console.log('innerModel computed - props.tierData:', props.tierData);
-    console.log('innerModel computed - tierInfo.value:', tierInfo.value);
 
     return props.modelValue && hasTierData;
   },
@@ -109,12 +105,9 @@ const getCurrentTierImage = computed(() => {
   const currentTierInfo = props.tierData || tierInfo.value;
   const tierId = currentTierInfo?.tierId;
 
-  console.log('ModalSecond - 사용된 티어 정보:', currentTierInfo);
-  console.log('ModalSecond - tier_id:', tierId, '타입:', typeof tierId);
 
   // 모달이 표시되는 상태에서는 항상 유효한 tier 데이터가 있어야 함
   const selectedImage = tierImages[tierId] || tier00;
-  console.log('ModalSecond - 선택된 이미지:', selectedImage);
   return selectedImage;
 });
 
@@ -124,11 +117,9 @@ const getCurrentTierName = computed(() => {
   const currentTierInfo = props.tierData || tierInfo.value;
   const tierName = currentTierInfo?.tierName;
 
-  console.log('ModalSecond - 백엔드 tierName:', tierName);
 
   // 모달이 표시되는 상태에서는 항상 유효한 tier 데이터가 있어야 함
   const finalTierName = tierName || '미등급';
-  console.log('ModalSecond - 선택된 티어 이름:', finalTierName);
   return finalTierName;
 });
 
@@ -139,20 +130,14 @@ watch(
     if (newValue) {
       // props로 tierData가 이미 전달되었으면 API 호출 건너뛰기
       if (props.tierData) {
-        console.log(
-          'ModalSecond - props에서 티어 데이터 받음:',
-          props.tierData
-        );
         return; // 즉시 모달 표시
       }
 
       // props에 tierData가 없으면 API 호출
-      console.log('ModalSecond - 티어 정보 로딩 중...');
 
       try {
         const tierData = await authAPI.getMyPageTier();
         tierInfo.value = tierData;
-        console.log('ModalSecond - 티어 정보 로딩 완료:', tierData);
       } catch (error) {
         console.error('ModalSecond - 티어 정보 로딩 실패:', error);
         tierInfo.value = null;
