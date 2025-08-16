@@ -257,7 +257,7 @@ const handleNewChallenge = async () => {
   router.push('/challenge/flow');
 };
 
-const calculatePotentialSavings = () => {
+const calculateLocalPotentialSavings = () => {
   potentialSavedAmount.value =
     props.challengeData.savedAmount * props.challengeData.days;
 };
