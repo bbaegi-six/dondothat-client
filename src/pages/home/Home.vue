@@ -137,30 +137,30 @@ const loadSavingAccount = async () => {
 
 onMounted(async () => {
   try {
-    // API 호출을 병렬로 처리하여 성능 개선 (Promise.allSettled 사용)
-    const apiCalls = [
-      { name: 'loadCurrentMonthSummary', fn: loadCurrentMonthSummary }
-    ];
+    // 1. 중요한 차트 데이터를 우선적으로 로드 (사용자가 바로 볼 수 있는 데이터)
+    await loadCurrentMonthSummary();
     
+    // 2. 로그인 상태에서만 필요한 API들을 백그라운드에서 병렬 처리
     if (authStore.isLoggedIn) {
-      apiCalls.push({ name: 'loadSavingAccount', fn: loadSavingAccount });
-      apiCalls.push({ name: 'fetchChallengeProgress', fn: challengeStore.fetchChallengeProgress });
+      const backgroundTasks = [
+        loadSavingAccount(),
+        challengeStore.fetchChallengeProgress()
+      ];
+      
+      // 백그라운드 API는 실패해도 홈 화면 로딩을 방해하지 않음
+      Promise.allSettled(backgroundTasks).then(results => {
+        results.forEach((result, index) => {
+          if (result.status === 'rejected') {
+            const taskNames = ['loadSavingAccount', 'fetchChallengeProgress'];
+            console.error(`${taskNames[index]} API 실패:`, result.reason);
+          }
+        });
+      });
     }
-    
-    // 모든 API를 병렬로 실행 (개별 실패 허용)
-    const promises = apiCalls.map(api => api.fn());
-    const results = await Promise.allSettled(promises);
-    
-    // 개별 API 실패 로깅
-    results.forEach((result, index) => {
-      if (result.status === 'rejected') {
-        console.error(`${apiCalls[index].name} API 실패:`, result.reason);
-      }
-    });
-    
-    // 차트는 ExpenseChart 컴포넌트에서 자동으로 초기화됨
   } catch (error) {
-    console.error('Home 화면 데이터 로딩 예상치 못한 오류:', error);
+    console.error('Home 화면 핵심 데이터 로딩 오류:', error);
+    // 차트 데이터 로딩 실패 시에도 빈 배열로 초기화하여 화면 표시
+    currentMonthSummary.value = {};
   }
 });
 
