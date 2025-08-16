@@ -72,12 +72,14 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useChallengeStore } from '@/stores/challenge';
 import ChallengeLoading from './ChallengeLoading.vue';
 import ChallengeSelection from './ChallengeSelection.vue';
 import ChallengeDaysInput from './ChallengeDaysInput.vue';
 import challengeService from '@/services/challengeService';
 
 const router = useRouter();
+const challengeStore = useChallengeStore();
 
 const currentStep = ref('loading');
 const availableChallenges = ref([]);
@@ -128,6 +130,10 @@ const handleDateComplete = async (data) => {
 
 const completeChallenge = () => {
   console.log('✅ 챌린지 플로우 완료 - Challenge 페이지로 이동');
+  
+  // 새로운 챌린지가 생성되었으므로 기존 캐시된 데이터 무효화
+  challengeStore.userChallengeData = null;
+  
   router.push('/challenge');
 };
 

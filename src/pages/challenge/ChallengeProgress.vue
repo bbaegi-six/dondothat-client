@@ -139,15 +139,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
 
 import { useRouter } from 'vue-router';
 import { useSavingStore } from '@/stores/saving';
 import { useExpensesStore } from '@/stores/expenses';
-import ModalFirst from './ModalFirst.vue';
-import ModalSecond from './ModalSecond.vue';
-import ModalThird from './ModalThird.vue';
-import SavedAmountInfoModal from '@/components/modals/SavedAmountInfoModal.vue';
+
+// 모달들을 동적 import로 변경하여 초기 로딩 속도 개선
+const ModalFirst = defineAsyncComponent(() => import('./ModalFirst.vue'));
+const ModalSecond = defineAsyncComponent(() => import('./ModalSecond.vue'));
+const ModalThird = defineAsyncComponent(() => import('./ModalThird.vue'));
+const SavedAmountInfoModal = defineAsyncComponent(() => import('@/components/modals/SavedAmountInfoModal.vue'));
 import { faCircleQuestion as farCircleQuestion } from '@fortawesome/free-regular-svg-icons';
 
 const router = useRouter();
