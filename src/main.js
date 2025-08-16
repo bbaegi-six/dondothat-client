@@ -4,50 +4,14 @@ import App from './App.vue';
 import router from './router';
 import './assets/styles/global.css';
 import { useAuthStore } from './stores/auth';
-import { library } from '@fortawesome/fontawesome-svg-core';
+// FontAwesome 전역 등록 제거 - 컴포넌트별 로컬 import로 변경
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCircleQuestion as farCircleQuestion } from '@fortawesome/free-regular-svg-icons';
-import {
-  faCircleQuestion as fasCircleQuestion,
-  faAngleRight,
-  faMotorcycle,
-  faMugSaucer,
-  faBagShopping,
-  faTaxi,
-  faStore,
-  faClapperboard,
-  faWineBottle,
-  faTrainSubway,
-  faSuitcaseMedical,
-  faHome,
-  faUtensils,
-  faEllipsis,
-  faCoins,
-} from '@fortawesome/free-solid-svg-icons';
-
-library.add(
-  farCircleQuestion,
-  fasCircleQuestion,
-  faAngleRight,
-  faMotorcycle,
-  faMugSaucer,
-  faBagShopping,
-  faTaxi,
-  faStore,
-  faClapperboard,
-  faWineBottle,
-  faTrainSubway,
-  faSuitcaseMedical,
-  faHome,
-  faUtensils,
-  faEllipsis,
-  faCoins
-);
 
 const app = createApp(App);
 const pinia = createPinia();
 
 app.use(pinia);
+// FontAwesome 컴포넌트 전역 등록
 app.component('FontAwesomeIcon', FontAwesomeIcon);
 
 // Define an async function for app initialization
