@@ -51,6 +51,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useChallengeStore } from '@/stores/challenge';
 import { authAPI } from '@/utils/api';
 import { expensesService } from '@/services/expensesService';
+import { SavingCache } from '@/utils/savingCache';
 
 const authStore = useAuthStore();
 const accountStore = useAccountStore();
@@ -115,11 +116,25 @@ const goToSavingTab = () => {
   router.push('/expenses?tab=savings');
 };
 
-// 저금통 계좌 정보 로드
+// 저금통 계좌 정보 로드 (캐싱 적용)
 const loadSavingAccount = async () => {
   try {
+    // 1. 캐시에서 먼저 확인
+    const cachedData = SavingCache.get();
+    if (cachedData) {
+      subAccount.value = cachedData;
+      console.log('저금통 캐시 데이터 사용');
+      return;
+    }
+    
+    // 2. 캐시가 없으면 API 호출
+    console.log('저금통 API 호출');
     const response = await authAPI.getMyPageAccounts();
     subAccount.value = response.subAccount;
+    
+    // 3. 새로 받은 데이터를 캐시에 저장
+    SavingCache.set(response.subAccount);
+    
   } catch (error) {
     console.error('저금통 계좌 정보 조회 오류:', error);
     subAccount.value = null;
@@ -130,7 +145,10 @@ const loadSavingAccount = async () => {
 // 저금통 계좌 정보 업데이트 이벤트 리스너
 const handleSavingAccountUpdate = (event) => {
   subAccount.value = event.detail;
-  console.log('홈페이지: 저금통 계좌 정보 업데이트됨');
+  
+  // 새로운 데이터로 캐시 업데이트
+  SavingCache.set(event.detail);
+  console.log('홈페이지: 저금통 계좌 정보 및 캐시 업데이트됨');
 };
 
 onMounted(async () => {
