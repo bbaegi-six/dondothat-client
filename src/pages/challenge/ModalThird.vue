@@ -34,7 +34,7 @@
           </div>
           
           <!-- 상품 리스트 -->
-          <template v-else-if="savingsProducts.length > 0" v-for="(item, index) in savingsProducts" :key="index">
+          <template v-else-if="savingsProducts.length > 0" v-for="(item, index) in savingsProducts" :key="`${item.bank}-${item.name}`">
             <li>
               <div
                 class="flex items-center py-5 cursor-pointer hover:bg-gray-800 hover:bg-opacity-20 transition-colors duration-200 rounded-lg px-2 -mx-2"
