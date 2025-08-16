@@ -155,9 +155,9 @@ const fetchRecommendations = async () => {
 };
 
 onMounted(async () => {
-  console.log('⏳ 챌린지 로딩 시작 - API 호출 및 최소 5초 대기');
+  console.log('⏳ 챌린지 로딩 시작 - API 호출 및 최소 1초 대기');
 
-  const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 5000));
+  const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 3500));
   const fetchPromise = fetchRecommendations();
 
   const [, challenges] = await Promise.all([minLoadingTime, fetchPromise]);
