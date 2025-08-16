@@ -182,7 +182,7 @@
 
 <script setup>
 import Header from '@/components/layout/Header.vue';
-import { ref, onMounted, nextTick, watch, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, nextTick, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import Chart from 'chart.js/auto';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -406,6 +406,14 @@ onMounted(async () => {
     createChart();
   } catch (error) {
     console.error('Home 화면 데이터 로딩 예상치 못한 오류:', error);
+  }
+});
+
+// 컴포넌트 언마운트 시 차트 인스턴스 정리로 메모리 누수 방지
+onBeforeUnmount(() => {
+  if (chartInstance.value) {
+    chartInstance.value.destroy();
+    chartInstance.value = null;
   }
 });
 </script>
