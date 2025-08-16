@@ -1,23 +1,25 @@
 <!-- challenge.vue -->
 <template>
   <div>
-    <!-- 진행 중인 챌린지가 있는 경우 -->
-    <ChallengeProgress
-      v-if="showProgress"
-      :challenge-data="challengeStore.activeChallenge"
-    />
+    <!-- API 로딩 완료 후에만 렌더링 -->
+    <template v-if="!challengeStore.isLoading">
+      <!-- 진행 중인 챌린지가 있는 경우 -->
+      <ChallengeProgress
+        v-if="showProgress"
+        :challenge-data="challengeStore.activeChallenge"
+      />
 
-    <!-- 실패한 챌린지가 있는 경우 -->
-    <ChallengeFailed
-      v-else-if="showFailed"
-      :challenge-data="challengeStore.activeChallenge"
-    />
+      <!-- 실패한 챌린지가 있는 경우 -->
+      <ChallengeFailed
+        v-else-if="showFailed"
+        :challenge-data="challengeStore.activeChallenge"
+      />
 
-    <!-- 참여 중인 챌린지가 없는 경우 (기본 화면) -->
-    <div
-      v-else
-      :class="['flex flex-col h-screen pt-[10vh]', { 'is-leaving': isLeaving }]"
-    >
+      <!-- 참여 중인 챌린지가 없는 경우 (기본 화면) -->
+      <div
+        v-else
+        :class="['flex flex-col h-screen pt-[10vh]', { 'is-leaving': isLeaving }]"
+      >
       <!-- Main Content Area -->
       <div
         class="flex-1 flex items-center justify-center pt-[60px] pb-[90px] px-5 slide-up-animation"
@@ -59,6 +61,7 @@
         </Button>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -68,9 +71,9 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useChallengeStore } from '@/stores/challenge';
 import Button from '@/components/Button.vue';
+import challengeService from '@/services/challengeService';
 import ChallengeProgress from './ChallengeProgress.vue';
 import ChallengeFailed from './ChallengeFailed.vue';
-import challengeService from '@/services/challengeService';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -98,19 +101,29 @@ const startChallenge = () => {
 
 // 페이지 로드 시 진척도 확인
 onMounted(async () => {
-  // 챌린지 정보 로드
-  await challengeStore.fetchChallengeProgress();
+  try {
+    // 홈에서 이미 로드된 데이터가 있으면 API 호출 스킵 (성능 최적화)
+    // 단, userChallengeData가 null이거나 activeChallenge가 초기 상태면 새로 로드
+    if (!challengeStore.userChallengeData || challengeStore.activeChallenge.status === 'NONE') {
+      await challengeStore.fetchChallengeProgress();
+    }
 
-  // 스토어의 activeChallenge를 기반으로 화면 상태 설정
-  if (challengeStore.activeChallenge.status === 'failed') {
-    showFailed.value = true;
-  } else if (
-    challengeStore.activeChallenge.status === 'ongoing' ||
-    challengeStore.activeChallenge.status === 'completed'
-  ) {
-    showProgress.value = true;
-  } else {
-    // 챌린지가 없는 경우 (NONE) 또는 알 수 없는 상태
+    // 스토어의 activeChallenge를 기반으로 화면 상태 설정
+    if (challengeStore.activeChallenge.status === 'failed') {
+      showFailed.value = true;
+    } else if (
+      challengeStore.activeChallenge.status === 'ongoing' ||
+      challengeStore.activeChallenge.status === 'completed'
+    ) {
+      showProgress.value = true;
+    } else {
+      // 챌린지가 없는 경우 (NONE) 또는 알 수 없는 상태
+      showProgress.value = false;
+      showFailed.value = false;
+    }
+  } catch (error) {
+    console.error('챌린지 정보 로드 실패:', error);
+    // 에러 시 기본 상태로 설정
     showProgress.value = false;
     showFailed.value = false;
   }
@@ -228,9 +241,13 @@ if (process.env.NODE_ENV === 'development') {
 .slide-up-animation {
   animation: slide-up 0.5s ease-out forwards;
   animation-fill-mode: backwards;
+  will-change: opacity, transform;
+  transform: translateZ(0); /* GPU 가속 강제 활성화 */
 }
 
 .is-leaving .slide-up-animation {
   animation: slide-down 0.5s ease-out forwards;
+  will-change: opacity, transform;
+  transform: translateZ(0); /* GPU 가속 강제 활성화 */
 }
 </style>

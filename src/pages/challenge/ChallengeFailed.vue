@@ -292,8 +292,20 @@ const fetchFailedTransactions = async () => {
 };
 
 onMounted(async () => {
-  calculatePotentialSavings();
-  await fetchFailedTransactions();
+  try {
+    // 병렬로 실행 가능한 작업들을 동시에 처리
+    const tasks = [
+      fetchFailedTransactions()
+    ];
+    
+    // 즉시 실행 가능한 작업은 먼저 실행
+    calculatePotentialSavings();
+    
+    // API 호출들을 병렬로 처리 (현재는 하나지만 확장 가능)
+    await Promise.allSettled(tasks);
+  } catch (error) {
+    console.error('챌린지 실패 페이지 초기화 오류:', error);
+  }
 });
 </script>
 
