@@ -379,16 +379,31 @@ watch(
 );
 
 onMounted(async () => {
-  // 독립적으로 현재월 지출 집계 로드
-  await loadCurrentMonthSummary();
-
-  await nextTick(); // DOM 업데이트 완료 대기
-  createChart();
-
-  // 저금통 계좌 정보 로드
-  if (authStore.isLoggedIn) {
-    await loadSavingAccount();
-    await challengeStore.fetchChallengeProgress();
+  try {
+    // API 호출을 병렬로 처리하여 성능 개선 (Promise.allSettled 사용)
+    const promises = [loadCurrentMonthSummary()];
+    
+    if (authStore.isLoggedIn) {
+      promises.push(loadSavingAccount());
+      promises.push(challengeStore.fetchChallengeProgress());
+    }
+    
+    // 모든 API를 병렬로 실행 (개별 실패 허용)
+    const results = await Promise.allSettled(promises);
+    
+    // 개별 API 실패 로깅
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        const apiNames = ['loadCurrentMonthSummary', 'loadSavingAccount', 'fetchChallengeProgress'];
+        console.error(`${apiNames[index]} API 실패:`, result.reason);
+      }
+    });
+    
+    // 차트 데이터 로딩 완료 후 차트 생성
+    await nextTick();
+    createChart();
+  } catch (error) {
+    console.error('Home 화면 데이터 로딩 예상치 못한 오류:', error);
   }
 });
 </script>
