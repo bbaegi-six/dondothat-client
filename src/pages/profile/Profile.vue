@@ -130,9 +130,9 @@ const accountStore = useAccountStore();
 const nickname = computed(() => user.value?.nickname || '게스트');
 const email = computed(() => user.value?.email || 'guest@example.com');
 
-// 계좌 정보
-const mainAccount = ref(null);
-const subAccount = ref(null);
+// 계좌 정보 (Account Store computed 사용)
+const mainAccount = computed(() => accountStore.mainAccount);
+const subAccount = computed(() => accountStore.subAccount);
 
 // 은행 로고 매핑
 const bankLogos = {
@@ -333,21 +333,18 @@ function formatAmount(amount) {
   return amount.toLocaleString();
 }
 
-// 계좌 정보 로드
+// 계좌 정보 로드 (Account Store 사용)
 async function loadAssets() {
   try {
-    const response = await authAPI.getMyPageAccounts();
-
-    mainAccount.value = response.mainAccount;
-    subAccount.value = response.subAccount;
-
-    console.log('메인 계좌:', mainAccount.value);
-    console.log('서브 계좌:', subAccount.value);
+    await accountStore.fetchAccounts();
+    
+    console.log('메인 계좌:', accountStore.mainAccount);
+    console.log('서브 계좌:', accountStore.subAccount);
 
     // 계좌명 확인
-    if (mainAccount.value) {
-      console.log('메인 계좌명:', mainAccount.value.assetName);
-      console.log('메인 계좌명 타입:', typeof mainAccount.value.assetName);
+    if (accountStore.mainAccount) {
+      console.log('메인 계좌명:', accountStore.mainAccount.assetName);
+      console.log('메인 계좌명 타입:', typeof accountStore.mainAccount.assetName);
     }
   } catch (error) {
     console.error('계좌 정보 조회 오류:', error);
@@ -382,7 +379,8 @@ async function handleConfirm() {
       console.log('계좌 삭제 성공'); // message 필드가 없을 경우 기본 메시지
     }
 
-    // 계좌 목록 다시 로드
+    // 계좌 목록 다시 로드 (캐시 무효화 후 새로 가져오기)
+    accountStore.invalidateAll();
     await loadAssets();
 
     // ✅ 삭제 성공하면 계좌 연결 화면으로 이동
