@@ -5,7 +5,7 @@
   >
     <!-- 저금통 섹션 -->
     <SavingAccountSection
-      :sub-account="subAccount"
+      :sub-account="accountStore.subAccount"
       @show-guide="isSavingGuideModalOpen = true"
       @go-to-saving="goToSavingTab"
       @connect-account="goToAccountStep2"
@@ -49,9 +49,7 @@ import { useExpensesStore } from '@/stores/expenses';
 import { useAccountStore } from '@/stores/account';
 import { useAuthStore } from '@/stores/auth';
 import { useChallengeStore } from '@/stores/challenge';
-import { authAPI } from '@/utils/api';
 import { expensesService } from '@/services/expensesService';
-import { SavingCache } from '@/utils/savingCache';
 
 const authStore = useAuthStore();
 const accountStore = useAccountStore();
@@ -60,9 +58,6 @@ const challengeStore = useChallengeStore();
 
 const isSavingGuideModalOpen = ref(false);
 const router = useRouter();
-
-// 저금통 계좌 정보
-const subAccount = ref(null);
 
 // 독립적인 현재월 지출 데이터
 const currentMonthSummary = ref({});
@@ -116,39 +111,23 @@ const goToSavingTab = () => {
   router.push('/expenses?tab=savings');
 };
 
-// 저금통 계좌 정보 로드 (캐싱 적용)
-const loadSavingAccount = async () => {
+// 계좌 정보 로드 (Account Store 사용)
+const loadAccounts = async () => {
   try {
-    // 1. 캐시에서 먼저 확인
-    const cachedData = SavingCache.get();
-    if (cachedData) {
-      subAccount.value = cachedData;
-      console.log('저금통 캐시 데이터 사용');
-      return;
-    }
-    
-    // 2. 캐시가 없으면 API 호출
-    console.log('저금통 API 호출');
-    const response = await authAPI.getMyPageAccounts();
-    subAccount.value = response.subAccount;
-    
-    // 3. 새로 받은 데이터를 캐시에 저장
-    SavingCache.set(response.subAccount);
-    
+    await accountStore.fetchAccounts();
   } catch (error) {
-    console.error('저금통 계좌 정보 조회 오류:', error);
-    subAccount.value = null;
+    console.error('계좌 정보 조회 오류:', error);
   }
 };
 
 
-// 저금통 계좌 정보 업데이트 이벤트 리스너
+// 저금통 계좌 정보 업데이트 이벤트 리스너 (Account Store 사용)
 const handleSavingAccountUpdate = (event) => {
-  subAccount.value = event.detail;
-  
-  // 새로운 데이터로 캐시 업데이트
-  SavingCache.set(event.detail);
-  console.log('홈페이지: 저금통 계좌 정보 및 캐시 업데이트됨');
+  // Account Store의 subAccount 데이터 직접 업데이트
+  if (accountStore.accounts) {
+    accountStore.accounts.subAccount = event.detail;
+    console.log('홈페이지: Account Store 저금통 계좌 정보 업데이트됨');
+  }
 };
 
 onMounted(async () => {
@@ -162,7 +141,7 @@ onMounted(async () => {
     // 2. 로그인 상태에서만 필요한 API들을 백그라운드에서 병렬 처리
     if (authStore.isLoggedIn) {
       const backgroundTasks = [
-        loadSavingAccount(),
+        loadAccounts(),
         challengeStore.fetchChallengeProgress()
       ];
       
@@ -170,7 +149,7 @@ onMounted(async () => {
       Promise.allSettled(backgroundTasks).then(results => {
         results.forEach((result, index) => {
           if (result.status === 'rejected') {
-            const taskNames = ['loadSavingAccount', 'fetchChallengeProgress'];
+            const taskNames = ['loadAccounts', 'fetchChallengeProgress'];
             console.error(`${taskNames[index]} API 실패:`, result.reason);
           }
         });
@@ -181,7 +160,7 @@ onMounted(async () => {
     // 차트 데이터 로딩 실패 시에도 빈 배열로 초기화하여 화면 표시
     currentMonthSummary.value = {};
   }
-});
+};
 
 onBeforeUnmount(() => {
   // 이벤트 리스너 제거
