@@ -495,11 +495,9 @@ const refreshMainAccount = async () => {
     const { useAccountStore } = await import('@/stores/account');
     const accountStore = useAccountStore();
     
-    // 메인 계좌 캐시 무효화 후 새로 가져오기
-    accountStore.invalidateMainAccount();
-    await accountStore.fetchAccounts();
+    // 메인 계좌만 새로고침 (서브 계좌는 보존)
+    await accountStore.fetchMainAccountOnly();
     
-    console.log('메인 계좌 캐시 무효화 및 새로고침 완료');
     return accountStore.mainAccount;
   } catch (error) {
     console.error('메인 계좌 정보 새로고침 실패:', error);
