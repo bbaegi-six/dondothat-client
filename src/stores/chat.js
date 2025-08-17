@@ -6,8 +6,17 @@ import { chatApi } from '@/services/chatApi';
 
 // WebSocket URL 설정 통일
 const getWebSocketUrl = () => {
+  // 환경별 WebSocket URL 사용
+  const wsUrl = import.meta.env.VITE_WS_URL;
+  if (wsUrl) {
+    return `${wsUrl}/ws/chat`;
+  }
+  
+  // fallback: API URL에서 WebSocket URL 생성
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-  return `${apiUrl}/ws/chat`;
+  const protocol = apiUrl.startsWith('https:') ? 'wss:' : 'ws:';
+  const cleanUrl = apiUrl.replace(/^https?:\/\//, '').replace('/api', '');
+  return `${protocol}//${cleanUrl}/ws/chat`;
 };
 
 export const useChatStore = defineStore('chat', () => {
