@@ -130,9 +130,8 @@ const accountStore = useAccountStore();
 const nickname = computed(() => user.value?.nickname || '게스트');
 const email = computed(() => user.value?.email || 'guest@example.com');
 
-// 계좌 정보 (Account Store computed 사용)
-const mainAccount = computed(() => accountStore.mainAccount);
-const subAccount = computed(() => accountStore.subAccount);
+// 계좌 정보 (storeToRefs로 반응성 확보)
+const { mainAccount, subAccount, isLoading } = storeToRefs(accountStore);
 
 // 은행 로고 매핑
 const bankLogos = {
@@ -384,31 +383,15 @@ async function refreshUserInfo() {
 // 컴포넌트 마운트 시 계좌 정보 로드
 onMounted(async () => {
   try {
-    // 로그인된 상태에서는 미리 로드된 데이터 사용, 필요시에만 추가 로드
-    if (authStore.isLoggedIn) {
-      // 사용자 정보가 없다면 로드 (로그인 시 미리 로드했지만 실패했을 경우)
-      if (!user.value) {
-        await refreshUserInfo();
-      }
-      // 계좌 정보가 없다면 로드 (로그인 시 미리 로드했지만 실패했을 경우)
-      if (!accountStore.hasCache) {
-        await loadAssets();
-      }
-    } else {
-      // 로그인하지 않은 상태에서는 직접 로드
-      await Promise.allSettled([
-        refreshUserInfo(),
-        loadAssets()
-      ]);
+    // 사용자 정보 확인
+    if (!user.value) {
+      await refreshUserInfo();
     }
+    
+    // 계좌 정보 강제 로드 (캐시 무시하고 최신 데이터 가져오기)
+    await loadAssets();
   } catch (error) {
     console.error('Profile 페이지 데이터 로드 오류:', error);
-    // 오류가 발생해도 계좌 정보라도 로드 시도
-    try {
-      await loadAssets();
-    } catch (assetsError) {
-      console.error('계좌 정보 로드 재시도 실패:', assetsError);
-    }
   }
 });
 </script>
