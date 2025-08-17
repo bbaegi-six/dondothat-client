@@ -404,11 +404,23 @@ async function refreshUserInfo() {
 // 컴포넌트 마운트 시 계좌 정보 로드
 onMounted(async () => {
   try {
-    // 사용자 정보와 계좌 정보를 병렬로 로드 (서로 독립적이므로)
-    await Promise.allSettled([
-      refreshUserInfo(),
-      loadAssets()
-    ]);
+    // 로그인된 상태에서는 미리 로드된 데이터 사용, 필요시에만 추가 로드
+    if (authStore.isLoggedIn) {
+      // 사용자 정보가 없다면 로드 (로그인 시 미리 로드했지만 실패했을 경우)
+      if (!user.value) {
+        await refreshUserInfo();
+      }
+      // 계좌 정보가 없다면 로드 (로그인 시 미리 로드했지만 실패했을 경우)
+      if (!accountStore.hasCache) {
+        await loadAssets();
+      }
+    } else {
+      // 로그인하지 않은 상태에서는 직접 로드
+      await Promise.allSettled([
+        refreshUserInfo(),
+        loadAssets()
+      ]);
+    }
   } catch (error) {
     console.error('Profile 페이지 데이터 로드 오류:', error);
     // 오류가 발생해도 계좌 정보라도 로드 시도
