@@ -160,7 +160,7 @@ onMounted(async () => {
     // 차트 데이터 로딩 실패 시에도 빈 배열로 초기화하여 화면 표시
     currentMonthSummary.value = {};
   }
-};
+});
 
 onBeforeUnmount(() => {
   // 이벤트 리스너 제거
