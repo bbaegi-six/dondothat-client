@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia';
 import { authAPI } from '../utils/api';
 import { useExpensesStore } from './expenses'; // expenses 스토어 import
+import { useAccountStore } from './account'; // account 스토어 import
+import { useChallengeStore } from './challenge'; // challenge 스토어 import
+import { expensesService } from '../services/expensesService'; // expenses 서비스 import
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -47,11 +50,21 @@ export const useAuthStore = defineStore('auth', {
         // 로그인 성공 시 fetchMe를 호출하여 사용자 정보 및 인증 상태 업데이트 (강제 호출)
         await this.checkAuth(true);
 
-        // 로그인 성공 후 지출 내역 미리 로드
+        // 로그인 성공 후 핵심 데이터 미리 로드
         if (this.isAuthenticated) {
           const expensesStore = useExpensesStore();
-          await expensesStore.fetchExpensesFromAPI();
-          console.log('login: Expenses pre-fetched.');
+          const accountStore = useAccountStore();
+          const challengeStore = useChallengeStore();
+
+          // 핵심 데이터를 병렬로 미리 로드
+          await Promise.allSettled([
+            expensesStore.fetchExpensesFromAPI(),        // 거래내역
+            accountStore.fetchAccounts(),                // 계좌 정보
+            challengeStore.fetchChallengeProgress(),     // 챌린지 진행상황
+            expensesService.fetchCurrentMonthSummary()   // 차트 데이터
+          ]);
+          
+          console.log('login: 핵심 데이터 미리 로드 완료');
         }
 
         console.log('login: checkAuth completed.');
