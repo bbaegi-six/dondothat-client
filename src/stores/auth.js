@@ -92,10 +92,32 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       try {
         await authAPI.logout();
-        // 로그아웃 후 인증 상태 재확인
-        await this.checkAuth(); // /me 요청으로 실제 상태 확인
+        
+        // 모든 스토어 캐시 삭제
+        const { useAccountStore } = await import('./account');
+        const { useExpensesStore } = await import('./expenses');
+        const { useSavingStore } = await import('./saving');
+        const { useChallengeStore } = await import('./challenge');
+        
+        const accountStore = useAccountStore();
+        const expensesStore = useExpensesStore();
+        const savingStore = useSavingStore();
+        const challengeStore = useChallengeStore();
+        
+        // 모든 스토어 데이터 초기화
+        accountStore.invalidateAll();
+        expensesStore.transactions = [];
+        savingStore.total = 0;
+        savingStore.history = [];
+        
+        // 인증 상태 초기화
+        this.isAuthenticated = false;
+        this.user = null;
       } catch (error) {
         this.error = error;
+        // 에러가 발생해도 클라이언트 상태는 초기화
+        this.isAuthenticated = false;
+        this.user = null;
       } finally {
         this.loading = false;
       }
