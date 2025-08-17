@@ -57,14 +57,28 @@ export const useAuthStore = defineStore('auth', {
           const challengeStore = useChallengeStore();
 
           // 핵심 데이터를 병렬로 미리 로드
-          await Promise.allSettled([
+          const preloadResults = await Promise.allSettled([
             expensesStore.fetchExpensesFromAPI(),        // 거래내역
             accountStore.fetchAccounts(),                // 계좌 정보
             challengeStore.fetchChallengeProgress(),     // 챌린지 진행상황
             expensesService.fetchCurrentMonthSummary()   // 차트 데이터
           ]);
           
-          console.log('login: 핵심 데이터 미리 로드 완료');
+          // 실패한 항목만 경고 로그 출력
+          const [expensesResult, accountResult, challengeResult, chartResult] = preloadResults;
+          
+          if (expensesResult.status === 'rejected') {
+            console.warn('거래내역 미리 로드 실패:', expensesResult.reason);
+          }
+          if (accountResult.status === 'rejected') {
+            console.warn('계좌 정보 미리 로드 실패:', accountResult.reason);
+          }
+          if (challengeResult.status === 'rejected') {
+            console.warn('챌린지 정보 미리 로드 실패:', challengeResult.reason);
+          }
+          if (chartResult.status === 'rejected') {
+            console.warn('차트 데이터 미리 로드 실패:', chartResult.reason);
+          }
         }
 
         console.log('login: checkAuth completed.');
