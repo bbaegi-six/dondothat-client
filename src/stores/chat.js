@@ -9,9 +9,13 @@ const getWebSocketUrl = () => {
   // 환경별 WebSocket URL 사용
   const wsUrl = import.meta.env.VITE_WS_URL;
   if (wsUrl) {
-    return `${wsUrl}/ws/chat`;
+    // SockJS는 HTTP/HTTPS URL을 받아야 함
+    const httpUrl = wsUrl.replace(/^ws(s)?:/, (match, s) =>
+      s ? 'https:' : 'http:'
+    );
+    return `${httpUrl}/ws/chat`;
   }
-  
+
   // fallback: API URL에서 WebSocket URL 생성
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
   const protocol = apiUrl.startsWith('https:') ? 'wss:' : 'ws:';
