@@ -18,9 +18,8 @@ const getWebSocketUrl = () => {
 
   // fallback: API URL에서 WebSocket URL 생성
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-  const protocol = apiUrl.startsWith('https:') ? 'wss:' : 'ws:';
-  const cleanUrl = apiUrl.replace(/^https?:\/\//, '').replace('/api', '');
-  return `${protocol}//${cleanUrl}/ws/chat`;
+  const cleanUrl = apiUrl.replace('/api', '');
+  return `${cleanUrl}/ws/chat`;
 };
 
 export const useChatStore = defineStore('chat', () => {
