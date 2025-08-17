@@ -1,6 +1,6 @@
 <template>
   <!-- 저금통 섹션 -->
-  <div v-if="subAccount">
+  <div v-if="savingTotal !== undefined && savingTotal !== null">
     <div
       class="w-[328px] h-[56px] bg-[#414141] rounded-2xl flex items-center px-6 cursor-pointer"
     >
@@ -16,7 +16,7 @@
         class="font-pretendard font-medium text-base text-white ml-auto mr-2"
         @click="$emit('goToSaving')"
       >
-        {{ subAccount.balance.toLocaleString() }}원
+        {{ savingTotal.toLocaleString() }}원
       </div>
       <FontAwesomeIcon :icon="faAngleRight" class="text-white w-[10px] h-4" />
     </div>
@@ -45,8 +45,8 @@ import { faCircleQuestion as farCircleQuestion } from '@fortawesome/free-regular
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
 defineProps({
-  subAccount: {
-    type: Object,
+  savingTotal: {
+    type: Number,
     default: null,
   },
 });

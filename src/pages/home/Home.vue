@@ -5,7 +5,7 @@
   >
     <!-- 저금통 섹션 -->
     <SavingAccountSection
-      :sub-account="accountStore.subAccount"
+      :saving-total="savingTotal"
       @show-guide="isSavingGuideModalOpen = true"
       @go-to-saving="goToSavingTab"
       @connect-account="goToAccountStep2"
@@ -49,12 +49,19 @@ import { useExpensesStore } from '@/stores/expenses';
 import { useAccountStore } from '@/stores/account';
 import { useAuthStore } from '@/stores/auth';
 import { useChallengeStore } from '@/stores/challenge';
+import { useSavingStore } from '@/stores/saving';
 import { expensesService } from '@/services/expensesService';
+import { storeToRefs } from 'pinia';
 
 const authStore = useAuthStore();
 const accountStore = useAccountStore();
 const expensesStore = useExpensesStore();
 const challengeStore = useChallengeStore();
+const savingStore = useSavingStore();
+
+// Store에서 반응성 있는 데이터 가져오기 (정석적인 storeToRefs 사용)
+const { mainAccount } = storeToRefs(accountStore);
+const { total: savingTotal } = storeToRefs(savingStore);
 
 const isSavingGuideModalOpen = ref(false);
 const router = useRouter();
@@ -110,11 +117,16 @@ onMounted(async () => {
       if (!expensesStore.transactions || expensesStore.transactions.length === 0) {
         await expensesStore.fetchExpensesFromAPI();
       }
+      // 저금통 데이터가 없다면 로드 (로그인 시 미리 로드했지만 실패했을 경우)
+      if (savingTotal.value === null || savingTotal.value === undefined) {
+        await savingStore.fetchAll();
+      }
     } else {
-      // 로그인하지 않은 상태에서는 계좌 정보와 거래내역 로드
+      // 로그인하지 않은 상태에서는 모든 데이터 로드
       await Promise.all([
         loadAccounts(),
-        expensesStore.fetchExpensesFromAPI()
+        expensesStore.fetchExpensesFromAPI(),
+        savingStore.fetchAll()
       ]);
     }
   } catch (error) {
