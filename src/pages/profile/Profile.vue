@@ -89,6 +89,7 @@ import { storeToRefs } from 'pinia';
 import { useAuthStore } from '../../stores/auth'; // auth 스토어 임포트
 import { useRouter } from 'vue-router';
 import { useAccountStore } from '@/stores/account';
+import { useSavingStore } from '@/stores/saving';
 import { accountService } from '@/services/accountService';
 import { authAPI } from '../../utils/api';
 
@@ -125,6 +126,7 @@ const { user } = storeToRefs(authStore); // auth 스토어에서 user 정보 가
 const router = useRouter();
 const showModal = ref(false);
 const accountStore = useAccountStore();
+const savingStore = useSavingStore();
 
 // 사용자 정보 (reactive)
 const nickname = computed(() => user.value?.nickname || '게스트');
@@ -132,6 +134,7 @@ const email = computed(() => user.value?.email || 'guest@example.com');
 
 // 계좌 정보 (storeToRefs로 반응성 확보)
 const { mainAccount, subAccount, isLoading } = storeToRefs(accountStore);
+const { total: savingTotal } = storeToRefs(savingStore);
 
 // 은행 로고 매핑
 const bankLogos = {
@@ -388,8 +391,11 @@ onMounted(async () => {
       await refreshUserInfo();
     }
     
-    // 계좌 정보 강제 로드 (캐시 무시하고 최신 데이터 가져오기)
-    await loadAssets();
+    // 모든 데이터 병렬 로드
+    await Promise.all([
+      loadAssets(),           // 계좌 정보
+      savingStore.fetchAll()  // 저금통 데이터
+    ]);
   } catch (error) {
     console.error('Profile 페이지 데이터 로드 오류:', error);
   }
