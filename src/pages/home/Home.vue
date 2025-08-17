@@ -59,35 +59,16 @@ const challengeStore = useChallengeStore();
 const isSavingGuideModalOpen = ref(false);
 const router = useRouter();
 
-// 독립적인 현재월 지출 데이터
-const currentMonthSummary = ref({});
-const chartLoading = ref(false);
-
-
-// 현재월 지출 집계 로드
-const loadCurrentMonthSummary = async () => {
-  chartLoading.value = true;
-  try {
-    const summary = await expensesService.fetchCurrentMonthSummary();
-    currentMonthSummary.value = summary || {};
-  } catch (error) {
-    console.error('현재월 지출 집계 조회 오류:', error);
-    currentMonthSummary.value = {};
-  } finally {
-    chartLoading.value = false;
-  }
-};
-
-// 집계 데이터를 차트 데이터로 변환
+// 차트 데이터는 Expenses Store에서 가져오기 (로그인 시 미리 로드됨)
 const chartData = computed(() => {
-  if (
-    !currentMonthSummary.value ||
-    Object.keys(currentMonthSummary.value).length === 0
-  ) {
+  // Expenses Store에서 현재월 집계 데이터 가져오기
+  const currentMonthSummary = expensesStore.currentMonthSummary || {};
+  
+  if (!currentMonthSummary || Object.keys(currentMonthSummary).length === 0) {
     return [];
   }
 
-  return Object.entries(currentMonthSummary.value)
+  return Object.entries(currentMonthSummary)
     .map(([name, amount]) => ({
       name,
       amount,
@@ -135,30 +116,25 @@ onMounted(async () => {
     // 저금통 업데이트 이벤트 리스너 등록
     window.addEventListener('savingAccountUpdated', handleSavingAccountUpdate);
     
-    // 1. 중요한 차트 데이터를 우선적으로 로드 (사용자가 바로 볼 수 있는 데이터)
-    await loadCurrentMonthSummary();
-    
-    // 2. 로그인 상태에서만 필요한 API들을 백그라운드에서 병렬 처리
+    // 로그인된 상태라면 미리 로드된 데이터 사용, 아니면 직접 로드
     if (authStore.isLoggedIn) {
-      const backgroundTasks = [
+      // 계좌 정보가 없다면 로드 (로그인 시 미리 로드했지만 실패했을 경우)
+      if (!accountStore.hasCache) {
+        await loadAccounts();
+      }
+      // 차트 데이터가 없다면 로드 (로그인 시 미리 로드했지만 실패했을 경우)
+      if (!expensesStore.currentMonthSummary || Object.keys(expensesStore.currentMonthSummary).length === 0) {
+        await expensesService.fetchCurrentMonthSummary();
+      }
+    } else {
+      // 로그인하지 않은 상태에서는 계좌 정보와 차트 데이터만 로드
+      await Promise.all([
         loadAccounts(),
-        challengeStore.fetchChallengeProgress()
-      ];
-      
-      // 백그라운드 API는 실패해도 홈 화면 로딩을 방해하지 않음
-      Promise.allSettled(backgroundTasks).then(results => {
-        results.forEach((result, index) => {
-          if (result.status === 'rejected') {
-            const taskNames = ['loadAccounts', 'fetchChallengeProgress'];
-            console.error(`${taskNames[index]} API 실패:`, result.reason);
-          }
-        });
-      });
+        expensesService.fetchCurrentMonthSummary()
+      ]);
     }
   } catch (error) {
-    console.error('Home 화면 핵심 데이터 로딩 오류:', error);
-    // 차트 데이터 로딩 실패 시에도 빈 배열로 초기화하여 화면 표시
-    currentMonthSummary.value = {};
+    console.error('Home 화면 데이터 로딩 오류:', error);
   }
 });
 
