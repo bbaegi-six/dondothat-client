@@ -458,30 +458,30 @@ const addTransaction = () => {
 const loading = computed(() => expensesStore.loading);
 
 const refreshExpenses = async () => {
-  console.log('Codef 거래내역 및 저금통 새로고침 시작');
+  console.log('Codef 거래내역 및 메인 계좌 새로고침 시작');
   try {
-    // 거래내역과 저금통 계좌 정보를 병렬로 새로고침
+    // 거래내역과 메인 계좌 정보를 병렬로 새로고침
     const tasks = [
       expensesStore.refreshFromCodef(),
-      // 저금통 계좌 정보도 새로고침 (다른 곳에서 입출금 했을 수 있음)
-      refreshSavingAccount()
+      // 메인 계좌 캐시 무효화 및 새로고침
+      refreshMainAccount()
     ];
     
     const results = await Promise.allSettled(tasks);
     
     // 결과 확인
-    const [expensesResult, savingResult] = results;
+    const [expensesResult, mainAccountResult] = results;
     
     if (expensesResult.status === 'fulfilled' && expensesResult.value) {
-      console.log('Codef 거래내역 새로고침 완료');
+      console.log('Codef 거래내역 새로고침 완룼');
     } else {
       console.error('Codef 거래내역 새로고침 실패');
     }
     
-    if (savingResult.status === 'fulfilled') {
-      console.log('저금통 계좌 새로고침 완료');
+    if (mainAccountResult.status === 'fulfilled') {
+      console.log('메인 계좌 새로고침 완료');
     } else {
-      console.error('저금통 계좌 새로고침 실패:', savingResult.reason);
+      console.error('메인 계좌 새로고침 실패:', mainAccountResult.reason);
     }
     
   } catch (error) {
@@ -489,21 +489,20 @@ const refreshExpenses = async () => {
   }
 };
 
-// 저금통 계좌 정보 새로고침
-const refreshSavingAccount = async () => {
+// 메인 계좌 정보 새로고침 (Account Store 사용)
+const refreshMainAccount = async () => {
   try {
-    const { authAPI } = await import('@/utils/api');
-    const response = await authAPI.getMyPageAccounts();
+    const { useAccountStore } = await import('@/stores/account');
+    const accountStore = useAccountStore();
     
-    // 홈페이지가 열려있다면 저금통 데이터도 업데이트되도록
-    // 전역적으로 저금통 데이터 갱신 이벤트 발생
-    window.dispatchEvent(new CustomEvent('savingAccountUpdated', {
-      detail: response.subAccount
-    }));
+    // 메인 계좌 캐시 무효화 후 새로 가져오기
+    accountStore.invalidateMainAccount();
+    await accountStore.fetchAccounts();
     
-    return response.subAccount;
+    console.log('메인 계좌 캐시 무효화 및 새로고침 완료');
+    return accountStore.mainAccount;
   } catch (error) {
-    console.error('저금통 계좌 정보 새로고침 실패:', error);
+    console.error('메인 계좌 정보 새로고침 실패:', error);
     throw error;
   }
 };
