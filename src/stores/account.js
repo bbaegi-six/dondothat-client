@@ -24,7 +24,6 @@ export const useAccountStore = defineStore('account', {
     setAccount(type, isChanging = false) {
       this.accountType = type;
       this.isAccountChangeFlow = isChanging;
-      console.log('Account Store - 타입 설정:', type);
     },
 
     clearAccountType() {
@@ -88,7 +87,6 @@ export const useAccountStore = defineStore('account', {
       
       // mainAccount는 시간 기반 캐시 확인
       if (elapsed > CACHE_DURATION.mainAccount) {
-        console.log('Account Store - mainAccount 캐시 만료');
         return false;
       }
       

@@ -107,7 +107,6 @@ const handleSavingAccountUpdate = (event) => {
   // Account Store의 subAccount 데이터 직접 업데이트
   if (accountStore.accounts) {
     accountStore.accounts.subAccount = event.detail;
-    console.log('홈페이지: Account Store 저금통 계좌 정보 업데이트됨');
   }
 };
 
