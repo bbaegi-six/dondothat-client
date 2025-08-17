@@ -337,15 +337,6 @@ function formatAmount(amount) {
 async function loadAssets() {
   try {
     await accountStore.fetchAccounts();
-    
-    console.log('메인 계좌:', accountStore.mainAccount);
-    console.log('서브 계좌:', accountStore.subAccount);
-
-    // 계좌명 확인
-    if (accountStore.mainAccount) {
-      console.log('메인 계좌명:', accountStore.mainAccount.assetName);
-      console.log('메인 계좌명 타입:', typeof accountStore.mainAccount.assetName);
-    }
   } catch (error) {
     console.error('계좌 정보 조회 오류:', error);
   }
@@ -412,10 +403,21 @@ async function refreshUserInfo() {
 
 // 컴포넌트 마운트 시 계좌 정보 로드
 onMounted(async () => {
-  // 사용자 정보를 먼저 갱신
-  await refreshUserInfo();
-  // 계좌 정보 로드
-  await loadAssets();
+  try {
+    // 사용자 정보와 계좌 정보를 병렬로 로드 (서로 독립적이므로)
+    await Promise.allSettled([
+      refreshUserInfo(),
+      loadAssets()
+    ]);
+  } catch (error) {
+    console.error('Profile 페이지 데이터 로드 오류:', error);
+    // 오류가 발생해도 계좌 정보라도 로드 시도
+    try {
+      await loadAssets();
+    } catch (assetsError) {
+      console.error('계좌 정보 로드 재시도 실패:', assetsError);
+    }
+  }
 });
 </script>
 

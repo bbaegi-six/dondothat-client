@@ -36,14 +36,12 @@ export const useAccountStore = defineStore('account', {
     async fetchAccounts() {
       // 캐시 유효성 확인
       if (this.accounts && this.isValidCache()) {
-        console.log('Account Store - 캐시 데이터 사용');
         return this.accounts;
       }
 
       // API 호출
       this.isLoading = true;
       try {
-        console.log('Account Store - API 호출');
         const response = await authAPI.getMyPageAccounts();
         
         this.accounts = response;
@@ -52,6 +50,30 @@ export const useAccountStore = defineStore('account', {
         return response;
       } catch (error) {
         console.error('Account Store - API 호출 실패:', error);
+        throw error;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    // 메인 계좌만 업데이트 (서브 계좌는 보존)
+    async fetchMainAccountOnly() {
+      this.isLoading = true;
+      try {
+        const response = await authAPI.getMyPageAccounts();
+        
+        if (this.accounts) {
+          // 기존 subAccount는 유지하고 mainAccount만 업데이트
+          this.accounts.mainAccount = response.mainAccount;
+        } else {
+          // 캐시가 없으면 전체 데이터 저장
+          this.accounts = response;
+        }
+        
+        this.lastFetched = Date.now();
+        return this.accounts;
+      } catch (error) {
+        console.error('Account Store - 메인 계좌 API 호출 실패:', error);
         throw error;
       } finally {
         this.isLoading = false;
@@ -76,24 +98,17 @@ export const useAccountStore = defineStore('account', {
 
     // 특정 계좌만 캐시 무효화
     invalidateMainAccount() {
-      console.log('Account Store - mainAccount 캐시 무효화');
-      if (this.accounts) {
-        // mainAccount만 무효화, subAccount는 유지
-        this.lastFetched = 0; // 다음 호출 시 API 재호출
-      }
+      this.lastFetched = 0;
     },
 
     invalidateSubAccount() {
-      console.log('Account Store - subAccount 캐시 무효화');
       if (this.accounts) {
-        // subAccount만 무효화
         this.accounts.subAccount = null;
       }
     },
 
     // 전체 캐시 무효화
     invalidateAll() {
-      console.log('Account Store - 전체 캐시 무효화');
       this.accounts = null;
       this.lastFetched = null;
     },

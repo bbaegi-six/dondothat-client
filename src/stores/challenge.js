@@ -167,7 +167,6 @@ export const useChallengeStore = defineStore('challenge', () => {
         const { useAccountStore } = await import('@/stores/account');
         const accountStore = useAccountStore();
         accountStore.invalidateSubAccount();
-        console.log('챌린지 완료로 인한 저금통 캐시 무효화 완료');
       } catch (error) {
         console.warn('저금통 캐시 무효화 실패:', error);
       }
