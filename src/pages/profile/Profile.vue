@@ -156,8 +156,6 @@ const bankLogos = {
 
 // 은행 로고 가져오기 함수
 function getBankLogo(bankName) {
-  console.log('은행명:', bankName); // 디버깅용
-
   if (!bankName) return kbLogo; // 기본 로고
 
   // 은행명 매핑 완성
@@ -292,10 +290,7 @@ function getBankLogo(bankName) {
     bankMapping[bankName.toLowerCase()] ||
     bankName.toLowerCase().replace(/[^a-z]/g, '');
 
-  const logo = bankLogos[bankKey] || kbLogo;
-  console.log('매핑된 로고:', bankKey, logo); // 디버깅용
-
-  return logo;
+  return bankLogos[bankKey] || kbLogo;
 }
 
 // 티어 이미지 매핑
@@ -312,19 +307,13 @@ const tierImages = {
 function getTierImage() {
   const tierId = user.value?.tierId;
 
-  console.log('현재 사용자 정보:', user.value);
-  console.log('티어 ID:', tierId, '타입:', typeof tierId);
-
   // tierId가 null이면 tier_00 사용
   if (tierId === null || tierId === undefined) {
-    console.log('티어 ID가 null/undefined이므로 tier_00 사용');
     return tier00;
   }
 
   // 해당 tierId에 맞는 이미지 반환, 없으면 기본값
-  const selectedImage = tierImages[tierId] || tier00;
-  console.log('선택된 티어 이미지:', selectedImage);
-  return selectedImage;
+  return tierImages[tierId] || tier00;
 }
 
 // 금액 포맷팅 함수
@@ -363,12 +352,6 @@ async function handleConfirm() {
     // ✅ 응답 값을 변수에 저장
     const response = await accountService.deleteAccount(status);
 
-    // ✅ 응답 데이터의 message 필드에 접근하여 출력
-    if (response && response.message) {
-      console.log('계좌 삭제 메시지:', response.message);
-    } else {
-      console.log('계좌 삭제 성공'); // message 필드가 없을 경우 기본 메시지
-    }
 
     // 계좌 목록 다시 로드 (캐시 무효화 후 새로 가져오기)
     accountStore.invalidateAll();
@@ -392,10 +375,7 @@ async function logout() {
 // 사용자 정보 새로고침 함수를 더 강력하게 수정
 async function refreshUserInfo() {
   try {
-    console.log('사용자 정보 갱신 시작');
     await authStore.checkAuth(true); // 강제로 최신 사용자 정보 갱신
-    console.log('갱신된 사용자 정보:', user.value);
-    console.log('갱신된 tierId:', user.value?.tierId);
   } catch (error) {
     console.error('사용자 정보 갱신 실패:', error);
   }
