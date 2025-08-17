@@ -59,23 +59,8 @@ const challengeStore = useChallengeStore();
 const isSavingGuideModalOpen = ref(false);
 const router = useRouter();
 
-// 차트 데이터는 Expenses Store에서 가져오기 (로그인 시 미리 로드됨)
-const chartData = computed(() => {
-  // Expenses Store에서 현재월 집계 데이터 가져오기
-  const currentMonthSummary = expensesStore.currentMonthSummary || {};
-  
-  if (!currentMonthSummary || Object.keys(currentMonthSummary).length === 0) {
-    return [];
-  }
-
-  return Object.entries(currentMonthSummary)
-    .map(([name, amount]) => ({
-      name,
-      amount,
-      color: expensesStore.getCategoryColorByName(name),
-    }))
-    .sort((a, b) => b.amount - a.amount);
-});
+// 차트 데이터는 Expenses Store의 computed 데이터 사용 (거래내역 기반으로 계산됨)
+const chartData = computed(() => expensesStore.chartData);
 
 
 // 페이지 이동 함수들
@@ -121,15 +106,15 @@ onMounted(async () => {
       if (!accountStore.hasCache) {
         await loadAccounts();
       }
-      // 차트 데이터가 없다면 로드 (로그인 시 미리 로드했지만 실패했을 경우)
-      if (!expensesStore.currentMonthSummary || Object.keys(expensesStore.currentMonthSummary).length === 0) {
-        await expensesService.fetchCurrentMonthSummary();
+      // 거래내역이 없다면 로드 (로그인 시 미리 로드했지만 실패했을 경우)
+      if (!expensesStore.transactions || expensesStore.transactions.length === 0) {
+        await expensesStore.fetchExpensesFromAPI();
       }
     } else {
-      // 로그인하지 않은 상태에서는 계좌 정보와 차트 데이터만 로드
+      // 로그인하지 않은 상태에서는 계좌 정보와 거래내역 로드
       await Promise.all([
         loadAccounts(),
-        expensesService.fetchCurrentMonthSummary()
+        expensesStore.fetchExpensesFromAPI()
       ]);
     }
   } catch (error) {

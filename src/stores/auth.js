@@ -51,14 +51,13 @@ export const useAuthStore = defineStore('auth', {
 
           // 핵심 데이터를 병렬로 미리 로드
           const preloadResults = await Promise.allSettled([
-            expensesStore.fetchExpensesFromAPI(),        // 거래내역
+            expensesStore.fetchExpensesFromAPI(),        // 거래내역 (차트 데이터도 이것으로 계산됨)
             accountStore.fetchAccounts(),                // 계좌 정보
-            challengeStore.fetchChallengeProgress(),     // 챌린지 진행상황
-            expensesService.fetchCurrentMonthSummary()   // 차트 데이터
+            challengeStore.fetchChallengeProgress()      // 챌린지 진행상황
           ]);
           
           // 실패한 항목만 경고 로그 출력
-          const [expensesResult, accountResult, challengeResult, chartResult] = preloadResults;
+          const [expensesResult, accountResult, challengeResult] = preloadResults;
           
           if (expensesResult.status === 'rejected') {
             console.warn('거래내역 미리 로드 실패:', expensesResult.reason);
@@ -68,9 +67,6 @@ export const useAuthStore = defineStore('auth', {
           }
           if (challengeResult.status === 'rejected') {
             console.warn('챌린지 정보 미리 로드 실패:', challengeResult.reason);
-          }
-          if (chartResult.status === 'rejected') {
-            console.warn('차트 데이터 미리 로드 실패:', chartResult.reason);
           }
         }
 
