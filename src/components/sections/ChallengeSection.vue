@@ -72,6 +72,19 @@ import {
   faCircleQuestion as fasCircleQuestion,
   faAngleRight,
   faXmark,
+  faMotorcycle,
+  faMugSaucer,
+  faBagShopping,
+  faTaxi,
+  faStore,
+  faClapperboard,
+  faWineBottle,
+  faTrainSubway,
+  faSuitcaseMedical,
+  faHome,
+  faUtensils,
+  faEllipsis,
+  faCoins,
 } from '@fortawesome/free-solid-svg-icons';
 
 const props = defineProps({
@@ -86,6 +99,23 @@ const props = defineProps({
 });
 
 defineEmits(['goToChallenge']);
+
+// 문자열 아이콘을 FontAwesome 아이콘 객체로 변환
+const iconMap = {
+  'fas fa-motorcycle': faMotorcycle,
+  'fas fa-mug-saucer': faMugSaucer,
+  'fas fa-bag-shopping': faBagShopping,
+  'fas fa-taxi': faTaxi,
+  'fas fa-store': faStore,
+  'fas fa-clapperboard': faClapperboard,
+  'fas fa-wine-bottle': faWineBottle,
+  'fas fa-train-subway': faTrainSubway,
+  'fas fa-suitcase-medical': faSuitcaseMedical,
+  'fas fa-home': faHome,
+  'fas fa-utensils': faUtensils,
+  'fas fa-ellipsis': faEllipsis,
+  'fas fa-coins': faCoins,
+};
 
 // 카테고리 정보를 한 번만 검색하는 최적화된 computed
 const challengeCategory = computed(() => {
@@ -109,7 +139,14 @@ const challengeIconClass = computed(() => {
     return faXmark;
   }
   
-  return challengeCategory.value?.icon || '';
+  // 문자열 아이콘을 FontAwesome 아이콘 객체로 변환
+  const iconString = challengeCategory.value?.icon;
+  if (iconString && iconMap[iconString]) {
+    return iconMap[iconString];
+  }
+  
+  // 기본 아이콘 (찾지 못한 경우)
+  return faEllipsis;
 });
 
 const challengeIconColor = computed(() => {
