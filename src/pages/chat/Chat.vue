@@ -12,7 +12,7 @@
     />
 
     <!-- Body Content with proper top margin for fixed header -->
-    <div class="flex flex-col flex-1 mt-[60px]">
+    <div class="flex flex-col flex-1 mt-[60px] h-0">
       <!-- 🚀 채팅 메인 화면 (우선순위 1 - 가장 먼저 체크) -->
       <ChatMessages
         v-if="shouldShowChatUI"
@@ -154,7 +154,7 @@ const sendMessage = (messageText) => {
 
   const success = chatStore.sendMessage(messageText.trim());
   if (success) {
-    // 입력창 초기화는 ChatInput 컴포넌트에서 자동으로 처리됨
+    // 메시지 전송 후 스크롤
     nextTick(() => {
       if (chatMessagesRef.value) {
         chatMessagesRef.value.scrollToBottom();
