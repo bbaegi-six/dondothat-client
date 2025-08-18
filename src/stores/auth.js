@@ -49,18 +49,21 @@ export const useAuthStore = defineStore('auth', {
           const accountStore = useAccountStore();
           const challengeStore = useChallengeStore();
           const { useSavingStore } = await import('./saving');
+          const { useChatStore } = await import('./chat');
           const savingStore = useSavingStore();
+          const chatStore = useChatStore();
 
           // 핵심 데이터를 병렬로 미리 로드
           const preloadResults = await Promise.allSettled([
             expensesStore.fetchExpensesFromAPI(),        // 거래내역 (차트 데이터도 이것으로 계산됨)
             accountStore.fetchAccounts(),                // 계좌 정보  
             challengeStore.fetchChallengeProgress(),     // 챌린지 진행상황
-            savingStore.fetchAll()                       // 저금통 데이터 (가상 저금 금액)
+            savingStore.fetchAll(),                      // 저금통 데이터 (가상 저금 금액)
+            chatStore.preloadChallengeName()             // 채팅 챌린지명
           ]);
           
           // 실패한 항목만 경고 로그 출력
-          const [expensesResult, accountResult, challengeResult, savingResult] = preloadResults;
+          const [expensesResult, accountResult, challengeResult, savingResult, chatResult] = preloadResults;
           
           if (expensesResult.status === 'rejected') {
             console.warn('거래내역 미리 로드 실패:', expensesResult.reason);
@@ -73,6 +76,9 @@ export const useAuthStore = defineStore('auth', {
           }
           if (savingResult.status === 'rejected') {
             console.warn('저금통 데이터 미리 로드 실패:', savingResult.reason);
+          }
+          if (chatResult.status === 'rejected') {
+            console.warn('채팅 챌린지명 미리 로드 실패:', chatResult.reason);
           }
         }
 
