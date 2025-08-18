@@ -7,7 +7,7 @@ import { chatApi } from '@/services/chatApi';
 // WebSocket URL 설정 통일
 const getWebSocketUrl = () => {
   // 환경별 WebSocket URL 사용
-  const wsUrl = 'wss://54.208.50.238';
+  const wsUrl = 'https://54.208.50.238';
 
   return `${wsUrl}/api/ws/chat`;
 };
