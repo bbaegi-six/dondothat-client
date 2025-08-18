@@ -1,7 +1,7 @@
 <template>
   <div class="confetti-container">
     <div
-      class="confetti"
+      class="confetti w-2 h-2"
       v-for="i in count"
       :key="i"
       :class="`confetti-${i % 6}`"
@@ -31,8 +31,6 @@ defineProps({
 
 .confetti {
   position: absolute;
-  width: 8px;
-  height: 8px;
   animation: confetti-fall 3s linear infinite;
 }
 
