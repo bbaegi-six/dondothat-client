@@ -73,6 +73,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useChallengeStore } from '@/stores/challenge';
+import { useChatStore } from '@/stores/chat';
 import ChallengeLoading from './ChallengeLoading.vue';
 import ChallengeSelection from './ChallengeSelection.vue';
 import ChallengeDaysInput from './ChallengeDaysInput.vue';
@@ -80,6 +81,7 @@ import challengeService from '@/services/challengeService';
 
 const router = useRouter();
 const challengeStore = useChallengeStore();
+const chatStore = useChatStore();
 
 const currentStep = ref('loading');
 const availableChallenges = ref([]);
@@ -128,11 +130,24 @@ const handleDateComplete = async (data) => {
   }
 };
 
-const completeChallenge = () => {
+const completeChallenge = async () => {
   console.log('✅ 챌린지 플로우 완료 - Challenge 페이지로 이동');
   
   // 새로운 챌린지가 생성되었으므로 기존 캐시된 데이터 무효화
   challengeStore.userChallengeData = null;
+  
+  // Chat Store의 챌린지명도 즉시 업데이트 (채팅 헤더 반영)
+  if (selectedChallengeData.value?.title) {
+    chatStore.currentChallengeName = selectedChallengeData.value.title;
+    console.log('채팅 헤더 챌린지명 즉시 업데이트:', selectedChallengeData.value.title);
+  }
+  
+  // 백그라운드에서 최신 챌린지 정보도 다시 로드
+  try {
+    await chatStore.preloadChallengeName();
+  } catch (error) {
+    console.warn('챌린지명 재로드 실패:', error);
+  }
   
   router.push('/challenge');
 };
