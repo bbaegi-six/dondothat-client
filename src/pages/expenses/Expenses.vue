@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen w-98 mx-auto relative bg-[#2f2f2f] pt-22 px-8 pb-22"
+    class="min-h-screen w-98 mx-auto relative bg-[#2f2f2f] pt-20 px-8 pb-20"
   >
     <Header
       :showBack="false"
@@ -11,10 +11,10 @@
     />
 
     <!-- 탭 -->
-    <div class="w-82 h-9 mt-1 flex">
+    <div class="w-98 h-9 mt-1 flex">
       <div
         @click="switchTab('account')"
-        class="w-41 h-9 bg-[#2f2f2f] relative cursor-pointer"
+        class="w-49 h-9 bg-[#2f2f2f] relative cursor-pointer"
       >
         <div
           class="font-pretendard font-medium text-base leading-8 text-center pt-0.5"
@@ -24,12 +24,12 @@
         </div>
         <div
           v-if="activeTab === 'account'"
-          class="absolute bottom-0 w-41 h-0 border border-[#ff5555]"
+          class="absolute bottom-0 w-49 h-0 border border-[#ff5555]"
         ></div>
       </div>
       <div
         @click="switchTab('savings')"
-        class="w-41 h-9 bg-[#2f2f2f] relative cursor-pointer"
+        class="w-49 h-9 bg-[#2f2f2f] relative cursor-pointer"
       >
         <div
           class="font-pretendard font-medium text-base leading-8 text-center pt-0.5"
@@ -39,7 +39,7 @@
         </div>
         <div
           v-if="activeTab === 'savings'"
-          class="absolute bottom-0 w-41 h-0 border border-[#ff5555]"
+          class="absolute bottom-0 w-49 h-0 border border-[#ff5555]"
         ></div>
       </div>
     </div>
@@ -48,14 +48,7 @@
     <div v-if="activeTab === 'account'">
       <!-- 월별 요약 섹션 -->
       <div
-        class="relative"
-        style="
-          width: 328px;
-          height: 120px;
-          background-color: #414141;
-          border-radius: 16px;
-          margin-top: 10px;
-        "
+        class="relative w-98 h-30 bg-[#414141] rounded-2xl mt-2.5"
       >
         <!-- 월 표시 -->
         <div
@@ -155,14 +148,7 @@
     <div v-if="activeTab === 'savings'">
       <!-- 저금통 요약 섹션 -->
       <div
-        class="relative"
-        style="
-          width: 328px;
-          height: 120px;
-          background-color: #414141;
-          border-radius: 16px;
-          margin-top: 10px;
-        "
+        class="relative w-98 h-30 bg-[#414141] rounded-2xl mt-2.5"
       >
         <!-- 저금통 타이틀 -->
         <div

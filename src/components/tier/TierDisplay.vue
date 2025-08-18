@@ -7,7 +7,7 @@
         class="w-full h-full object-contain"
       />
     </div>
-    <p class="text-white text-[18px] font-bold">
+    <p class="text-white text-lg font-bold">
       {{ tierName }}
     </p>
   </div>

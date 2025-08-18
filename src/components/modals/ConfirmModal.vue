@@ -33,10 +33,6 @@ defineEmits(["close", "confirm"]);
   z-index: 1000;
 }
 .modal {
-  background: white;
-  color: black;
-  padding: 20px;
-  border-radius: 8px;
-  min-width: 200px;
+  @apply bg-white text-black p-5 rounded-lg min-w-48;
 }
 </style>

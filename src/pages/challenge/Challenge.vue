@@ -22,7 +22,7 @@
       >
       <!-- Main Content Area -->
       <div
-        class="flex-1 flex items-center justify-center pt-15 pb-22 px-5 slide-up-animation"
+        class="flex-1 flex items-center justify-center pt-15 pb-20 px-5 slide-up-animation"
       >
         <!-- Empty State Container - 328 × 296 -->
         <div
@@ -53,7 +53,7 @@
 
       <!-- Start Challenge Button - 컨테이너 밖으로 분리 -->
       <div
-        class="px-8 pb-[90px] slide-up-animation"
+        class="px-8 pb-20 slide-up-animation"
         style="animation-delay: 0.2s"
       >
         <Button :disabled="false" @click="startChallenge" class="font-normal">

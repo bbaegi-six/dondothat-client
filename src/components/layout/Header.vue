@@ -57,8 +57,7 @@
         <button
           v-if="showAddButton"
           @click="$emit('add-click')"
-          class="rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
-          class="w-8 h-8"
+          class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path

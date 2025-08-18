@@ -2,7 +2,7 @@
 <template>
   <div class="flex flex-col h-screen bg-default">
     <!-- Challenge Icon & Title -->
-    <div class="flex items-center justify-center mt-[70px] mb-4">
+    <div class="flex items-center justify-center mt-18 mb-4">
       <div
         class="w-12 h-12 rounded-full flex items-center justify-center bg-gray-1"
       >
@@ -24,18 +24,16 @@
         일일 성공 여부
       </h3>
 
-      <div class="bg-gray-1 rounded-2xl p-4" style="width: 328px">
+      <div class="bg-gray-1 rounded-2xl p-4 w-82">
         <div
-          class="grid grid-cols-7"
-          style="width: 296px; height: auto; gap: 12px"
+          class="grid grid-cols-7 w-72 h-auto gap-3"
         >
           <div
             v-for="day in challengeData.days"
             :key="day"
             :class="getDayBoxClass(day)"
             :style="getDayBoxStyle(day)"
-            class="rounded-lg flex items-center justify-center transition-colors"
-            style="width: 32px; height: 32px"
+            class="rounded-lg flex items-center justify-center transition-colors w-8 h-8"
           >
             <span class="text-white text-sm font-bold font-pretendard">{{
               day
@@ -47,8 +45,7 @@
 
     <!-- Failed Amount Box -->
     <div
-      class="mx-8 mb-6 bg-gray-1 rounded-2xl p-6 relative"
-      style="width: 328px; height: 112px"
+      class="mx-8 mb-6 bg-gray-1 rounded-2xl p-6 relative w-82 h-28"
     >
       <p
         class="text-white text-base font-medium text-center mb-2 font-pretendard"
@@ -67,7 +64,7 @@
     <div class="flex-1"></div>
 
     <!-- Failed transaction info -->
-    <div class="mx-8 mb-6 text-center" style="width: 328px">
+    <div class="mx-8 mb-6 text-center w-82">
       <p class="text-white text-base font-medium mb-4 font-pretendard">
         {{ challengeCategoryText }} 결제 내역이 있습니다
       </p>
@@ -99,7 +96,7 @@
                 class="w-10 h-10 rounded-full flex items-center justify-center mr-3"
                 :style="{ backgroundColor: challengeIconColor }"
               >
-                <i :class="challengeIcon" class="text-white text-sm"></i>
+                <i :class="[challengeIcon, 'text-white text-sm']"></i>
               </div>
               <div class="text-left">
                 <p class="text-white font-semibold text-sm">
@@ -129,7 +126,7 @@
     </div>
 
     <!-- Action Button -->
-    <div class="mx-8 mb-6" style="width: 328px">
+    <div class="mx-8 mb-6 w-82">
       <!-- New Challenge Button (Red) -->
       <button
         class="w-full bg-brand text-white text-lg font-medium py-4 rounded-2xl font-pretendard"
@@ -140,7 +137,7 @@
     </div>
 
     <!-- Navigation Space -->
-    <div class="pb-[90px]"></div>
+    <div class="pb-20"></div>
   </div>
 </template>
 

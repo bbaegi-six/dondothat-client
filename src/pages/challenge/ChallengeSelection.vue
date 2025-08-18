@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col h-screen bg-default" ref="selectionContainer">
     <!-- Top Section (Timer, Title, Subtitle) -->
-    <div class="flex flex-col items-center pt-[120px] pb-4 fade-in">
+    <div class="flex flex-col items-center pt-30 pb-4 fade-in">
       <div class="relative mb-6">
         <div class="w-24 h-24 relative">
           <!-- Background Circle -->
@@ -67,7 +67,7 @@
             :key="challenge.challengeId"
             @click="selectChallenge(challenge.challengeId)"
             :class="[
-              'w-[328px] h-[98px] bg-default border-2 rounded-2xl p-4 flex items-center gap-4 transition-colors fade-in',
+              'w-82 h-24 bg-default border-2 rounded-2xl p-4 flex items-center gap-4 transition-colors fade-in',
               selectedChallenge === challenge.challengeId
                 ? 'border-brand'
                 : 'border-gray-1',
@@ -96,7 +96,7 @@
       <!-- Selection Button - Just above nav -->
       <div
         :class="[
-          'px-8 pt-0 pb-[90px] fade-in fade-in-delay-1',
+          'px-8 pt-0 pb-20 fade-in fade-in-delay-1',
           { 'fade-out': isLeaving },
         ]"
       >
@@ -104,7 +104,7 @@
           :disabled="!selectedChallenge"
           @click="startChallenge"
           :class="[
-            'w-[328px] h-[56px] rounded-2xl font-normal transition',
+            'w-82 h-14 rounded-2xl font-normal transition',
             selectedChallenge
               ? 'bg-brand text-white hover:bg-red-600'
               : 'bg-gray-5 text-gray-2',

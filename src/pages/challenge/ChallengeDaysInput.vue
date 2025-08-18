@@ -2,7 +2,7 @@
 <template>
   <div class="flex flex-col h-screen bg-default">
     <!-- Timer Circle - Top Section -->
-    <div class="flex flex-col items-center pt-[120px] pb-4">
+    <div class="flex flex-col items-center pt-30 pb-4">
       <div class="relative mb-6">
         <div class="w-24 h-24 relative">
           <!-- Background Circle -->
@@ -77,12 +77,12 @@
     </div>
 
     <!-- Complete Button -->
-    <div class="px-8 pb-[90px] fade-in fade-in-delay-1">
+    <div class="px-8 pb-20 fade-in fade-in-delay-1">
       <button
         @click="completeInput"
         :disabled="!isValidInput"
         :class="[
-          'w-[328px] h-[56px] rounded-2xl font-normal transition font-pretendard',
+          'w-82 h-14 rounded-2xl font-normal transition font-pretendard',
           isValidInput
             ? 'bg-brand text-white hover:bg-red-600'
             : 'bg-gray-5 text-gray-2 cursor-not-allowed',

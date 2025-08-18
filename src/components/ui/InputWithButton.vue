@@ -9,7 +9,7 @@
     />
     <button
       @click="$emit('buttonClick')"
-      class="w-16 h-[48px] bg-brand text-white border-none rounded-10 text-sm cursor-pointer flex-shrink-0"
+      class="w-16 h-12 bg-brand text-white border-none rounded-10 text-sm cursor-pointer flex-shrink-0"
     >
       {{ buttonLabel }}
     </button>

@@ -6,7 +6,7 @@
     <div
       class="flex flex-col flex-1 justify-center items-center -translate-y-20"
     >
-      <div class="max-w-[230px] w-full">
+      <div class="max-w-58 w-full">
         <img
           :src="accountstr"
           alt="account illustration"
@@ -24,10 +24,10 @@
     <!-- 하단 버튼 -->
     <div class="absolute bottom-10 left-5 right-5 z-10">
       <div class="flex justify-center gap-4">
-        <div class="w-[156px]">
+        <div class="w-39">
           <Button label="돌아가기" variant="tertiary" @click="router.back()" />
         </div>
-        <div class="w-[156px]">
+        <div class="w-39">
           <Button label="연결하기" :disabled="false" @click="$emit('next')" />
         </div>
       </div>

@@ -31,7 +31,7 @@
     <!-- Additional Info - Fixed at bottom -->
     <div class="pb-10">
       <div class="flex justify-center">
-        <div class="w-[328px] bg-[#414141] rounded-lg p-4">
+        <div class="w-82 bg-[#414141] rounded-lg p-4">
           <div class="flex items-center gap-2 mb-2">
             <!-- Time Icon -->
             <svg

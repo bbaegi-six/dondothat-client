@@ -5,12 +5,12 @@
     <div
       class="w-12 h-12 rounded-full flex items-center justify-center bg-gray-1"
     >
-      <i :class="icon" class="text-xl" :style="{ color: resolvedColor }"></i>
+      <i :class="[icon, 'text-xl']" :style="{ color: resolvedColor }"></i>
     </div>
 
     <!-- 텍스트 -->
     <div class="flex flex-col justify-center gap-1">
-      <h3 class="text-white text-[16px] font-bold leading-tight">
+      <h3 class="text-white text-base font-bold leading-tight">
         {{ name }}
       </h3>
       <!-- 시작일 ~ 종료일 -->

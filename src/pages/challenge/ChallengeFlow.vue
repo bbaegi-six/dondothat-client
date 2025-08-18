@@ -51,7 +51,7 @@
       </div>
 
       <!-- Complete Button -->
-      <div class="px-8 pb-[90px]">
+      <div class="px-8 pb-20">
         <button
           @click="completeChallenge"
           :disabled="isJoining"
