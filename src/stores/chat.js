@@ -33,6 +33,7 @@ export const useChatStore = defineStore('chat', () => {
   const userCount = ref(0);
   const challengeId = ref(null);
   const challengeInfo = ref({}); // 챌린지 정보 저장
+  const currentChallengeName = ref(''); // 현재 챌린지명 저장
   const currentUser = ref({
     userId: null,
     userName: null,
@@ -504,6 +505,20 @@ export const useChatStore = defineStore('chat', () => {
     error.value = null;
   };
 
+  // 챌린지명 미리 로드 함수 (로그인 시 호출)
+  const preloadChallengeName = async () => {
+    try {
+      const status = await chatApi.getUserChallengeStatus();
+      if (status.hasActiveChallenge) {
+        currentChallengeName.value = status.challengeName || '챌린지 채팅방';
+        console.log('채팅 챌린지명 미리 로드:', currentChallengeName.value);
+      }
+    } catch (error) {
+      console.warn('채팅 챌린지명 미리 로드 실패:', error);
+      currentChallengeName.value = '';
+    }
+  };
+
   // 완전 초기화 (다른 채팅방으로 이동 시)
   const reset = () => {
     disconnect();
@@ -535,6 +550,7 @@ export const useChatStore = defineStore('chat', () => {
     userCount,
     challengeId,
     challengeInfo,
+    currentChallengeName,
     currentUser,
     error,
     isLoading,
@@ -555,6 +571,7 @@ export const useChatStore = defineStore('chat', () => {
     resetForNewUser,
     setError,
     clearError,
+    preloadChallengeName,
     cleanup,
 
     // Helper functions
