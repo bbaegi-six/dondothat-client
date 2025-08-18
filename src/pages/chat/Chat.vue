@@ -68,6 +68,7 @@ import { ref, onMounted, onUnmounted, nextTick, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useChatStore } from '@/stores/chat';
 import { useAuthStore } from '@/stores/auth';
+import { storeToRefs } from 'pinia';
 import Header from '@/components/layout/Header.vue';
 import ChatMessages from '@/components/chat/ChatMessages.vue';
 import ChatInput from '@/components/chat/ChatInput.vue';
@@ -81,10 +82,13 @@ const router = useRouter();
 const chatStore = useChatStore();
 const authStore = useAuthStore();
 
+// Store에서 반응성 있는 데이터 가져오기
+const { currentChallengeName } = storeToRefs(chatStore);
+
 // Reactive data
 const chatMessagesRef = ref(null);
 const chatInputRef = ref(null);
-const challengeName = ref('챌린지 채팅방');
+const challengeName = computed(() => currentChallengeName.value || '챌린지 채팅방');
 const isCheckingStatus = ref(false);
 const hasHistoryMessages = ref(false);
 const challengeId = ref(null);
@@ -181,7 +185,10 @@ const initializeChat = async () => {
     ) {
       console.log('⚡ 기존 연결 즉시 재사용 (0ms)');
       challengeId.value = routeChallengeId;
-      challengeName.value = route.query.challengeName || '챌린지 채팅방';
+      // URL 쿼리 파라미터가 있으면 Chat Store도 업데이트
+      if (route.query.challengeName) {
+        chatStore.currentChallengeName = route.query.challengeName;
+      }
       hasHistoryMessages.value = chatStore.messages.length > 0;
       isInitialized.value = true;
       // isCheckingStatus는 건드리지 않음 (이미 false)
@@ -215,7 +222,8 @@ const initializeChat = async () => {
 
     // 2. challengeId 설정
     challengeId.value = status.challengeId;
-    challengeName.value = status.challengeName || '챌린지 채팅방';
+    // Chat Store의 챌린지명도 업데이트 (반응성으로 헤더에 자동 반영)
+    chatStore.currentChallengeName = status.challengeName || '챌린지 채팅방';
 
     // 3. URL 파라미터와 실제 챌린지 ID가 다른 경우에만 replace
     if (routeChallengeId && routeChallengeId !== status.challengeId) {
