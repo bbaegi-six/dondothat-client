@@ -96,11 +96,16 @@ const isInitialized = ref(false);
 
 // 🚀 핵심: 계산된 속성으로 UI 상태 결정
 const shouldShowChatUI = computed(() => {
+  // 초기화되지 않았거나 상태 확인 중이면 채팅 UI 표시하지 않음
+  if (!isInitialized.value || isCheckingStatus.value) {
+    return false;
+  }
+  
   // 기존 연결이 있거나, 연결되어 있거나, 메시지가 있으면 채팅 UI 표시
   return (
     chatStore.isConnected ||
     chatStore.messages.length > 0 ||
-    (isInitialized.value && !isCheckingStatus.value && !chatStore.error)
+    !chatStore.error
   );
 });
 
@@ -216,7 +221,9 @@ const initializeChat = async () => {
     }
 
     if (!status.hasActiveChallenge) {
-      router.push('/no-chat');
+      isCheckingStatus.value = false;
+      isInitialized.value = true;
+      await router.replace('/no-chat');
       return;
     }
 
