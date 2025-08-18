@@ -170,7 +170,7 @@ const goBack = () => {
   router.push('/');
 };
 
-// 🚨 새로 추가: 사용자 변경 감지 로직
+// 채팅방 초기화 (라우터 가드에서 이미 챌린지 상태 확인함)
 const initializeChat = async () => {
   if (isInitialized.value) {
     console.log('🔄 이미 초기화됨, 스킵');
@@ -196,7 +196,6 @@ const initializeChat = async () => {
       }
       hasHistoryMessages.value = chatStore.messages.length > 0;
       isInitialized.value = true;
-      // isCheckingStatus는 건드리지 않음 (이미 false)
 
       nextTick(() => {
         if (chatMessagesRef.value) {
@@ -206,10 +205,10 @@ const initializeChat = async () => {
       return;
     }
 
-    // 기존 연결이 없거나 다른 채팅방일 때만 상태 확인
+    // 라우터 가드에서 이미 챌린지 상태를 확인했으므로 바로 상태 확인 API 호출
     isCheckingStatus.value = true;
 
-    // 1. 사용자의 챌린지 상태 확인 (JWT 기반)
+    // 1. 사용자의 챌린지 상태 확인 (라우터 가드에서 확인했지만 최신 정보를 위해 다시 호출)
     const status = await chatStore.checkUserChallengeStatus();
 
     // 🚨 핵심: 사용자가 실제로 바뀌었는지 확인
@@ -218,13 +217,6 @@ const initializeChat = async () => {
       chatStore.currentUser.userId !== status.userId
     ) {
       chatStore.resetForNewUser();
-    }
-
-    if (!status.hasActiveChallenge) {
-      isCheckingStatus.value = false;
-      isInitialized.value = true;
-      await router.replace('/no-chat');
-      return;
     }
 
     // 2. challengeId 설정
