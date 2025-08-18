@@ -236,7 +236,57 @@ export const useExpensesStore = defineStore('expenses', () => {
     return categoryMasterData[categoryName]?.color || '#c9c9c9';
   };
 
-  // 차트 데이터 계산 (Home.vue에서 사용)
+  // 🏠 홈페이지 전용: 항상 현재 월 데이터 (expenses 페이지 월 선택과 독립적)
+  const homeCurrentMonthTransactions = computed(() => {
+    if (!Array.isArray(transactions.value)) return [];
+    const actualCurrentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    return transactions.value.filter((transaction) => {
+      const transactionDate = new Date(transaction.date);
+      const isCurrentMonth =
+        transactionDate.getMonth() + 1 === actualCurrentMonth &&
+        transactionDate.getFullYear() === currentYear;
+
+      // 수입 카테고리 제외하고 지출만 반환
+      const isExpense = transaction.category !== '수입';
+
+      return isCurrentMonth && isExpense;
+    });
+  });
+
+  // 🏠 홈페이지 전용: 현재 월 지출 요약
+  const homeMonthlyExpense = computed(() => {
+    if (!Array.isArray(homeCurrentMonthTransactions.value)) return 0;
+    return homeCurrentMonthTransactions.value.reduce((sum, t) => {
+      return sum + Math.abs(t.amount);
+    }, 0);
+  });
+
+  // 🏠 홈페이지 전용: 차트 데이터 (항상 현재 월)
+  const homeChartData = computed(() => {
+    const categoryMap = new Map();
+
+    homeCurrentMonthTransactions.value
+      .filter((transaction) => transaction.category !== '수입')
+      .forEach((transaction) => {
+        const categoryName = transaction.category || '기타';
+        const amount = transaction.amount || 0;
+        categoryMap.set(
+          categoryName,
+          (categoryMap.get(categoryName) || 0) + amount
+        );
+      });
+
+    return Array.from(categoryMap.entries())
+      .map(([name, amount]) => ({
+        name,
+        amount,
+        color: getCategoryColorByName(name),
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  });
+
+  // 📊 expenses 페이지용: 차트 데이터 (선택된 월)
   const chartData = computed(() => {
     const categoryMap = new Map();
 
