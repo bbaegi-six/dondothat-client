@@ -66,8 +66,8 @@ const { total: savingTotal } = storeToRefs(savingStore);
 const isSavingGuideModalOpen = ref(false);
 const router = useRouter();
 
-// 차트 데이터는 Expenses Store의 computed 데이터 사용 (거래내역 기반으로 계산됨)
-const chartData = computed(() => expensesStore.chartData);
+// 🏠 홈페이지 전용: 항상 현재 월 차트 데이터 (내역 페이지 월 선택과 독립적)
+const chartData = computed(() => expensesStore.homeChartData);
 
 
 // 페이지 이동 함수들
