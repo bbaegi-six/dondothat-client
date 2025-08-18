@@ -469,6 +469,10 @@ export const useExpensesStore = defineStore('expenses', () => {
     categories,
     categoryMasterData, // Exposed for external use
     chartData,
+    // 🏠 홈페이지 전용 데이터
+    homeCurrentMonthTransactions,
+    homeMonthlyExpense,
+    homeChartData,
     fetchExpensesFromAPI,
     refreshFromCodef,
     addTransaction,
