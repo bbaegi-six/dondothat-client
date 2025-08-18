@@ -1,13 +1,6 @@
 <template>
   <div
-    class="min-h-screen w-[390px] mx-auto relative"
-    style="
-      background-color: #2f2f2f;
-      padding-top: 88px;
-      padding-left: 31px;
-      padding-right: 31px;
-      padding-bottom: 90px;
-    "
+    class="min-h-screen w-98 mx-auto relative bg-[#2f2f2f] pt-22 px-8 pb-22"
   >
     <Header
       :showBack="false"
@@ -18,75 +11,35 @@
     />
 
     <!-- 탭 -->
-    <div style="width: 328px; height: 38px; margin-top: 4px; display: flex">
+    <div class="w-82 h-9 mt-1 flex">
       <div
         @click="switchTab('account')"
-        style="
-          width: 164px;
-          height: 37px;
-          background-color: #2f2f2f;
-          position: relative;
-          cursor: pointer;
-        "
+        class="w-41 h-9 bg-[#2f2f2f] relative cursor-pointer"
       >
         <div
-          :style="{
-            fontFamily: 'Pretendard',
-            fontStyle: 'normal',
-            fontWeight: '500',
-            fontSize: '16px',
-            lineHeight: '32px',
-            textAlign: 'center',
-            color: activeTab === 'account' ? '#ff5555' : '#ffffff',
-            paddingTop: '2px',
-          }"
+          class="font-pretendard font-medium text-base leading-8 text-center pt-0.5"
+          :class="activeTab === 'account' ? 'text-[#ff5555]' : 'text-white'"
         >
           내 계좌
         </div>
         <div
           v-if="activeTab === 'account'"
-          style="
-            position: absolute;
-            bottom: 0;
-            width: 164px;
-            height: 0px;
-            border: 1px solid #ff5555;
-          "
+          class="absolute bottom-0 w-41 h-0 border border-[#ff5555]"
         ></div>
       </div>
       <div
         @click="switchTab('savings')"
-        style="
-          width: 164px;
-          height: 37px;
-          background-color: #2f2f2f;
-          position: relative;
-          cursor: pointer;
-        "
+        class="w-41 h-9 bg-[#2f2f2f] relative cursor-pointer"
       >
         <div
-          :style="{
-            fontFamily: 'Pretendard',
-            fontStyle: 'normal',
-            fontWeight: '500',
-            fontSize: '16px',
-            lineHeight: '32px',
-            textAlign: 'center',
-            color: activeTab === 'savings' ? '#ff5555' : '#ffffff',
-            paddingTop: '2px',
-          }"
+          class="font-pretendard font-medium text-base leading-8 text-center pt-0.5"
+          :class="activeTab === 'savings' ? 'text-[#ff5555]' : 'text-white'"
         >
           저금통
         </div>
         <div
           v-if="activeTab === 'savings'"
-          style="
-            position: absolute;
-            bottom: 0;
-            width: 164px;
-            height: 0px;
-            border: 1px solid #ff5555;
-          "
+          class="absolute bottom-0 w-41 h-0 border border-[#ff5555]"
         ></div>
       </div>
     </div>

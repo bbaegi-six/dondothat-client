@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-screen bg-default max-w-[390px] mx-auto">
+  <div class="flex flex-col h-screen bg-default max-w-98 mx-auto">
     <!-- 공통 헤더 컴포넌트 사용 -->
     <Header
       :title="challengeName"
@@ -12,7 +12,7 @@
     />
 
     <!-- Body Content with proper top margin for fixed header -->
-    <div class="flex flex-col flex-1 mt-[60px]">
+    <div class="flex flex-col flex-1 mt-15">
       <!-- 🚀 채팅 메인 화면 (우선순위 1 - 가장 먼저 체크) -->
       <ChatMessages
         v-if="shouldShowChatUI"
