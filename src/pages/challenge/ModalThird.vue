@@ -59,7 +59,8 @@
                 />
                 <div class="flex flex-col flex-shrink-0 ml-3 w-[140px]">
                   <p
-                    class="text-white text-[15px] text-left font-bold whitespace-nowrap"
+                    class="text-white text-[15px] text-left font-bold overflow-hidden text-ellipsis whitespace-nowrap"
+                    :title="item.name"
                   >
                     {{ item.name }}
                   </p>
