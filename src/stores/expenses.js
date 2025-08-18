@@ -262,35 +262,11 @@ export const useExpensesStore = defineStore('expenses', () => {
     }, 0);
   });
 
-  // 🏠 홈페이지 전용: 차트 데이터 (항상 현재 월)
-  const homeChartData = computed(() => {
-    const categoryMap = new Map();
-
-    homeCurrentMonthTransactions.value
-      .filter((transaction) => transaction.category !== '수입')
-      .forEach((transaction) => {
-        const categoryName = transaction.category || '기타';
-        const amount = transaction.amount || 0;
-        categoryMap.set(
-          categoryName,
-          (categoryMap.get(categoryName) || 0) + amount
-        );
-      });
-
-    return Array.from(categoryMap.entries())
-      .map(([name, amount]) => ({
-        name,
-        amount,
-        color: getCategoryColorByName(name),
-      }))
-      .sort((a, b) => b.amount - a.amount);
-  });
-
-  // 📊 expenses 페이지용: 차트 데이터 (선택된 월)
+  // 차트 데이터 (현재 월 전용)
   const chartData = computed(() => {
     const categoryMap = new Map();
 
-    currentMonthTransactions.value
+    homeCurrentMonthTransactions.value
       .filter((transaction) => transaction.category !== '수입')
       .forEach((transaction) => {
         const categoryName = transaction.category || '기타';
@@ -472,7 +448,6 @@ export const useExpensesStore = defineStore('expenses', () => {
     // 🏠 홈페이지 전용 데이터
     homeCurrentMonthTransactions,
     homeMonthlyExpense,
-    homeChartData,
     fetchExpensesFromAPI,
     refreshFromCodef,
     addTransaction,
