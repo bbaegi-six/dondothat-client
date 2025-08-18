@@ -44,8 +44,8 @@
 
 <script setup>
 import Header from '../../components/layout/Header.vue';
-import Input from '../../components/Input.vue';
-import Button from '../../components/Button.vue';
+import Input from '@/components/ui/Input.vue';
+import Button from '@/components/ui/Button.vue';
 import { authAPI } from '../../utils/api';
 import { useAuthStore } from '../../stores/auth';
 

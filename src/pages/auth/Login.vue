@@ -105,8 +105,8 @@ import { ref, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 import { useAccountStore } from '@/stores/account';
-import Input from '../../components/Input.vue';
-import Button from '../../components/Button.vue';
+import Input from '../../components/ui/Input.vue';
+import Button from '../../components/ui/Button.vue';
 import ErrorModal from '../../components/common/ErrorModal.vue';
 
 const router = useRouter();

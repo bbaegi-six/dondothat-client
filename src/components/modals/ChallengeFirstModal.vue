@@ -37,8 +37,8 @@
 
 <script setup>
 import { computed } from 'vue';
-import Modal from '../../components/Modal.vue';
-import Button from '../../components/Button.vue';
+import Modal from '@/components/ui/Modal.vue';
+import Button from '@/components/ui/Button.vue';
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },

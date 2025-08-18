@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import Modal from '@/components/Modal.vue';
+import Modal from '@/components/ui/Modal.vue';
 
 defineProps({
   modelValue: {

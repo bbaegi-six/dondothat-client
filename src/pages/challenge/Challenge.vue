@@ -70,7 +70,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useChallengeStore } from '@/stores/challenge';
-import Button from '@/components/Button.vue';
+import Button from '@/components/ui/Button.vue';
 import challengeService from '@/services/challengeService';
 import ChallengeProgress from './ChallengeProgress.vue';
 import ChallengeFailed from './ChallengeFailed.vue';

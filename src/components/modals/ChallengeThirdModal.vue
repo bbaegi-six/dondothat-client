@@ -120,7 +120,7 @@
 <script setup>
 import { computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import Modal from '../../components/Modal.vue';
+import Modal from '@/components/ui/Modal.vue';
 import { useChallengeStore } from '@/stores/challenge';
 import { useFinproductStore } from '@/stores/finproduct';
 

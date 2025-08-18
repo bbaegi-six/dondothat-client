@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import BaseCard from '../BaseCard.vue';
+import BaseCard from '../ui/BaseCard.vue';
 import { computed } from 'vue';
 
 const props = defineProps({
