@@ -206,7 +206,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
-import Button from '../../../components/Button.vue';
+import Button from '@/components/ui/Button.vue';
 
 const props = defineProps({
   flowData: {

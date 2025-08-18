@@ -146,9 +146,9 @@ import { useSavingStore } from '@/stores/saving';
 import { useExpensesStore } from '@/stores/expenses';
 
 // 모달들을 동적 import로 변경하여 초기 로딩 속도 개선
-const ModalFirst = defineAsyncComponent(() => import('./ModalFirst.vue'));
-const ModalSecond = defineAsyncComponent(() => import('./ModalSecond.vue'));
-const ModalThird = defineAsyncComponent(() => import('./ModalThird.vue'));
+const ModalFirst = defineAsyncComponent(() => import('@/components/modals/ChallengeFirstModal.vue'));
+const ModalSecond = defineAsyncComponent(() => import('@/components/modals/ChallengeSecondModal.vue'));
+const ModalThird = defineAsyncComponent(() => import('@/components/modals/ChallengeThirdModal.vue'));
 const SavedAmountInfoModal = defineAsyncComponent(() => import('@/components/modals/SavedAmountInfoModal.vue'));
 import { faCircleQuestion as farCircleQuestion } from '@fortawesome/free-regular-svg-icons';
 

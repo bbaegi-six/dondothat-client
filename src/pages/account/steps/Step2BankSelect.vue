@@ -52,7 +52,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import Button from '../../../components/Button.vue';
+import Button from '@/components/ui/Button.vue';
 import kbLogo from '@/assets/logo/kb.svg';
 import shinhanLogo from '@/assets/logo/shinhan.svg';
 import wooriLogo from '@/assets/logo/woori.svg';

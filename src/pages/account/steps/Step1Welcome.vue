@@ -35,8 +35,8 @@
   </div>
 </template>
 <script setup>
-import Button from '../../../components/Button.vue';
-import accountstr from '@/assets/accountstr.svg';
+import Button from '../../../components/ui/Button.vue';
+import accountstr from '@/assets/icons/accountstr.svg';
 import { computed } from 'vue';
 import { useAccountStore } from '../../../stores/account';
 

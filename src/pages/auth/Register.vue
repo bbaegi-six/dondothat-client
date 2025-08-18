@@ -212,9 +212,9 @@
 <script setup>
 import { ref, watch } from 'vue';
 import Header from '../../components/layout/Header.vue';
-import Input from '../../components/Input.vue';
-import InputWithButton from '../../components/InputWithButton.vue';
-import Button from '../../components/Button.vue';
+import Input from '../../components/ui/Input.vue';
+import InputWithButton from '../../components/ui/InputWithButton.vue';
+import Button from '../../components/ui/Button.vue';
 import JobSelectionModal from '../../components/modals/JobSelectionModal.vue'; // New import
 
 import { authAPI } from '../../utils/api.js';

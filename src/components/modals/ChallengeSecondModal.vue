@@ -35,8 +35,8 @@
 <script setup>
 import { computed, watch, ref } from 'vue';
 import { authAPI } from '../../utils/api';
-import Modal from '../../components/Modal.vue';
-import Button from '../../components/Button.vue';
+import Modal from '@/components/ui/Modal.vue';
+import Button from '@/components/ui/Button.vue';
 import ConfettiEffect from '@/components/effects/ConfettiEffect.vue';
 import TierDisplay from '@/components/tier/TierDisplay.vue';
 

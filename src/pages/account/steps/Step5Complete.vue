@@ -147,7 +147,7 @@ import { useRouter } from 'vue-router';
 import { useAccountStore } from '../../../stores/account';
 import { useExpensesStore } from '../../../stores/expenses';
 // import { useAuthStore } from '../../stores/auth';
-import Button from '../../../components/Button.vue';
+import Button from '@/components/ui/Button.vue';
 
 const router = useRouter();
 const accountStore = useAccountStore();

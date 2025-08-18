@@ -78,10 +78,10 @@
 
 <script setup>
 import Header from '../../components/layout/Header.vue';
-import Square from '../../components/Square.vue';
+import Square from '../../components/ui/Square.vue';
 import Typography from '../../components/profile/Typography.vue';
 import AccountCard from '../../components/profile/AccountCard.vue';
-import ConfirmModal from './ConfirmModal.vue';
+import ConfirmModal from '../../components/modals/ConfirmModal.vue';
 
 // import { onMounted } from "vue";
 import { ref, onMounted, computed } from 'vue';

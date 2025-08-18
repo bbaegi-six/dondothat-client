@@ -41,7 +41,7 @@
 
 <script setup>
 import { ref, computed, reactive } from 'vue';
-import AccountHeader from './AccountHeader.vue';
+import AccountHeader from '@/components/account/AccountHeader.vue';
 import Step1Welcome from './steps/Step1Welcome.vue';
 import Step2BankSelect from './steps/Step2BankSelect.vue';
 import Step3AccountForm from './steps/Step3AccountForm.vue';
