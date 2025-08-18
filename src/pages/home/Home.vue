@@ -66,8 +66,8 @@ const { total: savingTotal } = storeToRefs(savingStore);
 const isSavingGuideModalOpen = ref(false);
 const router = useRouter();
 
-// 🏠 홈페이지 전용: 항상 현재 월 차트 데이터 (내역 페이지 월 선택과 독립적)
-const chartData = computed(() => expensesStore.homeChartData);
+// 차트 데이터 (현재 월 전용)
+const chartData = computed(() => expensesStore.chartData);
 
 
 // 페이지 이동 함수들
