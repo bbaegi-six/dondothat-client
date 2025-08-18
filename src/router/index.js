@@ -90,6 +90,27 @@ const routes = [
     name: 'Chat',
     component: () => import('@/pages/chat/Chat.vue'),
     meta: { requiresAuth: true },
+    async beforeEnter(to, from, next) {
+      try {
+        // Chat Store의 챌린지 상태 확인 API 호출
+        const { useChatStore } = await import('@/stores/chat');
+        const chatStore = useChatStore();
+        
+        const status = await chatStore.checkUserChallengeStatus();
+        
+        if (!status.hasActiveChallenge) {
+          // 챌린지가 없으면 no-chat으로 리다이렉트
+          next('/no-chat');
+        } else {
+          // 챌린지가 있으면 Chat 컴포넌트로 진행
+          next();
+        }
+      } catch (error) {
+        console.error('챌린지 상태 확인 실패:', error);
+        // 에러 발생 시에도 no-chat으로 이동
+        next('/no-chat');
+      }
+    },
   },
   {
     path: '/expenses',
