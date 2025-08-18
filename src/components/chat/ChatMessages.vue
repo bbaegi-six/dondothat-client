@@ -97,7 +97,6 @@ const shouldShowDateSeparator = (message, index) => {
 const getDateFromMessage = (message) => {
   const timestamp = message.sentAt || message.time;
 
-
   if (!timestamp) {
     return new Date();
   }
@@ -142,9 +141,21 @@ const isSameDay = (date1, date2) => {
 
 // 스크롤을 하단으로 이동
 const scrollToBottom = () => {
-  if (chatContainer.value) {
-    chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
-  }
+  if (!chatContainer.value) return;
+
+  const container = chatContainer.value;
+
+  const performScroll = () => {
+    container.scrollTop = container.scrollHeight;
+  };
+
+  // 즉시 실행
+  performScroll();
+
+  // DOM 업데이트 후 한번 더
+  nextTick(() => {
+    performScroll();
+  });
 };
 
 // 새 메시지가 추가될 때마다 자동 스크롤
