@@ -4,7 +4,7 @@
     style="background-color: #2f2f2f"
   >
     <!-- Header -->
-    <Header :showBack="false" :showAddButton="false" />
+    <Header :showBack="false" :showAddButton="false" :showBorder="false" />
 
     <!-- 빈 상태 컨텐츠 -->
     <div
