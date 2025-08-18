@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex-1 px-[31px] py-4 overflow-y-auto space-y-2 pb-[140px]"
+    class="flex-1 px-8 py-4 overflow-y-auto space-y-2 pb-35"
     ref="chatContainer"
   >
     <!-- 메시지 목록 with 날짜 구분 -->

@@ -35,7 +35,7 @@
       <div class="flex items-end gap-1">
         <!-- Message Bubble -->
         <div
-          class="bg-[#414141] rounded-lg px-3 py-2 inline-block max-w-[280px] min-w-[40px]"
+          class="bg-[#414141] rounded-lg px-3 py-2 inline-block max-w-70 min-w-10"
         >
           <p
             class="text-white text-xs font-light leading-4 whitespace-pre-line"
@@ -45,7 +45,7 @@
         </div>
 
         <!-- Time -->
-        <span class="text-white text-[8px] font-extralight">{{
+        <span class="text-white text-2xs font-extralight">{{
           formatTimeOnly(time || sentAt)
         }}</span>
       </div>
@@ -56,13 +56,13 @@
   <div v-else class="flex justify-end mb-2">
     <div class="flex items-end gap-1">
       <!-- Time -->
-      <span class="text-white text-[8px] font-extralight">{{
+      <span class="text-white text-2xs font-extralight">{{
         formatTimeOnly(time || sentAt)
       }}</span>
 
       <!-- Message Bubble -->
       <div
-        class="bg-[#FF5555] rounded-lg px-3 py-2 inline-block max-w-[280px] min-w-[40px]"
+        class="bg-[#FF5555] rounded-lg px-3 py-2 inline-block max-w-70 min-w-10"
       >
         <p class="text-white text-xs font-light leading-4 whitespace-pre-line">
           {{ content }}

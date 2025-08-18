@@ -1,12 +1,12 @@
 <template>
   <nav
-    class="fixed bottom-0 left-0 right-0 w-[390px] mx-auto flex justify-between items-center bg-dark-bg p-3 px-5 h-[75px] box-border z-[1000]"
+    class="fixed bottom-0 left-0 right-0 w-98 mx-auto flex justify-between items-center bg-dark-bg p-3 px-5 h-19 box-border z-[1000]"
   >
     <button
       v-for="item in navItems"
       :key="item.id"
       @click="handleNavigation(item.path)"
-      class="flex flex-col items-center justify-center bg-transparent border-none cursor-pointer w-[69px] h-[46px] transition-transform duration-200 rounded-[12px]"
+      class="flex flex-col items-center justify-center bg-transparent border-none cursor-pointer w-17 h-12 transition-transform duration-200 rounded-3"
       :class="{
         'hover:scale-105': true,
         'hover:bg-white/10': true,

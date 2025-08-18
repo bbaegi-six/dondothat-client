@@ -1,9 +1,9 @@
 <template>
   <!-- 차트 섹션 -->
-  <div class="w-[328px] mt-10 flex flex-col items-center">
+  <div class="w-82 mt-10 flex flex-col items-center">
     <!-- 차트 컨테이너 -->
-    <div class="w-[170px] h-[170px] mb-6">
-      <canvas ref="chartCanvas" width="170" height="170"></canvas>
+    <div class="w-43 h-43 mb-6">
+      <canvas ref="chartCanvas" width="172" height="172"></canvas>
     </div>
   </div>
 </template>
