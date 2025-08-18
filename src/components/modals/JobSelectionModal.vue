@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import Modal from '../Modal.vue'; // Adjust path if needed
+import Modal from '../ui/Modal.vue';
 import { defineProps, defineEmits } from 'vue';
 
 const props = defineProps({
