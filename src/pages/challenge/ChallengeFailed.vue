@@ -24,9 +24,9 @@
         일일 성공 여부
       </h3>
 
-      <div class="bg-gray-1 rounded-2xl p-4 w-82">
+      <div class="bg-gray-1 rounded-2xl p-4 w-full">
         <div
-          class="grid grid-cols-7 w-72 h-auto gap-3"
+          class="grid grid-cols-7 w-full h-auto gap-3"
         >
           <div
             v-for="day in challengeData.days"

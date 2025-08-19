@@ -38,18 +38,14 @@
           일일 성공 여부
         </h3>
 
-        <div class="bg-gray-1 rounded-2xl p-4" style="width: 328px">
-          <div
-            class="grid grid-cols-7"
-            style="width: 296px; height: auto; gap: 12px"
-          >
+        <div class="bg-gray-1 rounded-2xl p-4 w-full">
+          <div class="grid grid-cols-7 gap-3 w-full">
             <div
               v-for="day in challengeData.days"
               :key="day"
               :class="getDayBoxClass(day)"
               :style="getDayBoxStyle(day)"
-              class="rounded-lg flex items-center justify-center transition-colors"
-              style="width: 32px; height: 32px"
+              class="aspect-square rounded-lg flex items-center justify-center transition-colors"
             >
               <span class="text-white text-sm font-bold font-pretendard">{{
                 day
@@ -60,10 +56,7 @@
       </div>
 
       <!-- Saved Amount Box -->
-      <div
-        class="mx-8 mb-6 bg-gray-1 rounded-2xl p-6 relative"
-        style="width: 328px; height: 112px"
-      >
+      <div class="mx-8 mb-6 bg-gray-1 rounded-2xl p-6 relative w-auto h-28">
         <p
           class="text-white text-base font-medium text-center mb-2 font-pretendard"
         >
@@ -86,7 +79,7 @@
       <div class="flex-1"></div>
 
       <!-- Challenge Info Text or Success Button -->
-      <div v-if="isCompleted" class="mx-8 mb-6" style="width: 328px">
+      <div v-if="isCompleted" class="mx-8 mb-6">
         <!-- Success Button -->
         <button
           class="w-full bg-brand text-white text-lg font-semibold py-4 rounded-2xl font-pretendard"
@@ -95,11 +88,7 @@
           저금 하기
         </button>
       </div>
-      <div
-        v-else
-        class="mx-8 mb-6 text-center"
-        style="width: 328px; height: 86px"
-      >
+      <div v-else class="mx-8 mb-6 text-center min-h-[86px]">
         <p class="text-brand text-xl font-semibold mb-2 font-pretendard">
           {{ challengeStatusText }}
         </p>

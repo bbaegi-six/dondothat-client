@@ -1,27 +1,12 @@
 <template>
   <div
-    class="cursor-pointer"
-    style="
-      width: 328px;
-      height: 80px;
-      margin-top: 0px;
-      display: flex;
-      align-items: center;
-    "
+    class="cursor-pointer w-full h-20 flex items-center"
     @click="handleClick"
   >
     <!-- 카테고리 아이콘 배경 -->
     <div
       :class="getCategoryBackgroundColor()"
-      style="
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        margin-right: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      "
+      class="w-12 h-12 rounded-full mr-4 flex items-center justify-center flex-shrink-0"
     >
       <!-- 폰트어썸 아이콘 -->
       <i
@@ -31,62 +16,20 @@
     </div>
 
     <!-- 거래 정보 -->
-    <div style="flex: 1">
-      <div style="display: flex; justify-content: space-between">
-        <div
-          style="
-            font-family: 'Pretendard';
-            font-style: normal;
-            font-weight: 500;
-            font-size: 16px;
-            line-height: 24px;
-            color: #ffffff;
-          "
-        >
+    <div class="flex-1 min-w-0">
+      <div class="flex justify-between items-center">
+        <div class="font-pretendard font-medium text-base text-white truncate pr-2">
           {{ transaction.name }}
         </div>
-        <div
-          style="
-            font-family: 'Pretendard';
-            font-style: normal;
-            font-weight: 700;
-            font-size: 14.125px;
-            line-height: 24px;
-            color: #ffffff;
-            text-align: right;
-            width: 80px;
-          "
-        >
+        <div class="font-pretendard font-bold text-sm text-white text-right flex-shrink-0 min-w-20">
           {{ formatAmount(transaction.amount, transaction.category) }}
         </div>
       </div>
-      <div style="display: flex; justify-content: space-between">
-        <div
-          style="
-            font-family: 'Pretendard';
-            font-style: normal;
-            font-weight: 400;
-            font-size: 14px;
-            line-height: 20px;
-            color: #c6c6c6;
-            margin-top: 2px;
-          "
-        >
+      <div class="flex justify-between items-center mt-0.5">
+        <div class="font-pretendard font-normal text-sm text-[#c6c6c6] truncate pr-2">
           {{ transaction.categoryDisplay || transaction.category }}
         </div>
-        <div
-          style="
-            font-family: 'Pretendard';
-            font-style: normal;
-            font-weight: 400;
-            font-size: 14px;
-            line-height: 20px;
-            color: #c6c6c6;
-            text-align: right;
-            width: 48px;
-            margin-top: 2px;
-          "
-        >
+        <div class="font-pretendard font-normal text-sm text-[#c6c6c6] text-right flex-shrink-0 min-w-12">
           {{ transaction.time }}
         </div>
       </div>

@@ -82,7 +82,7 @@
         @click="completeInput"
         :disabled="!isValidInput"
         :class="[
-          'w-82 h-14 rounded-2xl font-normal transition font-pretendard',
+          'w-full h-14 rounded-2xl font-normal transition font-pretendard',
           isValidInput
             ? 'bg-brand text-white hover:bg-red-600'
             : 'bg-gray-5 text-gray-2 cursor-not-allowed',

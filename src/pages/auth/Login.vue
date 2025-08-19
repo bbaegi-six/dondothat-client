@@ -10,7 +10,7 @@
     </div>
 
     <!-- 로그인 폼 -->
-    <div class="flex flex-col mb-5 w-82 mx-auto">
+    <div class="flex flex-col mb-5 w-full">
       <div class="relative mb-6">
         <Input v-model="email" type="email" placeholder="이메일을 입력하세요" />
       </div>

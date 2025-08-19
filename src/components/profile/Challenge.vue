@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-82 bg-default border-2 border-gray-1 rounded-16 flex items-center p-4 gap-4"
+    class="w-full bg-default border-2 border-gray-1 rounded-16 flex items-center p-4 gap-4"
   >
     <div
       class="w-12 h-12 rounded-full flex items-center justify-center bg-gray-1"

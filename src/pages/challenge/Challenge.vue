@@ -24,9 +24,9 @@
       <div
         class="flex-1 flex items-center justify-center pt-15 pb-20 px-5 slide-up-animation"
       >
-        <!-- Empty State Container - 328 × 296 -->
+        <!-- Empty State Container -->
         <div
-          class="w-82 h-74 text-center flex flex-col justify-center"
+          class="w-full h-74 text-center flex flex-col justify-center"
         >
           <!-- Icon Circle - 하얀색 배경 -->
           <div
