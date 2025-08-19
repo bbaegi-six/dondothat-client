@@ -4,7 +4,6 @@ import { ref } from 'vue';
 import { useAuthStore } from './auth'; // auth 스토어 임포트
 
 import kbLogo from '@/assets/logo/kb.svg';
-import eatBadge from '@/assets/badge/eat.svg';
 
 export const useUserStore = defineStore('user', () => {
   const authStore = useAuthStore(); // auth 스토어 사용
@@ -24,13 +23,6 @@ export const useUserStore = defineStore('user', () => {
       name: '국민 저축 통장',
       balance: 500000,
     },
-  ]);
-  const badges = ref([
-    { image: eatBadge },
-    { image: eatBadge },
-    { image: eatBadge },
-    { image: eatBadge },
-    { image: eatBadge },
   ]);
   const successChallenges = ref([
     {
@@ -73,7 +65,6 @@ export const useUserStore = defineStore('user', () => {
     nickname.value = '';
     email.value = '';
     accounts.value = [];
-    badges.value = [];
     successChallenges.value = [];
     failedChallenges.value = [];
     authStore.user = null; // auth 스토어의 사용자 정보도 초기화
@@ -84,7 +75,6 @@ export const useUserStore = defineStore('user', () => {
     nickname,
     email,
     accounts,
-    badges,
     successChallenges,
     failedChallenges,
     resetStore,
