@@ -51,32 +51,72 @@
       <p class="text-white text-4xl font-bold text-center font-pretendard">
         {{ potentialSavedAmount.toLocaleString() }}원
       </p>
-      <div class="absolute top-4 right-4">
-        <i class="fas fa-info-circle text-gray-3 text-sm"></i>
+      <div 
+        class="absolute top-4 right-4 p-2 -m-2 cursor-pointer hover:bg-gray-600 rounded-lg transition-colors"
+        @click.stop="savedAmountInfoModalOpen = true"
+      >
+        <FontAwesomeIcon
+          :icon="farCircleQuestion"
+          class="text-[#c9c9c9] text-lg hover:text-white transition-colors"
+        />
       </div>
     </div>
 
     <!-- Spacer -->
     <div class="flex-1"></div>
 
-    <!-- Challenge Info Text or Action Button -->
-    <div class="mx-8 mb-6 text-center min-h-[86px]">
+    <!-- Challenge Info Text -->
+    <div class="mx-8 mb-6 text-center">
       <p class="text-brand text-xl font-semibold mb-2 font-pretendard">
         챌린지 실패
       </p>
       <p class="text-white text-base font-pretendard mb-4">
-        {{ challengeCategoryText }} 결제 내역이 확인되었습니다
+        {{ challengeCategoryText }} 결제 내역이 있습니다
       </p>
+    </div>
+
+    <!-- Failed Transactions Section -->
+    <div class="mx-8 mb-6">
+      <h3 class="text-white text-base font-semibold mb-4 font-pretendard">
+        관련 결제 내역
+      </h3>
       
-      <!-- Failed transactions display (simplified) -->
-      <div v-if="loading" class="text-white text-sm">
-        지출 내역을 불러오는 중...
+      <div v-if="loading" class="bg-gray-1 rounded-2xl p-4 text-center">
+        <p class="text-white text-sm">결제 내역을 불러오는 중...</p>
       </div>
-      <div v-else-if="error" class="text-red-400 text-sm">
-        {{ error }}
+      
+      <div v-else-if="error" class="bg-gray-1 rounded-2xl p-4 text-center">
+        <p class="text-red-400 text-sm">{{ error }}</p>
       </div>
-      <div v-else-if="failedTransactions.length > 0" class="text-gray-3 text-sm">
-        총 {{ failedTransactions.length }}건의 지출 내역이 있습니다
+      
+      <div v-else-if="failedTransactions.length > 0" class="space-y-3">
+        <div 
+          v-for="(transaction, index) in failedTransactions.slice(0, 3)" 
+          :key="index"
+          class="bg-gray-1 rounded-2xl p-4"
+        >
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h4 class="text-white font-medium text-sm mb-1">{{ transaction.content || '결제 내역' }}</h4>
+              <p class="text-gray-3 text-xs">{{ formatTransactionDate(transaction.resUsedDate) }}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-brand font-semibold">{{ formatAmount(transaction.resUsedAmount) }}원</p>
+            </div>
+          </div>
+        </div>
+        
+        <div v-if="failedTransactions.length > 3" class="bg-gray-1 rounded-2xl p-4 text-center">
+          <p class="text-gray-3 text-sm">외 {{ failedTransactions.length - 3 }}건 더</p>
+        </div>
+        
+        <div class="text-center mt-4">
+          <p class="text-gray-3 text-sm">총 {{ failedTransactions.length }}건의 {{ challengeCategoryText }} 결제가 확인되었습니다</p>
+        </div>
+      </div>
+      
+      <div v-else class="bg-gray-1 rounded-2xl p-4 text-center">
+        <p class="text-gray-3 text-sm">결제 내역을 불러올 수 없습니다</p>
       </div>
     </div>
 
@@ -92,16 +132,26 @@
 
     <!-- Navigation Space -->
     <div class="pb-24"></div>
+
+    <!-- SavedAmountInfoModal -->
+    <SavedAmountInfoModal
+      :modelValue="savedAmountInfoModalOpen"
+      @close="savedAmountInfoModalOpen = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { useExpensesStore } from '@/stores/expenses';
 import { useChallengeStore } from '@/stores/challenge';
 import { calculatePotentialSavings } from '@/utils/challengeUtils';
 import { challengeService } from '@/services/challengeService';
+import { faCircleQuestion as farCircleQuestion } from '@fortawesome/free-regular-svg-icons';
+
+// 모달을 동적 import로 로딩
+const SavedAmountInfoModal = defineAsyncComponent(() => import('@/components/modals/SavedAmountInfoModal.vue'));
 
 // Props
 const props = defineProps({
@@ -123,18 +173,22 @@ const potentialSavedAmount = ref(0);
 const failedTransactions = ref([]);
 const loading = ref(false);
 const error = ref(null);
+const savedAmountInfoModalOpen = ref(false);
 
 // Computed properties
 const currentMetadata = computed(() => {
-  const categoryData = Object.values(expensesStore.categoryMasterData).find(
-    (category) => category.id === props.challengeData.type
+  // categoryMasterData의 키들을 순회하면서 id가 일치하는 카테고리 찾기
+  const categoryName = Object.keys(expensesStore.categoryMasterData).find(
+    (name) => expensesStore.categoryMasterData[name].id === props.challengeData.type
   );
+  
+  const categoryData = categoryName ? expensesStore.categoryMasterData[categoryName] : null;
 
   if (categoryData) {
     return {
       icon: categoryData.icon,
       color: categoryData.color,
-      categoryText: categoryData.name,
+      categoryText: categoryName, // 카테고리 이름 (예: '배달음식', '카페', '편의점' 등)
       dailyAverage: categoryData.dailyAverage || 5000,
     };
   }
@@ -192,6 +246,24 @@ const formatDateTime = (dateTimeString) => {
   }
 };
 
+const formatTransactionDate = (dateTimeString) => {
+  try {
+    const date = new Date(dateTimeString);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${month}/${day} ${hours}:${minutes}`;
+  } catch (e) {
+    return dateTimeString;
+  }
+};
+
+const formatAmount = (amount) => {
+  if (!amount) return '0';
+  return Number(amount).toLocaleString();
+};
+
 const handleNewChallenge = async () => {
   // closeChallenge API 호출 - userChallengeData의 user_challenge_id 사용
   if (challengeStore.userChallengeData?.user_challenge_id) {
@@ -209,8 +281,19 @@ const handleNewChallenge = async () => {
 };
 
 const calculateLocalPotentialSavings = () => {
-  potentialSavedAmount.value =
-    props.challengeData.savedAmount * props.challengeData.days;
+  // savedAmount와 days가 유효한지 확인
+  const savedAmount = props.challengeData.savedAmount || 0;
+  const days = props.challengeData.days || 0;
+  
+  console.log('계산 데이터:', {
+    savedAmount,
+    days,
+    challengeData: props.challengeData
+  });
+  
+  potentialSavedAmount.value = savedAmount * days;
+  
+  console.log('계산된 잠재 저축 금액:', potentialSavedAmount.value);
 };
 
 const fetchFailedTransactions = async () => {
@@ -251,9 +334,7 @@ onMounted(async () => {
     ];
     
     // 즉시 실행 가능한 작업은 먼저 실행
-    const challengeType = props.challengeData.type;
-    const days = props.challengeData.days;
-    potentialSavings.value = calculatePotentialSavings(challengeType, days);
+    calculateLocalPotentialSavings();
     
     // API 호출들을 병렬로 처리 (현재는 하나지만 확장 가능)
     await Promise.allSettled(tasks);

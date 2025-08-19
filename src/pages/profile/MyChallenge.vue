@@ -47,6 +47,6 @@ const { successChallenges, failedChallenges } = storeToRefs(userStore);
 </script>
 <style scoped>
 .page-container {
-  @apply px-8 pt-18 flex flex-col gap-2;
+  @apply px-8 pt-20 flex flex-col gap-2;
 }
 </style>

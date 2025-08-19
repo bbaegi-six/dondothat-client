@@ -222,7 +222,7 @@ const challengeIconColor = computed(() => {
 });
 
 const challengeStatusText = computed(() => {
-  if (props.challengeData.currentDay === 1) {
+  if (props.challengeData.currentDay === 0) {
     return '지금부터 챌린지를 시작합니다';
   } else {
     return `${props.challengeData.currentDay}일까지 성공`;
@@ -231,7 +231,7 @@ const challengeStatusText = computed(() => {
 
 const challengeDescriptionText = computed(() => {
   const categoryText = currentMetadata.value.categoryText;
-  if (props.challengeData.currentDay === 1) {
+  if (props.challengeData.currentDay === 0) {
     return `매일 ${categoryText} 결제내역을 체크합니다`;
   } else {
     return `지금까지 ${categoryText} 결제 내역이 없습니다`;

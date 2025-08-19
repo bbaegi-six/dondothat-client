@@ -2,16 +2,14 @@
 <template>
   <div class="flex flex-col h-full px-5 relative">
     <!-- Top Section - Title -->
-    <div class="pt-3 pb-4 flex justify-center">
-      <div class="w-[328px]">
-        <h2 class="text-lg font-semibold text-white">{{ selectedBankName }}</h2>
-      </div>
+    <div class="pt-3 pb-4 px-5">
+      <h2 class="text-lg font-semibold text-white">{{ selectedBankName }}</h2>
     </div>
 
     <!-- Input Section -->
-    <div class="space-y-3 mb-8 flex flex-col items-center">
+    <div class="space-y-3 mb-8 px-5">
       <!-- 은행 아이디 입력 -->
-      <div class="w-[328px]">
+      <div>
         <input
           v-model="formData.bankId"
           type="text"
@@ -22,7 +20,7 @@
       </div>
 
       <!-- 비밀번호 입력 -->
-      <div class="relative w-[328px]">
+      <div class="relative">
         <input
           v-model="formData.bankpw"
           :type="showPassword ? 'text' : 'password'"
@@ -53,7 +51,7 @@
       </div>
 
       <!-- 계좌번호 입력 -->
-      <div class="w-[328px]">
+      <div>
         <input
           v-model="formData.bankAccount"
           type="text"
@@ -76,7 +74,7 @@
         </div>
       </div>
       <!-- 에러 메시지 표시 -->
-      <div v-if="errorMessage" class="w-[328px]">
+      <div v-if="errorMessage">
         <div
           class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm"
         >
@@ -86,9 +84,9 @@
     </div>
 
     <!-- Bottom Section - 하단에 모든 내용 -->
-    <div class="flex-1 flex flex-col justify-end pb-10 space-y-4 items-center">
+    <div class="flex-1 flex flex-col justify-end pb-10 space-y-4 px-5">
       <!-- 동의 사항 -->
-      <div class="space-y-3 w-[328px]">
+      <div class="space-y-3">
         <div>
           <div class="flex items-center gap-3">
             <input
@@ -162,7 +160,7 @@
       </div>
 
       <!-- 보안 안내 -->
-      <div class="w-[328px]">
+      <div>
         <div class="w-full bg-[#414141] rounded-2xl p-4">
           <div class="flex items-start gap-3">
             <div
@@ -191,10 +189,10 @@
       </div>
 
       <!-- 연결하기 버튼 -->
-      <div class="w-[328px]">
+      <div>
         <Button
           :disabled="!isFormValid"
-          class="font-normal"
+          class="font-normal w-full"
           @click="goToNextStep"
         >
           연결하기
