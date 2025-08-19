@@ -152,7 +152,8 @@ export const useChatStore = defineStore('chat', () => {
 
       // 2. 채팅방 정보 로드
       try {
-        challengeInfo.value = await chatService.getChatRoomInfo(chatChallengeId);
+        challengeInfo.value =
+          await chatService.getChatRoomInfo(chatChallengeId);
         userCount.value = challengeInfo.value.participantCount || 0;
         console.log('📋 채팅방 정보 로드 완료:', challengeInfo.value);
       } catch (error) {
