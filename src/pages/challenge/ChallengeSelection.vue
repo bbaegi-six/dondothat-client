@@ -78,8 +78,8 @@
               class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-1 rounded-full flex items-center justify-center flex-shrink-0"
             >
               <i
-                :class="getCategoryIcon(challenge.categoryId)"
-                :style="{ color: getCategoryColor(challenge.categoryId) }"
+                :class="getCategoryIconByTitle(challenge.title)"
+                :style="{ color: getCategoryColorByTitle(challenge.title) }"
               ></i>
             </div>
             <div class="flex-1 text-left min-w-0">
@@ -158,9 +158,46 @@ const getCategoryData = (categoryId) => {
   );
 };
 
+const getCategoryByTitle = (challengeTitle) => {
+  // 챌린지 제목을 기반으로 카테고리 매핑
+  const titleToCategoryMap = {
+    '카페': '카페',
+    '배달': '배달음식',
+    '쇼핑': '쇼핑',
+    '택시': '택시',
+    '편의점': '편의점',
+    '마트': '마트',
+    '온라인': '온라인쇼핑',
+    '술': '술',
+    '담배': '담배',
+    '버스': '버스'
+  };
+  
+  // 챌린지 제목에서 키워드를 찾아 매핑
+  for (const [keyword, category] of Object.entries(titleToCategoryMap)) {
+    if (challengeTitle.includes(keyword)) {
+      return category;
+    }
+  }
+  
+  return '그외'; // 기본값
+};
+
+const getCategoryIconByTitle = (challengeTitle) => {
+  const categoryName = getCategoryByTitle(challengeTitle);
+  const data = expensesStore.categoryMasterData[categoryName] || expensesStore.categoryMasterData['그외'];
+  return data ? `${data.icon} text-lg sm:text-xl` : 'fas fa-question-circle text-lg sm:text-xl';
+};
+
+const getCategoryColorByTitle = (challengeTitle) => {
+  const categoryName = getCategoryByTitle(challengeTitle);
+  const data = expensesStore.categoryMasterData[categoryName] || expensesStore.categoryMasterData['그외'];
+  return data ? data.color : '#ffffff';
+};
+
 const getCategoryIcon = (categoryId) => {
   const data = getCategoryData(categoryId);
-  return data ? `${data.icon} text-2xl` : 'fas fa-question-circle text-2xl';
+  return data ? `${data.icon} text-lg sm:text-xl` : 'fas fa-question-circle text-lg sm:text-xl';
 };
 
 const getCategoryColor = (categoryId) => {

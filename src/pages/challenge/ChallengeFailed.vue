@@ -77,46 +77,65 @@
 
     <!-- Failed Transactions Section -->
     <div class="mx-8 mb-6">
-      <h3 class="text-white text-base font-semibold mb-4 font-pretendard">
-        관련 결제 내역
-      </h3>
       
-      <div v-if="loading" class="bg-gray-1 rounded-2xl p-4 text-center">
-        <p class="text-white text-sm">결제 내역을 불러오는 중...</p>
+      <div v-if="loading" class="bg-gray-1 rounded-2xl p-3 sm:p-4 text-center">
+        <p class="text-white text-xs sm:text-sm">결제 내역을 불러오는 중...</p>
       </div>
       
-      <div v-else-if="error" class="bg-gray-1 rounded-2xl p-4 text-center">
-        <p class="text-red-400 text-sm">{{ error }}</p>
+      <div v-else-if="error" class="bg-gray-1 rounded-2xl p-3 sm:p-4 text-center">
+        <p class="text-red-400 text-xs sm:text-sm">{{ error }}</p>
       </div>
       
-      <div v-else-if="failedTransactions.length > 0" class="space-y-3">
+      <div v-else-if="failedTransactions.length > 0" class="space-y-2 sm:space-y-3">
         <div 
           v-for="(transaction, index) in failedTransactions.slice(0, 3)" 
           :key="index"
-          class="bg-gray-1 rounded-2xl p-4"
+          class="cursor-pointer w-full h-14 sm:h-16 flex items-center bg-gray-1 rounded-2xl px-3 sm:px-4"
         >
-          <div class="flex justify-between items-start">
-            <div class="flex-1">
-              <h4 class="text-white font-medium text-sm mb-1">{{ transaction.content || '결제 내역' }}</h4>
-              <p class="text-gray-3 text-xs">{{ formatTransactionDate(transaction.resUsedDate) }}</p>
+          <!-- 카테고리 아이콘 배경 -->
+          <div
+            class="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2 sm:mr-3 flex items-center justify-center flex-shrink-0 bg-[#414141]"
+          >
+            <!-- 폰트어썸 아이콘 -->
+            <i
+              :class="challengeIcon"
+              class="text-sm sm:text-base"
+              :style="{ color: challengeIconColor }"
+            ></i>
+          </div>
+
+          <!-- 거래 정보 -->
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between items-center">
+              <div class="font-pretendard font-medium text-xs sm:text-sm text-white truncate pr-2">
+                {{ transaction.description || '결제 내역' }}
+              </div>
+              <div class="font-pretendard font-bold text-xs sm:text-sm text-brand text-right flex-shrink-0 min-w-14 sm:min-w-16">
+                {{ formatAmount(transaction.amount) }}원
+              </div>
             </div>
-            <div class="text-right">
-              <p class="text-brand font-semibold">{{ formatAmount(transaction.resUsedAmount) }}원</p>
+            <div class="flex justify-between items-center mt-0.5">
+              <div class="font-pretendard font-normal text-xs text-[#c6c6c6] truncate pr-2">
+                {{ challengeCategoryText }}
+              </div>
+              <div class="font-pretendard font-normal text-xs text-[#c6c6c6] text-right flex-shrink-0 min-w-8 sm:min-w-10">
+                {{ formatTransactionDate(transaction.expenditureDate) }}
+              </div>
             </div>
           </div>
         </div>
         
-        <div v-if="failedTransactions.length > 3" class="bg-gray-1 rounded-2xl p-4 text-center">
-          <p class="text-gray-3 text-sm">외 {{ failedTransactions.length - 3 }}건 더</p>
+        <div v-if="failedTransactions.length > 3" class="bg-gray-1 rounded-2xl p-3 sm:p-4 text-center">
+          <p class="text-gray-3 text-xs sm:text-sm">외 {{ failedTransactions.length - 3 }}건 더</p>
         </div>
         
-        <div class="text-center mt-4">
-          <p class="text-gray-3 text-sm">총 {{ failedTransactions.length }}건의 {{ challengeCategoryText }} 결제가 확인되었습니다</p>
+        <div class="text-center mt-3 sm:mt-4">
+          <p class="text-gray-3 text-xs sm:text-sm">총 {{ failedTransactions.length }}건의 {{ challengeCategoryText }} 결제가 확인되었습니다</p>
         </div>
       </div>
       
-      <div v-else class="bg-gray-1 rounded-2xl p-4 text-center">
-        <p class="text-gray-3 text-sm">결제 내역을 불러올 수 없습니다</p>
+      <div v-else class="bg-gray-1 rounded-2xl p-3 sm:p-4 text-center">
+        <p class="text-gray-3 text-xs sm:text-sm">결제 내역을 불러올 수 없습니다</p>
       </div>
     </div>
 
@@ -248,14 +267,24 @@ const formatDateTime = (dateTimeString) => {
 
 const formatTransactionDate = (dateTimeString) => {
   try {
+    if (!dateTimeString) return '';
+    
+    // 백엔드에서 "yyyy-MM-dd HH:mm:ss" 형식으로 오는 데이터 처리
     const date = new Date(dateTimeString);
+    
+    // 유효한 날짜인지 확인
+    if (isNaN(date.getTime())) {
+      return dateTimeString;
+    }
+    
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${month}/${day} ${hours}:${minutes}`;
   } catch (e) {
-    return dateTimeString;
+    console.error('날짜 포맷 오류:', e, dateTimeString);
+    return dateTimeString || '';
   }
 };
 
@@ -301,26 +330,44 @@ const fetchFailedTransactions = async () => {
   error.value = null;
 
   try {
-    // challengeData에서 challengeId를 가져옵니다 (props에 id가 있다고 가정)
+    // challengeData에서 challengeId를 가져옵니다 (백엔드 API는 challengeId를 기대함)
     const challengeId = props.challengeData.type;
+    console.log('챌린지 데이터:', props.challengeData);
+    console.log('사용할 challengeId:', challengeId);
 
     if (!challengeId) {
       throw new Error('챌린지 ID를 찾을 수 없습니다');
     }
 
-    // console.log(challengeId);
+    console.log('실패 내역 요청 - 챌린지 ID:', challengeId);
     const response = await challengeService.failChallenge(challengeId);
-    // console.log(response);
+    console.log('실패 내역 API 응답:', response);
+    console.log('API 응답 타입:', typeof response, '배열 여부:', Array.isArray(response));
 
     if (response && Array.isArray(response)) {
       failedTransactions.value = response;
+      console.log('실패 거래 내역 설정 성공:', failedTransactions.value.length, '건');
+      
+      // 데이터 구조 확인을 위한 로그
+      if (failedTransactions.value.length > 0) {
+        console.log('첫 번째 거래 데이터 구조:', failedTransactions.value[0]);
+      }
     } else {
+      console.log('API에서 반환된 데이터가 예상 형식이 아님:', response);
       failedTransactions.value = [];
     }
   } catch (err) {
     console.error('실패 내역 조회 오류:', err);
-    error.value = '지출 내역을 불러올 수 없습니다';
+    error.value = '결제 내역을 불러올 수 없습니다';
     failedTransactions.value = [];
+    
+    // 오류 상세 정보 로깅
+    console.error('오류 상세:', {
+      message: err.message,
+      stack: err.stack,
+      challengeId: props.challengeData?.type,
+      challengeData: props.challengeData
+    });
   } finally {
     loading.value = false;
   }

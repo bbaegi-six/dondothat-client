@@ -67,7 +67,8 @@ export const challengeService = {
   // 챌린지 실패 처리
   async failChallenge(challengeId) {
     try {
-      const response = await challengeAPI.failChallenge(challengeId);
+      // 백엔드 API는 POST 요청이므로 빈 객체라도 전달
+      const response = await challengeAPI.failChallenge(challengeId, {});
       return response;
     } catch (error) {
       console.error('챌린지 실패 처리 오류:', error);
