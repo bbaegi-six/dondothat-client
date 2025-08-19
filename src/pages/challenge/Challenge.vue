@@ -22,11 +22,11 @@
       >
       <!-- Main Content Area -->
       <div
-        class="flex-1 flex items-center justify-center pt-[60px] pb-[90px] px-5 slide-up-animation"
+        class="flex-1 flex items-center justify-center pt-15 pb-20 px-5 slide-up-animation"
       >
-        <!-- Empty State Container - 328 × 296 -->
+        <!-- Empty State Container -->
         <div
-          class="w-[328px] h-[296px] text-center flex flex-col justify-center"
+          class="w-full h-74 text-center flex flex-col justify-center"
         >
           <!-- Icon Circle - 하얀색 배경 -->
           <div
@@ -53,7 +53,7 @@
 
       <!-- Start Challenge Button - 컨테이너 밖으로 분리 -->
       <div
-        class="px-8 pb-[90px] slide-up-animation"
+        class="px-8 pb-20 slide-up-animation"
         style="animation-delay: 0.2s"
       >
         <Button :disabled="false" @click="startChallenge" class="font-normal">

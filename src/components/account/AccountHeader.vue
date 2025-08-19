@@ -2,7 +2,7 @@
 <template>
   <div v-if="showHeader" class="relative">
     <!-- Header -->
-    <div class="flex items-center justify-between px-5 h-[61px]">
+    <div class="flex items-center justify-between px-5 h-16">
       <div class="flex items-center gap-2">
         <div
           class="bg-transparent border-none text-lg flex items-center rounded-md px-0 py-1 font-medium text-white transition-colors"

@@ -1,9 +1,9 @@
 <template>
   <div
-    class="w-full max-w-[393px] h-screen bg-[#2F2F2F] overflow-hidden relative mx-auto font-pretendard text-white"
+    class="w-full h-screen bg-[#2F2F2F] overflow-hidden relative font-pretendard text-white"
   >
     <!-- Header Component - 항상 65px 공간 확보 -->
-    <div class="h-[61px] relative">
+    <div class="h-16 relative">
       <div
         class="absolute inset-0 transition-opacity duration-300 ease-in-out"
         :class="
@@ -24,7 +24,7 @@
     </div>
 
     <!-- Main Content with Transition -->
-    <div class="relative h-[calc(100%-61px)]">
+    <div class="relative h-[calc(100%-60px)]">
       <Transition :name="transitionName" mode="out-in">
         <component
           :is="currentStepComponent"

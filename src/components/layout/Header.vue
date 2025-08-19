@@ -1,9 +1,9 @@
 <template>
   <header
-    class="bg-default text-white w-[390px] mx-auto fixed top-0 left-0 right-0 z-50 pt-4"
+    class="bg-default text-white w-full fixed top-0 left-0 right-0 z-50 pt-4"
   >
     <div
-      class="flex justify-between items-center px-[31px] h-[52px] box-border"
+      class="flex justify-between items-center px-8 h-13 box-border"
     >
       <div class="flex items-center gap-0">
         <button
@@ -31,15 +31,7 @@
         />
         <h2
           v-if="title"
-          class="m-0"
-          style="
-            font-family: 'Pretendard';
-            font-style: normal;
-            font-weight: 600;
-            font-size: 20px;
-            line-height: 32px;
-            color: #ffffff;
-          "
+          class="m-0 font-pretendard font-semibold text-xl leading-8 text-white"
         >
           {{ title }}
         </h2>
@@ -65,8 +57,7 @@
         <button
           v-if="showAddButton"
           @click="$emit('add-click')"
-          class="rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
-          style="width: 32px; height: 32px"
+          class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path

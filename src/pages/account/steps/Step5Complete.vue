@@ -22,10 +22,10 @@
         </div>
 
         <!-- Title -->
-        <h2 class="text-[20px] font-bold mb-1 text-white text-center">
+        <h2 class="text-xl font-bold mb-1 text-white text-center">
           {{ successTitle }}
         </h2>
-        <p class="text-gray-400 text-[12px] text-center">
+        <p class="text-gray-400 text-xs text-center">
           {{ successDescription }}
         </p>
       </div>
@@ -35,28 +35,28 @@
 
       <!-- Bottom Section - Fixed spacing -->
       <div class="pb-10">
-        <div class="flex flex-col items-center space-y-4">
+        <div class="flex flex-col space-y-4 px-5">
           <!-- Account Info Card -->
-          <div class="bg-white rounded-16 p-4 w-[328px]">
-            <h3 class="text-gray-900 font-medium mb-3 text-[14px]">
+          <div class="bg-white rounded-2xl p-4">
+            <h3 class="text-gray-900 font-medium mb-3 text-sm">
               {{ accountCardTitle }}
             </h3>
             <div class="space-y-2">
               <div class="flex justify-between items-center">
-                <span class="text-gray-600 text-[14px]">은행명</span>
-                <span class="text-gray-900 font-medium text-[14px]">{{
+                <span class="text-gray-600 text-sm">은행명</span>
+                <span class="text-gray-900 font-medium text-sm">{{
                   bankName
                 }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-gray-600 text-[14px]">계좌번호</span>
-                <span class="text-gray-900 font-medium text-[14px]">{{
+                <span class="text-gray-600 text-sm">계좌번호</span>
+                <span class="text-gray-900 font-medium text-sm">{{
                   maskedAccountNumber
                 }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-gray-600 text-[14px]">계좌명</span>
-                <span class="text-gray-900 font-medium text-[14px]">{{
+                <span class="text-gray-600 text-sm">계좌명</span>
+                <span class="text-gray-900 font-medium text-sm">{{
                   accountName
                 }}</span>
               </div>
@@ -64,11 +64,11 @@
           </div>
 
           <!-- Action Buttons -->
-          <div class="space-y-3 w-[328px]">
+          <div class="space-y-3">
             <div class="w-full">
               <Button
                 :disabled="false"
-                class="font-normal"
+                class="font-normal w-full"
                 @click="goToChallenge"
               >
                 챌린지 바로가기
@@ -76,7 +76,7 @@
             </div>
             <div class="w-full">
               <button
-                class="w-full h-14 py-3 rounded-16 font-normal transition bg-white text-gray-900 hover:bg-gray-100"
+                class="w-full h-14 py-3 rounded-2xl font-normal transition bg-white text-gray-900 hover:bg-gray-100"
                 @click="goToHome"
               >
                 홈으로 이동하기
@@ -112,30 +112,26 @@
         </div>
 
         <!-- Title -->
-        <h2 class="text-[20px] font-bold mb-1 text-white text-center">
+        <h2 class="text-xl font-bold mb-1 text-white text-center">
           연결 실패!
         </h2>
         <!-- 상세 에러 메시지 -->
-        <div class="w-[328px] text-center">
-          <p class="text-gray-300 text-[14px] whitespace-pre-line">
+        <div class="px-5 text-center">
+          <p class="text-gray-300 text-sm whitespace-pre-line">
             {{ errorMessage }}
           </p>
         </div>
       </div>
 
       <!-- Bottom Section - Only Retry Button -->
-      <div class="pb-10">
-        <div class="flex justify-center">
-          <div class="w-[328px]">
-            <Button
-              :disabled="false"
-              class="font-normal"
-              @click="retryConnection"
-            >
-              다시 연결하기
-            </Button>
-          </div>
-        </div>
+      <div class="pb-10 px-5">
+        <Button
+          :disabled="false"
+          class="font-normal w-full"
+          @click="retryConnection"
+        >
+          다시 연결하기
+        </Button>
       </div>
     </div>
   </div>

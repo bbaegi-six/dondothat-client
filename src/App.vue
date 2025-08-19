@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-[390px] h-screen bg-dark-bg relative mx-auto font-pretendard flex flex-col"
+    class="w-full h-screen bg-dark-bg relative font-pretendard flex flex-col"
   >
     <div class="flex-1 overflow-auto">
       <router-view />
@@ -39,11 +39,6 @@ const shouldShowNav = computed(() => {
 <style scoped>
 * {
   background-color: #2f2f2f;
-}
-@media (max-width: 430px) {
-  .w-\[390px\] {
-    width: 100%;
-  }
 }
 ::-webkit-scrollbar {
   display: none;

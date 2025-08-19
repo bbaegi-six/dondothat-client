@@ -4,7 +4,7 @@
     <!-- 기존 챌린지 화면 -->
     <div>
       <!-- Challenge Icon & Title -->
-      <div class="flex items-center justify-center mt-[70px] mb-4">
+      <div class="flex items-center justify-center pt-20 mb-4">
         <div
           class="w-20 h-20 rounded-full flex items-center justify-center"
           :class="isCompleted ? '' : 'bg-gray-1'"
@@ -38,18 +38,14 @@
           일일 성공 여부
         </h3>
 
-        <div class="bg-gray-1 rounded-2xl p-4" style="width: 328px">
-          <div
-            class="grid grid-cols-7"
-            style="width: 296px; height: auto; gap: 12px"
-          >
+        <div class="bg-gray-1 rounded-2xl p-4 w-full">
+          <div class="grid grid-cols-7 gap-3 w-full">
             <div
               v-for="day in challengeData.days"
               :key="day"
               :class="getDayBoxClass(day)"
               :style="getDayBoxStyle(day)"
-              class="rounded-lg flex items-center justify-center transition-colors"
-              style="width: 32px; height: 32px"
+              class="aspect-square rounded-lg flex items-center justify-center transition-colors"
             >
               <span class="text-white text-sm font-bold font-pretendard">{{
                 day
@@ -60,17 +56,14 @@
       </div>
 
       <!-- Saved Amount Box -->
-      <div
-        class="mx-8 mb-6 bg-gray-1 rounded-2xl p-6 relative"
-        style="width: 328px; height: 112px"
-      >
+      <div class="mx-8 mb-6 bg-gray-1 rounded-2xl p-6 relative w-auto h-28">
         <p
           class="text-white text-base font-medium text-center mb-2 font-pretendard"
         >
           지금까지 아낀 금액
         </p>
         <p class="text-white text-4xl font-bold text-center font-pretendard">
-          {{ (challengeData.savedAmount * challengeData.currentDay).toLocaleString() }}원
+          {{ currentSavedAmount.toLocaleString() }}원
         </p>
         <div class="absolute top-4 right-4">
           <FontAwesomeIcon
@@ -86,7 +79,7 @@
       <div class="flex-1"></div>
 
       <!-- Challenge Info Text or Success Button -->
-      <div v-if="isCompleted" class="mx-8 mb-6" style="width: 328px">
+      <div v-if="isCompleted" class="mx-8 mb-6">
         <!-- Success Button -->
         <button
           class="w-full bg-brand text-white text-lg font-semibold py-4 rounded-2xl font-pretendard"
@@ -95,11 +88,7 @@
           저금 하기
         </button>
       </div>
-      <div
-        v-else
-        class="mx-8 mb-6 text-center"
-        style="width: 328px; height: 86px"
-      >
+      <div v-else class="mx-8 mb-6 text-center min-h-[86px]">
         <p class="text-brand text-xl font-semibold mb-2 font-pretendard">
           {{ challengeStatusText }}
         </p>
@@ -110,7 +99,7 @@
     </div>
 
     <!-- Navigation Space -->
-    <div class="pb-[90px]"></div>
+    <div class="pb-24"></div>
 
     <!-- First Modal -->
     <ModalFirst
@@ -182,6 +171,7 @@ const isSavingCompleted = ref(false);
 const isSecondModal = ref(false);
 const isThirdModal = ref(false);
 const savedAmountInfoModalOpen = ref(false);
+const currentSavedAmount = ref(0);
 
 const expensesStore = useExpensesStore();
 
@@ -233,7 +223,7 @@ const challengeIconColor = computed(() => {
 });
 
 const challengeStatusText = computed(() => {
-  if (props.challengeData.currentDay === 1) {
+  if (props.challengeData.currentDay === 0) {
     return '지금부터 챌린지를 시작합니다';
   } else {
     return `${props.challengeData.currentDay}일까지 성공`;
@@ -242,7 +232,7 @@ const challengeStatusText = computed(() => {
 
 const challengeDescriptionText = computed(() => {
   const categoryText = currentMetadata.value.categoryText;
-  if (props.challengeData.currentDay === 1) {
+  if (props.challengeData.currentDay === 0) {
     return `매일 ${categoryText} 결제내역을 체크합니다`;
   } else {
     return `지금까지 ${categoryText} 결제 내역이 없습니다`;
@@ -250,6 +240,15 @@ const challengeDescriptionText = computed(() => {
 });
 
 // Methods
+const calculateCurrentSavedAmount = () => {
+  // 성공한 경우: savedAmount * days (전체 기간)
+  // 진행 중인 경우: savedAmount * currentDay (현재까지 성공한 일수)
+  const savedAmount = props.challengeData.savedAmount || 0;
+  const days = isCompleted.value ? props.challengeData.days : props.challengeData.currentDay;
+  
+  currentSavedAmount.value = savedAmount * days;
+};
+
 const getDayBoxClass = (day) => {
   if (isCompleted.value && day <= props.challengeData.days) {
     // 완료된 챌린지는 모든 날이 성공 (빨간색)
@@ -305,6 +304,10 @@ const handleThirdModalClose = () => {
   isThirdModal.value = false;
   router.push('/');
 };
+
+onMounted(() => {
+  calculateCurrentSavedAmount();
+});
 </script>
 
 <style scoped>

@@ -184,15 +184,6 @@ import Header from '../../components/layout/Header.vue';
 
 <style scoped>
 .page-container {
-  padding: 31px;
-  padding-top: 70px;
-  margin-bottom: 50px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  line-height: 1.6;
-  font-size: 14px;
-  color: #ffffff;
-  white-space: pre-wrap;
+  @apply px-8 pt-20 mb-12 flex flex-col gap-2 leading-relaxed text-sm text-white whitespace-pre-wrap;
 }
 </style>

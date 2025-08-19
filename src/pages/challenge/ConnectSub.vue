@@ -5,11 +5,11 @@
     <div class="flex flex-col h-screen">
       <!-- Main Content Area -->
       <div
-        class="flex-1 flex items-center justify-center pt-[60px] pb-[90px] px-5"
+        class="flex-1 flex items-center justify-center pt-15 pb-20 px-5"
       >
         <!-- Empty State Container - 328 × 296 -->
         <div
-          class="w-[328px] h-[296px] text-center flex flex-col justify-center"
+          class="w-82 h-74 text-center flex flex-col justify-center"
         >
           <!-- Icon Circle - 하얀색 배경 -->
           <div
@@ -34,7 +34,7 @@
         </div>
       </div>
 
-      <div class="pb-[90px] flex gap-3 px-8">
+      <div class="pb-20 flex gap-3 px-8">
         <button
           class="w-full h-14 py-3 rounded-16 transition"
           :class="'bg-brand text-white hover:bg-red-600'"

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 px-[31px] flex flex-col overflow-y-auto">
+  <div class="flex-1 px-8 flex flex-col overflow-y-auto">
     <!-- 로고 -->
     <div class="text-center mt-16 mb-10">
       <img
@@ -10,7 +10,7 @@
     </div>
 
     <!-- 로그인 폼 -->
-    <div class="flex flex-col mb-5 w-82 mx-auto">
+    <div class="flex flex-col mb-5 w-full">
       <div class="relative mb-6">
         <Input v-model="email" type="email" placeholder="이메일을 입력하세요" />
       </div>
@@ -65,13 +65,13 @@
       <div class="flex justify-center gap-8 mb-10">
         <button
           @click="handleNaverLogin"
-          class="w-[42px] h-[42px] rounded-full border-none cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-[#03C75A] text-white"
+          class="w-11 h-11 rounded-full border-none cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-[#03C75A] text-white"
         >
           <div class="naver-icon">N</div>
         </button>
         <button
           @click="handleGoogleLogin"
-          class="w-[42px] h-[42px] rounded-full border border-light-gray-db cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-white text-dark-gray"
+          class="w-11 h-11 rounded-full border border-light-gray-db cursor-pointer flex items-center justify-center font-bold transition-transform duration-200 bg-white text-dark-gray"
         >
           <div class="google-icon">G</div>
         </button>

@@ -2,7 +2,7 @@
   <!-- 참여 중인 챌린지 섹션 -->
   <div
     v-if="challengeData && challengeData.status !== 'closed'"
-    class="w-[328px] h-24 rounded-2xl mt-4 flex flex-col justify-center px-6 cursor-pointer border-2 border-[#414141]"
+    class="w-full h-24 rounded-2xl mt-4 flex flex-col justify-center px-6 cursor-pointer border-2 border-[#414141]"
     @click="$emit('goToChallenge')"
   >
     <div class="flex items-center">
@@ -40,7 +40,7 @@
       </div>
       <FontAwesomeIcon
         :icon="faAngleRight"
-        class="text-[#c6c6c6] w-[10px] h-4 ml-2"
+        class="text-[#c6c6c6] w-2 h-4 ml-2"
       />
     </div>
   </div>
@@ -48,7 +48,7 @@
   <!-- 참여 중인 챌린지가 없습니다 섹션 -->
   <div
     v-else
-    class="w-[328px] h-24 bg-[#2f2f2f] border-2 border-[#414141] rounded-2xl mt-4 flex items-center px-6 cursor-pointer"
+    class="w-full h-24 bg-[#2f2f2f] border-2 border-[#414141] rounded-2xl mt-4 flex items-center px-6 cursor-pointer"
     @click="$emit('goToChallenge')"
   >
     <FontAwesomeIcon
@@ -60,7 +60,7 @@
     </div>
     <FontAwesomeIcon
       :icon="faAngleRight"
-      class="text-[#c6c6c6] w-[10px] h-4"
+      class="text-[#c6c6c6] w-2 h-4"
     />
   </div>
 </template>

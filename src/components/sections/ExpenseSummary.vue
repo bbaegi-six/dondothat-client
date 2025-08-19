@@ -5,7 +5,7 @@
   </div>
 
   <!-- 이번 달 지출 요약 박스 -->
-  <div class="w-[328px] bg-[#414141] rounded-2xl p-6">
+  <div class="w-full bg-[#414141] rounded-2xl p-6">
     <!-- 카테고리별 지출 리스트 -->
     <div v-if="chartData && chartData.length > 0">
       <div

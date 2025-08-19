@@ -8,7 +8,7 @@
     ref="loadingContainer"
   >
     <!-- Title Section - 타이머와 동일한 위치에서 제거 -->
-    <div class="flex flex-col items-center pt-[30px] pb-4">
+    <div class="flex flex-col items-center pt-8 pb-4">
       <!-- 빈 공간 유지 -->
     </div>
 
@@ -43,7 +43,7 @@
       <div class="space-y-4 flex flex-col items-center blur-sm opacity-50">
         <!-- 카페 금지 챌린지 -->
         <div
-          class="w-[328px] h-[98px] bg-default border-2 border-gray-1 rounded-2xl p-4 flex items-center gap-4"
+          class="w-82 h-24 bg-default border-2 border-gray-1 rounded-2xl p-4 flex items-center gap-4"
         >
           <div
             class="w-12 h-12 bg-gray-1 rounded-full flex items-center justify-center"
@@ -66,7 +66,7 @@
 
         <!-- 배달음식 금지 챌린지 -->
         <div
-          class="w-[328px] h-[98px] bg-default border-2 border-gray-1 rounded-2xl p-4 flex items-center gap-4"
+          class="w-82 h-24 bg-default border-2 border-gray-1 rounded-2xl p-4 flex items-center gap-4"
         >
           <div
             class="w-12 h-12 bg-gray-1 rounded-full flex items-center justify-center"
@@ -91,7 +91,7 @@
 
         <!-- 택시 금지 챌린지 -->
         <div
-          class="w-[328px] h-[98px] bg-default border-2 border-gray-1 rounded-2xl p-4 flex items-center gap-4"
+          class="w-82 h-24 bg-default border-2 border-gray-1 rounded-2xl p-4 flex items-center gap-4"
         >
           <div
             class="w-12 h-12 bg-gray-1 rounded-full flex items-center justify-center"
@@ -115,7 +115,7 @@
     </div>
 
     <!-- Bottom Space - 원본과 동일한 여백 -->
-    <div class="px-8 pb-[90px]">
+    <div class="px-8 pb-20">
       <!-- 빈 공간 유지 -->
     </div>
   </div>

@@ -1,7 +1,7 @@
 <!-- Square.vue -->
 <template>
   <div
-    class="flex flex-col items-center justify-center relative overflow-hidden w-[104px] h-[104px] rounded-16 bg-gray-1"
+    class="flex flex-col items-center justify-center relative overflow-hidden w-26 h-26 rounded-16 bg-gray-1"
   >
     <!-- 이미지 영역 -->
     <div class="flex items-center justify-center flex-1">

@@ -1,7 +1,7 @@
 <template>
   <Header showLogo :show-border="false" />
   <div
-    class="min-h-screen w-[390px] mx-auto bg-[#2f2f2f] pt-[88px] px-[31px] pb-[90px]"
+    class="min-h-screen w-full bg-[#2f2f2f] pt-20 px-8 pb-20"
   >
     <!-- 저금통 섹션 -->
     <SavingAccountSection

@@ -1,20 +1,18 @@
 <!-- step2bankselect.vue -->
 <template>
   <div class="h-full flex flex-col relative">
-    <div class="pt-3 pb-4 flex justify-center">
-      <div class="w-[328px]">
-        <h2 class="text-lg font-semibold text-white">은행 선택</h2>
-      </div>
+    <div class="pt-3 pb-4 px-5">
+      <h2 class="text-lg font-semibold text-white">은행 선택</h2>
     </div>
 
     <div class="flex-1 px-5 overflow-hidden">
       <div
-        class="grid grid-cols-3 gap-3 h-full overflow-y-auto scrollbar-hide p-1 pb-[90px]"
+        class="grid grid-cols-3 gap-3 h-full overflow-y-auto scrollbar-hide p-1 pb-24"
       >
         <div
           v-for="bank in banks"
           :key="bank.id"
-          class="w-[104px] h-[104px] rounded-[16px] p-4 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 border-2 hover:bg-gray-700 hover:scale-105"
+          class="aspect-square rounded-2xl p-2 sm:p-3 md:p-4 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 border-2 hover:bg-gray-700 hover:scale-105"
           :class="{
             'border-[#FF5555] bg-[#FF5555]/10': selectedBank?.id === bank.id,
             'border-transparent bg-[#414141]': selectedBank?.id !== bank.id,
@@ -24,9 +22,9 @@
           <img
             :src="bank.icon"
             alt="logo"
-            class="w-10 h-10 object-contain mb-2"
+            class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 object-contain mb-1 sm:mb-2"
           />
-          <div class="text-sm font-medium text-white text-center leading-tight">
+          <div class="text-[9px] sm:text-[10px] md:text-xs font-medium text-white text-center leading-tight px-1">
             {{ bank.name }}
           </div>
         </div>
@@ -35,17 +33,13 @@
 
     <!-- Fixed Button at Bottom -->
     <div class="absolute bottom-10 left-5 right-5 z-10">
-      <div class="flex justify-center">
-        <div class="w-[328px]">
-          <Button
-            :disabled="!selectedBank"
-            class="font-normal"
-            @click="nextStep"
-          >
-            다음
-          </Button>
-        </div>
-      </div>
+      <Button
+        :disabled="!selectedBank"
+        class="font-normal w-full"
+        @click="nextStep"
+      >
+        다음
+      </Button>
     </div>
   </div>
 </template>

@@ -2,11 +2,11 @@
 <template>
   <div class="flex flex-col h-screen bg-default">
     <!-- Timer Circle - Top Section -->
-    <div class="flex flex-col items-center pt-[120px] pb-4">
+    <div class="flex flex-col items-center pt-20 sm:pt-24 md:pt-30 pb-4">
       <div class="relative mb-6">
-        <div class="w-24 h-24 relative">
+        <div class="w-20 h-20 sm:w-24 sm:h-24 relative">
           <!-- Background Circle -->
-          <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 80 80">
+          <svg class="w-20 h-20 sm:w-24 sm:h-24 transform -rotate-90" viewBox="0 0 80 80">
             <circle
               cx="40"
               cy="40"
@@ -31,7 +31,7 @@
           </svg>
           <!-- Timer Number -->
           <div class="absolute inset-0 flex items-center justify-center">
-            <span class="text-white text-4xl font-normal font-pretendard">{{
+            <span class="text-white text-3xl sm:text-4xl font-normal font-pretendard">{{
               timeLeft
             }}</span>
           </div>
@@ -39,56 +39,56 @@
       </div>
 
       <!-- Main Title -->
-      <h1 class="text-white text-xl font-bold text-center mb-2 font-pretendard">
+      <h1 class="text-white text-lg sm:text-xl font-bold text-center mb-2 font-pretendard px-4">
         원하는 날짜를 입력해주세요
       </h1>
 
       <!-- Subtitle -->
-      <div class="text-white/90 text-sm text-center font-pretendard">
+      <div class="text-white/90 text-xs sm:text-sm text-center font-pretendard px-4">
         <p>30초 후에 선택하지 않으면</p>
         <p>랜덤으로 배정됩니다</p>
       </div>
     </div>
 
     <!-- Middle Content - 날짜 입력 중앙 배치 -->
-    <div class="flex-1 flex flex-col items-center justify-center fade-in">
+    <div class="flex-1 flex flex-col items-center justify-center fade-in px-4">
       <!-- Date Input Field -->
-      <div class="flex items-baseline justify-center mb-8">
+      <div class="flex items-baseline justify-center mb-6 sm:mb-8">
         <input
           v-model="selectedDays"
           type="number"
           min="7"
           max="35"
-          class="text-white text-6xl font-semibold font-pretendard bg-transparent border-none outline-none text-center w-24"
+          class="text-white text-4xl sm:text-5xl md:text-6xl font-semibold font-pretendard bg-transparent border-none outline-none text-center w-16 sm:w-20 md:w-24"
           @input="validateInput"
           @blur="handleBlur"
           placeholder=""
           ref="daysInputRef"
         />
-        <span class="text-white text-3xl font-semibold font-pretendard ml-2"
+        <span class="text-white text-2xl sm:text-3xl font-semibold font-pretendard ml-1 sm:ml-2"
           >일</span
         >
       </div>
 
       <!-- Date Constraints -->
-      <div class="text-gray-3 text-xs text-center font-pretendard">
+      <div class="text-gray-3 text-xs sm:text-sm text-center font-pretendard">
         * 최소 7일, 최대 35일
       </div>
     </div>
 
     <!-- Complete Button -->
-    <div class="px-8 pb-[90px] fade-in fade-in-delay-1">
+    <div class="px-4 sm:px-6 pb-20 fade-in fade-in-delay-1">
       <button
         @click="completeInput"
         :disabled="!isValidInput"
         :class="[
-          'w-[328px] h-[56px] rounded-2xl font-normal transition font-pretendard',
+          'w-full max-w-md h-12 sm:h-14 rounded-2xl font-normal transition font-pretendard mx-auto block',
           isValidInput
             ? 'bg-brand text-white hover:bg-red-600'
             : 'bg-gray-5 text-gray-2 cursor-not-allowed',
         ]"
       >
-        입력 완료
+        <span class="text-sm sm:text-base">입력 완료</span>
       </button>
     </div>
   </div>

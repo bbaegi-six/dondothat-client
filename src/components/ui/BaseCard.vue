@@ -1,6 +1,6 @@
 <!-- BaseCard.vue -->
 <template>
-  <div class="bg-gray-1 rounded-16 p-4 min-h-[78px] items-center">
+  <div class="bg-gray-1 rounded-16 p-4 min-h-20 items-center">
     <slot></slot>
   </div>
 </template>

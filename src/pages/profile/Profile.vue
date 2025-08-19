@@ -1,5 +1,5 @@
 <template>
-  <Header title="마이페이지" :showBorder="false"></Header>
+  <Header title="마이페이지" :showBorder="true"></Header>
   <div class="page-container">
     <div class="info">
       <div class="info-content">
@@ -407,12 +407,7 @@ onMounted(async () => {
   color: #ffffff;
 }
 .page-container {
-  padding: 31px;
-  padding-top: 86px;
-  margin-bottom: 50px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  @apply px-8 pt-20 mb-12 flex flex-col gap-5;
 }
 .page-title {
   font-size: 1.75rem;
@@ -420,10 +415,7 @@ onMounted(async () => {
   margin-bottom: 1.5rem;
 }
 .badge-list {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  justify-items: center;
+  @apply grid grid-cols-3 gap-2 justify-items-center;
 }
 .menu {
   display: flex;
@@ -432,30 +424,17 @@ onMounted(async () => {
 }
 .no-account,
 .no-savings {
-  padding: 20px;
-  text-align: center;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  margin: 8px 0;
+  @apply p-5 text-center bg-white bg-opacity-10 rounded-xl my-2;
 }
 .connect-btn {
-  margin-top: 10px;
-  padding: 8px 16px;
-  background-color: #ff5555;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
+  @apply mt-2 px-4 py-2 bg-brand text-white border-none rounded-lg cursor-pointer text-sm;
 }
 .connect-btn:hover {
   background-color: #e04545;
 }
 
 .info-content {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  @apply flex items-center gap-1;
 }
 
 .tier-image {
@@ -463,9 +442,7 @@ onMounted(async () => {
 }
 
 .tier-image img {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
+  @apply w-16 h-16 object-contain;
 }
 
 .user-details {

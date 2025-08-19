@@ -1,12 +1,11 @@
 <template>
-  <div class="pt-[60px]">
-    <div class="mx-auto w-[328px]">
+  <div class="pt-20">
+    <div class="w-full">
       <!-- This div centers the entire content block and sets its width -->
       <Header :showBack="true" title="회원가입" />
-      <hr class="border-t border-[#414141]" />
-      <div class="flex flex-col gap-6 py-6">
+      <div class="flex flex-col gap-6 py-6 px-8">
         <!-- This div aligns its children -->
-        <div class="w-[328px] mx-auto">
+        <div class="w-full">
           <Input v-model="name" placeholder="이름" class="w-full" />
           <div class="h-1">
             <span
@@ -20,7 +19,7 @@
           </div>
         </div>
 
-        <div class="w-[328px] mx-auto">
+        <div class="w-full">
           <Input v-model="nickname" placeholder="닉네임" class="w-full" />
           <div class="h-1">
             <span
@@ -34,7 +33,7 @@
           </div>
         </div>
 
-        <div class="w-[328px] mx-auto">
+        <div class="w-full">
           <Input
             v-model="password"
             type="password"
@@ -54,7 +53,7 @@
           </div>
         </div>
 
-        <div class="w-[328px] mx-auto">
+        <div class="w-full">
           <Input
             v-model="confirmPassword"
             type="password"
@@ -77,7 +76,7 @@
           </div>
         </div>
 
-        <div class="w-[328px] mx-auto">
+        <div class="w-full">
           <InputWithButton
             v-model="email"
             placeholder="이메일"
@@ -108,7 +107,7 @@
           </div>
         </div>
 
-        <div class="w-[328px] mx-auto">
+        <div class="w-full">
           <div class="flex gap-4">
             <div class="flex-1">
               <Input
@@ -148,7 +147,7 @@
           </div>
         </div>
 
-        <div class="flex flex-col gap-3 w-[328px] mx-auto pt-12">
+        <div class="flex flex-col gap-3 w-full pt-12">
           <label
             class="flex items-center justify-between gap-2 text-white text-sm"
           >
@@ -199,7 +198,7 @@
           </label>
         </div>
 
-        <div class="w-[328px] mx-auto">
+        <div class="w-full">
           <Button @click="handleNext" class="w-full" :disabled="isSubmitting"
             >다음</Button
           >
