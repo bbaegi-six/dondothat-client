@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
-import { chatApi } from '@/services/chatApi';
+import { chatService } from '@/services/chatService';
 
 // WebSocket URL 설정 통일
 const getWebSocketUrl = () => {
@@ -82,7 +82,7 @@ export const useChatStore = defineStore('chat', () => {
       console.log('🔍 사용자 챌린지 상태 확인 (JWT 기반)');
       clearError(); // 이전 에러 클리어
 
-      const status = await chatApi.getUserChallengeStatus();
+      const status = await chatService.getUserChallengeStatus();
       console.log('📊 챌린지 상태:', status);
 
       // 현재 사용자 정보 업데이트
@@ -111,7 +111,7 @@ export const useChatStore = defineStore('chat', () => {
 
       console.log(`📚 채팅 이력 로드 시작: challengeId=${chatChallengeId}`);
 
-      const history = await chatApi.getChatHistory(chatChallengeId, limit);
+      const history = await chatService.getChatHistory(chatChallengeId, limit);
 
       // 기존 메시지 초기화 후 이력 로드
       messages.value = [];
@@ -152,7 +152,7 @@ export const useChatStore = defineStore('chat', () => {
 
       // 2. 채팅방 정보 로드
       try {
-        challengeInfo.value = await chatApi.getChatRoomInfo(chatChallengeId);
+        challengeInfo.value = await chatService.getChatRoomInfo(chatChallengeId);
         userCount.value = challengeInfo.value.participantCount || 0;
         console.log('📋 채팅방 정보 로드 완료:', challengeInfo.value);
       } catch (error) {
@@ -498,7 +498,7 @@ export const useChatStore = defineStore('chat', () => {
   // 챌린지명 미리 로드 함수 (로그인 시 호출)
   const preloadChallengeName = async () => {
     try {
-      const status = await chatApi.getUserChallengeStatus();
+      const status = await chatService.getUserChallengeStatus();
       if (status.hasActiveChallenge) {
         currentChallengeName.value = status.challengeName || '챌린지 채팅방';
         console.log('채팅 챌린지명 미리 로드:', currentChallengeName.value);
