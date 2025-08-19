@@ -49,15 +49,16 @@ export const useChatStore = defineStore('chat', () => {
   const getTimestampFromMessage = (message) => {
     const timestamp = message.sentAt || message.time;
 
-    if (Array.isArray(timestamp)) {
-      // 백엔드 배열 형식: [year, month, day, hour, minute, second]
+    if (Array.isArray(timestamp) && timestamp.length >= 5) {
+      // 백엔드 배열 형식: [year, month, day, hour, minute, second, nanosecond]
       return new Date(
         timestamp[0], // year
         timestamp[1] - 1, // month (0-based)
         timestamp[2], // day
         timestamp[3] || 0, // hour
         timestamp[4] || 0, // minute
-        timestamp[5] || 0 // second
+        timestamp[5] || 0, // second
+        Math.floor((timestamp[6] || 0) / 1000000) // nanosecond to millisecond
       );
     } else if (timestamp) {
       return new Date(timestamp);
