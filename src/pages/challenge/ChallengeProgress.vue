@@ -4,7 +4,7 @@
     <!-- 기존 챌린지 화면 -->
     <div>
       <!-- Challenge Icon & Title -->
-      <div class="flex items-center justify-center mt-[70px] mb-4">
+      <div class="flex items-center justify-center pt-20 mb-4">
         <div
           class="w-20 h-20 rounded-full flex items-center justify-center"
           :class="isCompleted ? '' : 'bg-gray-1'"
@@ -99,7 +99,7 @@
     </div>
 
     <!-- Navigation Space -->
-    <div class="pb-[90px]"></div>
+    <div class="pb-24"></div>
 
     <!-- First Modal -->
     <ModalFirst

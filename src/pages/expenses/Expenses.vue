@@ -6,7 +6,7 @@
       :showBack="false"
       title="내역"
       :showAddButton="true"
-      :showBorder="false"
+      :showBorder="true"
       @add-click="refreshExpenses"
     />
 

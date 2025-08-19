@@ -2,7 +2,7 @@
 <template>
   <div class="flex flex-col h-screen bg-default">
     <!-- Challenge Icon & Title -->
-    <div class="flex items-center justify-center mt-18 mb-4">
+    <div class="flex items-center justify-center pt-20 mb-4">
       <div
         class="w-12 h-12 rounded-full flex items-center justify-center bg-gray-1"
       >
@@ -25,15 +25,13 @@
       </h3>
 
       <div class="bg-gray-1 rounded-2xl p-4 w-full">
-        <div
-          class="grid grid-cols-7 w-full h-auto gap-3"
-        >
+        <div class="grid grid-cols-7 gap-3 w-full">
           <div
             v-for="day in challengeData.days"
             :key="day"
             :class="getDayBoxClass(day)"
             :style="getDayBoxStyle(day)"
-            class="rounded-lg flex items-center justify-center transition-colors w-8 h-8"
+            class="aspect-square rounded-lg flex items-center justify-center transition-colors"
           >
             <span class="text-white text-sm font-bold font-pretendard">{{
               day
@@ -44,9 +42,7 @@
     </div>
 
     <!-- Failed Amount Box -->
-    <div
-      class="mx-8 mb-6 bg-gray-1 rounded-2xl p-6 relative w-82 h-28"
-    >
+    <div class="mx-8 mb-6 bg-gray-1 rounded-2xl p-6 relative w-auto h-28">
       <p
         class="text-white text-base font-medium text-center mb-2 font-pretendard"
       >
@@ -63,73 +59,31 @@
     <!-- Spacer -->
     <div class="flex-1"></div>
 
-    <!-- Failed transaction info -->
-    <div class="mx-8 mb-6 text-center w-82">
-      <p class="text-white text-base font-medium mb-4 font-pretendard">
-        {{ challengeCategoryText }} 결제 내역이 있습니다
+    <!-- Challenge Info Text or Action Button -->
+    <div class="mx-8 mb-6 text-center min-h-[86px]">
+      <p class="text-brand text-xl font-semibold mb-2 font-pretendard">
+        챌린지 실패
       </p>
-
-      <!-- Loading state -->
-      <div v-if="loading" class="bg-gray-1 rounded-xl p-4 mb-6">
-        <div class="flex items-center justify-center">
-          <p class="text-white text-sm">지출 내역을 불러오는 중...</p>
-        </div>
+      <p class="text-white text-base font-pretendard mb-4">
+        {{ challengeCategoryText }} 결제 내역이 확인되었습니다
+      </p>
+      
+      <!-- Failed transactions display (simplified) -->
+      <div v-if="loading" class="text-white text-sm">
+        지출 내역을 불러오는 중...
       </div>
-
-      <!-- Error state -->
-      <div v-else-if="error" class="bg-gray-1 rounded-xl p-4 mb-6">
-        <div class="flex items-center justify-center">
-          <p class="text-red-400 text-sm">{{ error }}</p>
-        </div>
+      <div v-else-if="error" class="text-red-400 text-sm">
+        {{ error }}
       </div>
-
-      <!-- Failed transactions display -->
-      <div v-else-if="failedTransactions.length > 0" class="space-y-3 mb-6">
-        <div
-          v-for="transaction in failedTransactions"
-          :key="transaction.expenditureDate + transaction.amount"
-          class="rounded-xl p-2"
-        >
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <div
-                class="w-10 h-10 rounded-full flex items-center justify-center mr-3"
-                :style="{ backgroundColor: challengeIconColor }"
-              >
-                <i :class="[challengeIcon, 'text-white text-sm']"></i>
-              </div>
-              <div class="text-left">
-                <p class="text-white font-semibold text-sm">
-                  {{ transaction.description }}
-                </p>
-                <p class="text-gray-3 text-xs">{{ challengeCategoryText }}</p>
-                <p class="text-gray-3 text-xs">
-                  {{ formatDateTime(transaction.expenditureDate) }}
-                </p>
-              </div>
-            </div>
-            <div class="text-right">
-              <p class="text-brand font-bold text-base">
-                {{ transaction.amount.toLocaleString() }}원
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- No transactions found -->
-      <div v-else class="bg-gray-1 rounded-xl p-4 mb-6">
-        <div class="flex items-center justify-center">
-          <p class="text-gray-3 text-sm">지출 내역이 없습니다</p>
-        </div>
+      <div v-else-if="failedTransactions.length > 0" class="text-gray-3 text-sm">
+        총 {{ failedTransactions.length }}건의 지출 내역이 있습니다
       </div>
     </div>
 
     <!-- Action Button -->
-    <div class="mx-8 mb-6 w-82">
-      <!-- New Challenge Button (Red) -->
+    <div class="mx-8 mb-6">
       <button
-        class="w-full bg-brand text-white text-lg font-medium py-4 rounded-2xl font-pretendard"
+        class="w-full bg-brand text-white text-lg font-semibold py-4 rounded-2xl font-pretendard"
         @click="handleNewChallenge"
       >
         다른 챌린지 도전하기
@@ -137,7 +91,7 @@
     </div>
 
     <!-- Navigation Space -->
-    <div class="pb-20"></div>
+    <div class="pb-24"></div>
   </div>
 </template>
 

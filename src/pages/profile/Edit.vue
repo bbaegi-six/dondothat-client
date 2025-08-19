@@ -7,8 +7,6 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
-      max-width: 400px;
-      margin: 0 auto;
     "
   >
     <div style="flex: 1; display: flex; flex-direction: column">
