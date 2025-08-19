@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-full max-w-98 h-screen bg-[#2F2F2F] overflow-hidden relative mx-auto font-pretendard text-white"
+    class="w-full h-screen bg-[#2F2F2F] overflow-hidden relative font-pretendard text-white"
   >
     <!-- Header Component - 항상 65px 공간 확보 -->
     <div class="h-16 relative">

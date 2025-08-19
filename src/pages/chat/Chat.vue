@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-screen bg-default max-w-98 mx-auto">
+  <div class="flex flex-col h-screen bg-default w-full">
     <!-- 공통 헤더 컴포넌트 사용 -->
     <Header
       :title="challengeName"

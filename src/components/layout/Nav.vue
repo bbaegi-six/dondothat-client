@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="fixed bottom-0 left-0 right-0 w-98 mx-auto flex justify-between items-center bg-dark-bg p-3 px-5 h-20 box-border z-[1000]"
+    class="fixed bottom-0 left-0 right-0 w-full flex justify-between items-center bg-dark-bg p-3 px-5 h-20 box-border z-[1000]"
   >
     <button
       v-for="item in navItems"

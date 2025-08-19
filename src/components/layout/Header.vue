@@ -1,6 +1,6 @@
 <template>
   <header
-    class="bg-default text-white w-98 mx-auto fixed top-0 left-0 right-0 z-50 pt-4"
+    class="bg-default text-white w-full fixed top-0 left-0 right-0 z-50 pt-4"
   >
     <div
       class="flex justify-between items-center px-8 h-13 box-border"

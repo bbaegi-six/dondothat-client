@@ -1,6 +1,6 @@
 <template>
   <div
-    class="pt-20 px-8 pb-6 min-h-screen w-98 mx-auto"
+    class="pt-20 px-8 pb-6 min-h-screen w-full"
     style="background-color: #2f2f2f"
   >
     <Header

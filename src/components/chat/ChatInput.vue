@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed left-1/2 transform -translate-x-1/2 max-w-98 w-full bg-default px-6 z-50 bottom-20"
+    class="fixed left-0 right-0 w-full bg-default px-6 z-50 bottom-20"
   >
     <div class="flex gap-2 items-center">
       <div class="flex-1 relative">

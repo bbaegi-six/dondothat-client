@@ -2,7 +2,7 @@
   <!-- 저금통 섹션 -->
   <div v-if="savingTotal !== undefined && savingTotal !== null">
     <div
-      class="w-98 h-14 bg-[#414141] rounded-2xl flex items-center px-6 cursor-pointer"
+      class="w-full h-14 bg-[#414141] rounded-2xl flex items-center px-6 cursor-pointer"
     >
       <div class="font-pretendard font-medium text-base text-white">
         지금까지 저금한 금액
@@ -23,7 +23,7 @@
   </div>
   <div
     v-else
-    class="w-98 h-14 bg-[#414141] rounded-2xl flex items-center px-6 cursor-pointer"
+    class="w-full h-14 bg-[#414141] rounded-2xl flex items-center px-6 cursor-pointer"
     @click="$emit('connectAccount')"
   >
     <div class="font-pretendard font-medium text-base text-white">저금통</div>

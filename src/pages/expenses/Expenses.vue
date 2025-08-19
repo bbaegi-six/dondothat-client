@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen w-98 mx-auto relative bg-[#2f2f2f] pt-20 px-8 pb-20"
+    class="min-h-screen w-full relative bg-[#2f2f2f] pt-20 px-8 pb-20"
   >
     <Header
       :showBack="false"
@@ -11,10 +11,10 @@
     />
 
     <!-- 탭 -->
-    <div class="w-98 h-9 mt-1 flex">
+    <div class="w-full h-9 mt-1 flex">
       <div
         @click="switchTab('account')"
-        class="w-49 h-9 bg-[#2f2f2f] relative cursor-pointer"
+        class="flex-1 h-9 bg-[#2f2f2f] relative cursor-pointer"
       >
         <div
           class="font-pretendard font-medium text-base leading-8 text-center pt-0.5"
@@ -24,12 +24,12 @@
         </div>
         <div
           v-if="activeTab === 'account'"
-          class="absolute bottom-0 w-49 h-0 border border-[#ff5555]"
+          class="absolute bottom-0 w-full h-0 border border-[#ff5555]"
         ></div>
       </div>
       <div
         @click="switchTab('savings')"
-        class="w-49 h-9 bg-[#2f2f2f] relative cursor-pointer"
+        class="flex-1 h-9 bg-[#2f2f2f] relative cursor-pointer"
       >
         <div
           class="font-pretendard font-medium text-base leading-8 text-center pt-0.5"
@@ -39,7 +39,7 @@
         </div>
         <div
           v-if="activeTab === 'savings'"
-          class="absolute bottom-0 w-49 h-0 border border-[#ff5555]"
+          class="absolute bottom-0 w-full h-0 border border-[#ff5555]"
         ></div>
       </div>
     </div>
@@ -47,146 +47,69 @@
     <!-- 내 계좌 섹션 -->
     <div v-if="activeTab === 'account'">
       <!-- 월별 요약 섹션 -->
-      <div
-        class="relative w-98 h-30 bg-[#414141] rounded-2xl mt-2.5"
-      >
-        <!-- 월 표시 -->
-        <div
-          style="
-            font-family: 'Pretendard';
-            font-style: normal;
-            font-weight: 700;
-            font-size: 14px;
-            line-height: 32px;
-            text-align: center;
-            color: #ffffff;
-            position: absolute;
-            left: 149px;
-            top: 4px;
-            width: 30px;
-            height: 32px;
-          "
-        >
-          {{ currentMonthDisplay }}월
+      <div class="relative w-full h-30 bg-[#414141] rounded-2xl mt-2.5 p-4">
+        <!-- 헤더 부분 -->
+        <div class="flex items-center justify-center mb-2">
+          <button
+            @click="previousMonth"
+            class="w-5 h-5 flex items-center justify-center bg-transparent border-none"
+          >
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+              <path
+                d="M6 4L2 8L6 12"
+                stroke="#C9C9C9"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          
+          <div class="mx-4 text-center">
+            <div class="font-pretendard font-bold text-sm text-white">
+              {{ currentMonthDisplay }}월
+            </div>
+          </div>
+          
+          <button
+            @click="nextMonth"
+            class="w-5 h-5 flex items-center justify-center bg-transparent border-none"
+          >
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+              <path
+                d="M4 4L8 8L4 12"
+                stroke="#C9C9C9"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
         </div>
 
         <!-- 총 지출 타이틀 -->
-        <div
-          style="
-            font-family: 'Pretendard';
-            font-style: normal;
-            font-weight: 500;
-            font-size: 14px;
-            line-height: 32px;
-            text-align: center;
-            color: #ffffff;
-            position: absolute;
-            left: 136px;
-            top: 40px;
-            width: 58px;
-            height: 21px;
-          "
-        >
+        <div class="text-center font-pretendard font-medium text-sm text-white mb-2">
           총 지출
         </div>
 
         <!-- 금액 -->
-        <div
-          style="
-            font-family: 'Pretendard';
-            font-style: normal;
-            font-weight: 600;
-            font-size: 24px;
-            line-height: 28px;
-            text-align: center;
-            color: #ff5555;
-            position: absolute;
-            left: 13px;
-            top: 75px;
-            width: 302px;
-            height: 28px;
-          "
-        >
+        <div class="text-center font-pretendard font-semibold text-2xl text-[#ff5555]">
           {{ monthlyExpense.toLocaleString() }}원
         </div>
-
-        <!-- 월 변경 버튼들 -->
-        <button
-          @click="previousMonth"
-          class="absolute w-[20px] h-[20px] flex items-center justify-center bg-transparent border-none"
-          style="left: 120px; top: 10px"
-        >
-          <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
-            <path
-              d="M6 4L2 8L6 12"
-              stroke="#C9C9C9"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </button>
-        <button
-          @click="nextMonth"
-          class="absolute w-[20px] h-[20px] flex items-center justify-center bg-transparent border-none"
-          style="right: 120px; top: 10px"
-        >
-          <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
-            <path
-              d="M4 4L8 8L4 12"
-              stroke="#C9C9C9"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </button>
       </div>
     </div>
 
     <!-- 저금통 섹션 -->
     <div v-if="activeTab === 'savings'">
       <!-- 저금통 요약 섹션 -->
-      <div
-        class="relative w-98 h-30 bg-[#414141] rounded-2xl mt-2.5"
-      >
+      <div class="relative w-full h-30 bg-[#414141] rounded-2xl mt-2.5 p-4 flex flex-col justify-center">
         <!-- 저금통 타이틀 -->
-        <div
-          style="
-            font-family: 'Pretendard';
-            font-style: normal;
-            font-weight: 500;
-            font-size: 16px;
-            line-height: 32px;
-            text-align: center;
-            color: #ffffff;
-            position: absolute;
-            left: 88px;
-            top: 35px;
-            width: 153px;
-            height: 21px;
-          "
-        >
+        <div class="text-center font-pretendard font-medium text-base text-white mb-2">
           지금까지 절약한 금액
         </div>
 
         <!-- 금액 -->
-        <div
-          style="
-            font-family: 'Pretendard';
-            font-style: normal;
-            font-weight: 600;
-            font-size: 24px;
-            line-height: 28px;
-            text-align: center;
-            color: #ff5555;
-            position: absolute;
-            left: 13px;
-            top: 60px;
-            width: 302px;
-            height: 28px;
-          "
-        >
+        <div class="text-center font-pretendard font-semibold text-2xl text-[#ff5555]">
           {{ totalSavings.toLocaleString() }}원
         </div>
       </div>
@@ -200,50 +123,17 @@
         <!-- 날짜별 그룹 -->
         <div v-for="(group, date) in groupedTransactions" :key="date">
           <!-- 날짜와 금액 -->
-          <div
-            style="
-              margin-top: 28px;
-              width: 328px;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-            "
-          >
-            <div
-              style="
-                font-family: 'Pretendard';
-                font-style: normal;
-                font-weight: 500;
-                font-size: 16px;
-                line-height: 32px;
-                color: #ffffff;
-              "
-            >
+          <div class="mt-7 w-full flex justify-between items-center">
+            <div class="font-pretendard font-medium text-base text-white">
               {{ formatDate(date) }}
             </div>
-            <div
-              style="
-                font-family: 'Pretendard';
-                font-style: normal;
-                font-weight: 600;
-                font-size: 16px;
-                line-height: 24px;
-                color: #ffffff;
-              "
-            >
+            <div class="font-pretendard font-semibold text-base text-white">
               {{ getDailyTotal(group) }}
             </div>
           </div>
 
           <!-- 구분선 -->
-          <div
-            style="
-              width: 328px;
-              height: 0px;
-              border: 1px solid #414141;
-              margin-top: 0px;
-            "
-          ></div>
+          <div class="w-full border-t border-[#414141]"></div>
 
           <!-- 거래내역 아이템들 -->
           <div>
@@ -287,22 +177,7 @@
     <!-- 내역추가 버튼 -->
     <button
       @click="addTransaction"
-      class="fixed"
-      style="
-        bottom: 80px;
-        right: calc((100vw - 390px) / 2 + 31px);
-        width: 48px;
-        height: 48px;
-        background-color: #ff5555;
-        border: none;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 10;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      "
+      class="fixed bottom-20 right-8 w-12 h-12 bg-[#ff5555] border-none rounded-full flex items-center justify-center cursor-pointer z-10 shadow-lg"
       :disabled="loading"
     >
       <!-- + 아이콘 -->
