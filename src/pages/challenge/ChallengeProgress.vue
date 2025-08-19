@@ -63,7 +63,7 @@
           지금까지 아낀 금액
         </p>
         <p class="text-white text-4xl font-bold text-center font-pretendard">
-          {{ (challengeData.savedAmount * challengeData.currentDay).toLocaleString() }}원
+          {{ currentSavedAmount.toLocaleString() }}원
         </p>
         <div class="absolute top-4 right-4">
           <FontAwesomeIcon
@@ -171,6 +171,7 @@ const isSavingCompleted = ref(false);
 const isSecondModal = ref(false);
 const isThirdModal = ref(false);
 const savedAmountInfoModalOpen = ref(false);
+const currentSavedAmount = ref(0);
 
 const expensesStore = useExpensesStore();
 
@@ -239,6 +240,15 @@ const challengeDescriptionText = computed(() => {
 });
 
 // Methods
+const calculateCurrentSavedAmount = () => {
+  // 성공한 경우: savedAmount * days (전체 기간)
+  // 진행 중인 경우: savedAmount * currentDay (현재까지 성공한 일수)
+  const savedAmount = props.challengeData.savedAmount || 0;
+  const days = isCompleted.value ? props.challengeData.days : props.challengeData.currentDay;
+  
+  currentSavedAmount.value = savedAmount * days;
+};
+
 const getDayBoxClass = (day) => {
   if (isCompleted.value && day <= props.challengeData.days) {
     // 완료된 챌린지는 모든 날이 성공 (빨간색)
@@ -294,6 +304,10 @@ const handleThirdModalClose = () => {
   isThirdModal.value = false;
   router.push('/');
 };
+
+onMounted(() => {
+  calculateCurrentSavedAmount();
+});
 </script>
 
 <style scoped>
