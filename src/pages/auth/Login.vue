@@ -128,7 +128,7 @@ const getApiBaseUrl = () => {
     return window.location.origin;
   }
   // 프로덕션 환경에서는 실제 API 서버 URL 사용
-  return 'http://dondothat.duckdns.org:8080';
+  return 'https://dondothat.store/api';
 };
 
 // 메서드들
