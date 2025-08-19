@@ -1,7 +1,7 @@
 <template>
   <!-- 날짜 구분선 (새로운 날짜일 때만 표시) -->
   <div v-if="showDateSeparator" class="flex justify-center py-0.5 mt-1 mb-0.5">
-    <div class="bg-[#555555] text-[#C9C9C9] text-xs px-3 py-1 rounded-full">
+    <div class="bg-[#555555] text-[#C9C9C9] text-2xs sm:text-xs px-2 sm:px-3 py-1 rounded-full">
       {{ formatDateSeparator(sentAt) }}
     </div>
   </div>
@@ -11,42 +11,42 @@
     v-if="messageType === 'SYSTEM' || messageType === 'JOIN'"
     class="flex justify-center py-1 my-1"
   >
-    <div class="bg-[#555555] text-[#C9C9C9] text-xs px-3 py-1 rounded-full">
+    <div class="bg-[#555555] text-[#C9C9C9] text-2xs sm:text-xs px-2 sm:px-3 py-1 rounded-full">
       {{ content }}
     </div>
   </div>
 
   <!-- 받은 메시지 (다른 사용자) -->
-  <div v-else-if="!isMyMessage" class="flex items-start gap-2 mb-2">
+  <div v-else-if="!isMyMessage" class="flex items-start gap-1.5 sm:gap-2 mb-2">
     <!-- Profile Picture -->
     <div
-      class="w-8 h-8 bg-white rounded-full flex-shrink-0 flex items-center justify-center"
+      class="w-6 h-6 sm:w-8 sm:h-8 bg-white rounded-full flex-shrink-0 flex items-center justify-center"
     >
-      <i class="fas fa-user text-gray-600 text-sm"></i>
+      <i class="fas fa-user text-gray-600 text-xs sm:text-sm"></i>
     </div>
 
     <!-- Message Content -->
     <div class="flex-1">
       <!-- Username -->
       <div class="mb-1">
-        <span class="text-white text-xs font-extralight">{{ username }}</span>
+        <span class="text-white text-2xs sm:text-xs font-extralight">{{ username }}</span>
       </div>
 
       <div class="flex items-end gap-1">
         <!-- Message Bubble -->
         <div
-          class="bg-[#414141] rounded-lg px-3 py-2 inline-block max-w-70 min-w-10"
+          class="bg-[#414141] rounded-lg px-2.5 sm:px-3 py-1.5 sm:py-2 inline-block max-w-60 sm:max-w-70 min-w-8 sm:min-w-10"
         >
           <p
-            class="text-white text-xs font-light leading-4 whitespace-pre-line"
+            class="text-white text-2xs sm:text-xs font-light leading-3 sm:leading-4 whitespace-pre-line"
           >
             {{ content }}
           </p>
         </div>
 
         <!-- Time -->
-        <span class="text-white text-2xs font-extralight">{{
-          formatTimeOnly(time || sentAt)
+        <span class="text-white text-[10px] sm:text-2xs font-extralight">{{
+          formatTimeOnly(sentAt || time)
         }}</span>
       </div>
     </div>
@@ -56,15 +56,15 @@
   <div v-else class="flex justify-end mb-2">
     <div class="flex items-end gap-1">
       <!-- Time -->
-      <span class="text-white text-2xs font-extralight">{{
+      <span class="text-white text-[10px] sm:text-2xs font-extralight">{{
         formatTimeOnly(time || sentAt)
       }}</span>
 
       <!-- Message Bubble -->
       <div
-        class="bg-[#FF5555] rounded-lg px-3 py-2 inline-block max-w-70 min-w-10"
+        class="bg-[#FF5555] rounded-lg px-2.5 sm:px-3 py-1.5 sm:py-2 inline-block max-w-60 sm:max-w-70 min-w-8 sm:min-w-10"
       >
-        <p class="text-white text-xs font-light leading-4 whitespace-pre-line">
+        <p class="text-white text-2xs sm:text-xs font-light leading-3 sm:leading-4 whitespace-pre-line">
           {{ content }}
         </p>
       </div>
@@ -117,27 +117,34 @@ const isMyMessage = computed(() => {
 
 // 시간만 표시하는 함수 (HH:MM 형식)
 const formatTimeOnly = (timestamp) => {
-  if (!timestamp) return '';
+  if (!timestamp) return getCurrentTime();
+  
   try {
     let date;
+    
     // 백엔드에서 배열 형태로 오는 경우 처리
-    if (Array.isArray(timestamp)) {
-      // [year, month, day, hour, minute, second] 형태
+    if (Array.isArray(timestamp) && timestamp.length >= 5) {
+      // [year, month, day, hour, minute, second, nanosecond] 형태
       date = new Date(
         timestamp[0], // year
         timestamp[1] - 1, // month (0-based)
         timestamp[2], // day
         timestamp[3] || 0, // hour
         timestamp[4] || 0, // minute
-        timestamp[5] || 0 // second
+        timestamp[5] || 0, // second
+        Math.floor((timestamp[6] || 0) / 1000000) // nanosecond to millisecond
       );
-    } else {
+    } else if (typeof timestamp === 'string' || typeof timestamp === 'number') {
       date = new Date(timestamp);
-    }
-    // 유효한 날짜인지 확인
-    if (isNaN(date.getTime())) {
+    } else {
       return getCurrentTime();
     }
+    
+    // 유효한 날짜인지 확인
+    if (!date || isNaN(date.getTime())) {
+      return getCurrentTime();
+    }
+    
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
@@ -148,27 +155,30 @@ const formatTimeOnly = (timestamp) => {
 
 // 날짜 구분선 포맷 함수
 const formatDateSeparator = (timestamp) => {
-  if (!timestamp) return '';
+  if (!timestamp) return getCurrentDateString();
 
   try {
     let date;
 
     // 백엔드에서 배열 형태로 오는 경우 처리
-    if (Array.isArray(timestamp)) {
+    if (Array.isArray(timestamp) && timestamp.length >= 5) {
       date = new Date(
         timestamp[0], // year
         timestamp[1] - 1, // month (0-based)
         timestamp[2], // day
         timestamp[3] || 0, // hour
         timestamp[4] || 0, // minute
-        timestamp[5] || 0 // second
+        timestamp[5] || 0, // second
+        Math.floor((timestamp[6] || 0) / 1000000) // nanosecond to millisecond
       );
-    } else {
+    } else if (typeof timestamp === 'string' || typeof timestamp === 'number') {
       date = new Date(timestamp);
+    } else {
+      return getCurrentDateString();
     }
 
     // 유효한 날짜인지 확인
-    if (isNaN(date.getTime())) {
+    if (!date || isNaN(date.getTime())) {
       return getCurrentDateString();
     }
 

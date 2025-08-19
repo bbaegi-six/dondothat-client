@@ -13,7 +13,7 @@
 
     <!-- Body Content with proper top margin for fixed header -->
 
-    <div class="flex flex-col flex-1 mt-15">
+    <div class="flex flex-col flex-1 mt-14 sm:mt-16">
       <!-- 🚀 채팅 메인 화면 (우선순위 1 - 가장 먼저 체크) -->
       <ChatMessages
         v-if="shouldShowChatUI"

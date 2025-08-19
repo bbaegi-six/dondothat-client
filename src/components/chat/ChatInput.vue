@@ -1,8 +1,8 @@
 <template>
   <div
-    class="fixed left-0 right-0 w-full bg-default px-6 z-50 bottom-20"
+    class="fixed left-0 right-0 w-full bg-default px-4 sm:px-6 z-50 bottom-20"
   >
-    <div class="flex gap-2 items-center">
+    <div class="flex gap-2 sm:gap-3 items-center">
       <div class="flex-1 relative">
         <input
           v-model="messageText"
@@ -10,20 +10,20 @@
           :disabled="!isConnected"
           type="text"
           placeholder="채팅을 입력하세요"
-          class="w-full h-12 px-4 py-3 rounded-xl bg-white text-gray-800 placeholder-gray-400 text-sm disabled:bg-gray-200 disabled:cursor-not-allowed border-0 outline-none focus:outline-none focus:ring-0 focus:border-transparent appearance-none shadow-none"
+          class="w-full h-10 sm:h-12 px-3 sm:px-4 py-2 sm:py-3 rounded-xl bg-white text-gray-800 placeholder-gray-400 text-xs sm:text-sm disabled:bg-gray-200 disabled:cursor-not-allowed border-0 outline-none focus:outline-none focus:ring-0 focus:border-transparent appearance-none shadow-none"
         />
       </div>
       <button
         @click="handleSend"
         :disabled="!messageText.trim() || !isConnected"
-        class="w-12 h-12 text-white rounded-xl flex items-center justify-center transition-colors duration-200"
+        class="w-10 h-10 sm:w-12 sm:h-12 text-white rounded-xl flex items-center justify-center transition-colors duration-200"
         :class="
           messageText.trim() && isConnected
             ? 'bg-[#FF5555] hover:bg-red-600'
             : 'bg-gray-400 cursor-not-allowed'
         "
       >
-        <i class="fas fa-arrow-up text-lg"></i>
+        <i class="fas fa-arrow-up text-sm sm:text-lg"></i>
       </button>
     </div>
   </div>
