@@ -245,19 +245,34 @@ const getCurrentDateString = () => {
 </script>
 
 <style scoped>
-/* Message animation */
-div {
-  animation: fadeInUp 0.3s ease-out;
+/* Responsive message styling */
+@media (max-width: 639px) {
+  /* 모바일에서 더 컴팩트한 스타일 */
+  .message-bubble {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.25rem; /* 20px */
+  }
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+@media (min-width: 640px) {
+  /* 데스크톱에서 더 넉넉한 스타일 */
+  .message-bubble {
+    font-size: 1rem; /* 16px */
+    line-height: 1.5rem; /* 24px */
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+}
+
+/* Message bubble 호버 효과 */
+.bg-\[\#414141\]:hover {
+  background-color: #4a4a4a;
+}
+
+.bg-\[\#FF5555\]:hover {
+  background-color: #ff6666;
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.2s ease;
 }
 </style>
