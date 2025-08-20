@@ -37,8 +37,15 @@ export const useFinproductStore = defineStore('finproduct', () => {
     
     try {
       const data = await finproductService.fetchRecommendedSavings(limit);
-      recommendedSavings.value = Array.isArray(data) ? data : [];
-      return true;
+      
+      if (Array.isArray(data) && data.length > 0) {
+        recommendedSavings.value = data;
+        return true;
+      } else {
+        console.warn('추천 상품이 없습니다');
+        recommendedSavings.value = [];
+        return false;
+      }
     } catch (err) {
       error.value = err.message;
       console.error('추천 상품 조회 실패:', err);
@@ -58,8 +65,16 @@ export const useFinproductStore = defineStore('finproduct', () => {
 
   // 금리 포맷팅 (백분율)
   function formatInterestRate(rate) {
-    if (!rate || rate === 0) return '0.00%';
-    return `${Number(rate).toFixed(2)}%`;
+    if (!rate || rate === 0 || rate === null || rate === undefined) return '0.00%';
+    
+    try {
+      const numRate = Number(rate);
+      if (isNaN(numRate)) return '0.00%';
+      return `${numRate.toFixed(2)}%`;
+    } catch (error) {
+      console.warn('금리 포맷팅 오류:', rate, error);
+      return '0.00%';
+    }
   }
 
   // 특별조건 텍스트 정리
@@ -92,18 +107,42 @@ export const useFinproductStore = defineStore('finproduct', () => {
 
   // API 데이터를 UI 형태로 변환하는 헬퍼 함수
   function transformToUIFormat(apiProduct) {
-    if (!apiProduct) return null;
+    if (!apiProduct || typeof apiProduct !== 'object') {
+      console.warn('변환할 상품 데이터가 없습니다');
+      return null;
+    }
     
-    return {
-      logo: getBankLogoPath(apiProduct.korCoNm),
-      name: apiProduct.finPrdtNm || '상품명 없음',
-      bank: getDisplayBankName(apiProduct.korCoNm),  // 사용자 친화적 은행명 사용
-      maxRate: formatInterestRate(apiProduct.intrRate2).replace('%', ''),
-      baseRate: formatInterestRate(apiProduct.intrRate).replace('%', ''),
-      url: getBankProductUrl(apiProduct.korCoNm),
-      // 원본 데이터도 보관 (필요시 사용)
-      original: apiProduct,
-    };
+    try {
+      // 필수 필드 검증
+      const bankName = apiProduct.korCoNm || '은행명 없음';
+      const productName = apiProduct.finPrdtNm || '상품명 없음';
+      const baseRate = apiProduct.intrRate || 0;
+      const maxRate = apiProduct.intrRate2 || 0;
+      
+      return {
+        logo: getBankLogoPath(bankName),
+        name: productName,
+        bank: getDisplayBankName(bankName),
+        maxRate: formatInterestRate(maxRate).replace('%', ''),
+        baseRate: formatInterestRate(baseRate).replace('%', ''),
+        url: getBankProductUrl(bankName),
+        // 원본 데이터도 보관 (필요시 사용)
+        original: apiProduct,
+      };
+    } catch (error) {
+      console.error('상품 데이터 변환 중 오류:', error);
+      
+      // 오류 발생 시 기본값으로 반환
+      return {
+        logo: getBankLogoPath(DEFAULT_BANK),
+        name: '상품명 없음',
+        bank: DEFAULT_BANK,
+        maxRate: '0.00',
+        baseRate: '0.00',
+        url: getBankProductUrl(DEFAULT_BANK),
+        original: apiProduct,
+      };
+    }
   }
 
   return {
