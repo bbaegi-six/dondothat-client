@@ -193,9 +193,15 @@ defineExpose({
 </script>
 
 <style scoped>
-/* Custom scrollbar styling */
+/* Custom scrollbar styling - 반응형 */
 .overflow-y-auto::-webkit-scrollbar {
-  width: 4px;
+  width: 0.25rem; /* 4px */
+}
+
+@media (min-width: 640px) {
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 0.375rem; /* 6px */
+  }
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
@@ -204,22 +210,23 @@ defineExpose({
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
   background: #414141;
-  border-radius: 2px;
+  border-radius: 0.25rem;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #555555;
 }
 
-/* Message animation */
-.space-y-2 > * {
-  animation: fadeInUp 0.3s ease-out;
+/* Message container smooth scrolling */
+.overflow-y-auto {
+  scroll-behavior: smooth;
 }
 
+/* Message animation - 부드러운 애니메이션 */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(0.5rem);
   }
   to {
     opacity: 1;
