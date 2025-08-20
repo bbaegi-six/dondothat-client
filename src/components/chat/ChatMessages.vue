@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex-1 px-4 sm:px-6 py-3 sm:py-4 overflow-y-auto space-y-2 pb-32 sm:pb-36"
+    class="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto pb-32 sm:pb-36"
     ref="chatContainer"
   >
     <!-- 메시지 목록 with 날짜 구분 -->
@@ -25,11 +25,11 @@
     <!-- 메시지가 없을 때 -->
     <div
       v-if="messages.length === 0 && isConnected && !isLoading"
-      class="flex justify-center py-6 sm:py-8"
+      class="flex justify-center py-8 sm:py-12"
     >
       <div class="text-center">
-        <i class="fas fa-comments text-3xl sm:text-4xl text-[#414141] mb-3 sm:mb-4"></i>
-        <p class="text-[#C9C9C9] text-xs sm:text-sm">첫 메시지를 보내보세요!</p>
+        <i class="fas fa-comments text-4xl sm:text-5xl text-[#414141] mb-4 sm:mb-6"></i>
+        <p class="text-[#C9C9C9] text-sm sm:text-base font-light">첫 메시지를 보내보세요!</p>
       </div>
     </div>
   </div>
