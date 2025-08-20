@@ -148,6 +148,13 @@ export const useChatStore = defineStore('chat', () => {
       clearError(); // 연결 시도 전 에러 클리어
       challengeId.value = chatChallengeId;
 
+      // 연결 전 최종 상태 확인
+      const status = await checkUserChallengeStatus();
+      if (!status.hasActiveChallenge || 
+          (status.status && status.status !== 'ongoing')) {
+        throw new Error('채팅에 접속할 수 없는 상태입니다. (상태: ' + status.status + ')');
+      }
+
       // 1. 채팅 이력 로드 (현재 사용자 정보는 이미 확인됨)
       const historyCount = await loadChatHistory(chatChallengeId);
 
@@ -501,9 +508,13 @@ export const useChatStore = defineStore('chat', () => {
   const preloadChallengeName = async () => {
     try {
       const status = await chatService.getUserChallengeStatus();
-      if (status.hasActiveChallenge) {
+      // hasActiveChallenge는 ongoing 상태일 때만 true이므로 이것만 체크
+      if (status.hasActiveChallenge && status.status === 'ongoing') {
         currentChallengeName.value = status.challengeName || '챌린지 채팅방';
         console.log('채팅 챌린지명 미리 로드:', currentChallengeName.value);
+      } else {
+        console.log('채팅 접속 불가능한 상태:', status.status);
+        currentChallengeName.value = '';
       }
     } catch (error) {
       console.warn('채팅 챌린지명 미리 로드 실패:', error);

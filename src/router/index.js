@@ -98,13 +98,23 @@ const routes = [
         
         const status = await chatStore.checkUserChallengeStatus();
         
+        // 첫 번째 체크: 활성 챌린지가 있는지 확인
         if (!status.hasActiveChallenge) {
-          // 챌린지가 없으면 no-chat으로 리다이렉트
-          next('/no-chat');
-        } else {
-          // 챌린지가 있으면 Chat 컴포넌트로 진행
-          next();
+          console.log('❌ 활성 챌린지가 없습니다:', status);
+          next({ path: '/no-chat', query: { status: status.status || 'no_challenge' } });
+          return;
         }
+        
+        // 두 번째 체크: 상태가 ongoing인지 직접 확인
+        if (status.status && status.status !== 'ongoing') {
+          console.log('❌ 챌린지 상태가 ongoing이 아닙니다:', status.status);
+          next({ path: '/no-chat', query: { status: status.status } });
+          return;
+        }
+        
+        // 모든 체크를 통과하면 채팅방 접속 허용
+        console.log('✅ 채팅방 접속 허용:', status);
+        next();
       } catch (error) {
         console.error('챌린지 상태 확인 실패:', error);
         // 에러 발생 시에도 no-chat으로 이동
