@@ -1,7 +1,7 @@
 <template>
   <!-- 날짜 구분선 (새로운 날짜일 때만 표시) -->
-  <div v-if="showDateSeparator" class="flex justify-center py-0.5 mt-1 mb-0.5">
-    <div class="bg-[#555555] text-[#C9C9C9] text-2xs sm:text-xs px-2 sm:px-3 py-1 rounded-full">
+  <div v-if="showDateSeparator" class="flex justify-center py-2 my-2">
+    <div class="bg-[#555555] text-[#C9C9C9] text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium">
       {{ formatDateSeparator(sentAt) }}
     </div>
   </div>
@@ -9,43 +9,43 @@
   <!-- 시스템 메시지 (입장/퇴장 등) - 날짜가 아닌 시스템 메시지만 표시 -->
   <div
     v-if="messageType === 'SYSTEM' || messageType === 'JOIN'"
-    class="flex justify-center py-1 my-1"
+    class="flex justify-center py-1.5 my-2"
   >
-    <div class="bg-[#555555] text-[#C9C9C9] text-2xs sm:text-xs px-2 sm:px-3 py-1 rounded-full">
+    <div class="bg-[#555555] text-[#C9C9C9] text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-light">
       {{ content }}
     </div>
   </div>
 
   <!-- 받은 메시지 (다른 사용자) -->
-  <div v-else-if="!isMyMessage" class="flex items-start gap-1.5 sm:gap-2 mb-2">
+  <div v-else-if="!isMyMessage" class="flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
     <!-- Profile Picture -->
     <div
-      class="w-6 h-6 sm:w-8 sm:h-8 bg-white rounded-full flex-shrink-0 flex items-center justify-center"
+      class="w-7 h-7 sm:w-9 sm:h-9 bg-white rounded-full flex-shrink-0 flex items-center justify-center"
     >
-      <i class="fas fa-user text-gray-600 text-xs sm:text-sm"></i>
+      <i class="fas fa-user text-gray-600 text-sm sm:text-base"></i>
     </div>
 
     <!-- Message Content -->
-    <div class="flex-1">
+    <div class="flex-1 min-w-0">
       <!-- Username -->
-      <div class="mb-1">
-        <span class="text-white text-2xs sm:text-xs font-extralight">{{ username }}</span>
+      <div class="mb-1.5">
+        <span class="text-white text-xs sm:text-sm font-medium">{{ username }}</span>
       </div>
 
-      <div class="flex items-end gap-1">
+      <div class="flex items-end gap-1.5 sm:gap-2">
         <!-- Message Bubble -->
         <div
-          class="bg-[#414141] rounded-lg px-2.5 sm:px-3 py-1.5 sm:py-2 inline-block max-w-60 sm:max-w-70 min-w-8 sm:min-w-10"
+          class="bg-[#414141] rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 inline-block max-w-[75%] sm:max-w-[70%] min-w-[2rem]"
         >
           <p
-            class="text-white text-2xs sm:text-xs font-light leading-3 sm:leading-4 whitespace-pre-line"
+            class="text-white text-sm sm:text-base font-normal leading-5 sm:leading-6 whitespace-pre-line break-words"
           >
             {{ content }}
           </p>
         </div>
 
         <!-- Time -->
-        <span class="text-white text-[10px] sm:text-2xs font-extralight">{{
+        <span class="text-[#C9C9C9] text-xs sm:text-sm font-light flex-shrink-0">{{
           formatTimeOnly(sentAt || time)
         }}</span>
       </div>
@@ -53,18 +53,18 @@
   </div>
 
   <!-- 보낸 메시지 (내가 보낸 것) -->
-  <div v-else class="flex justify-end mb-2">
-    <div class="flex items-end gap-1">
+  <div v-else class="flex justify-end mb-3 sm:mb-4">
+    <div class="flex items-end gap-1.5 sm:gap-2 max-w-[80%] sm:max-w-[75%]">
       <!-- Time -->
-      <span class="text-white text-[10px] sm:text-2xs font-extralight">{{
+      <span class="text-[#C9C9C9] text-xs sm:text-sm font-light flex-shrink-0">{{
         formatTimeOnly(time || sentAt)
       }}</span>
 
       <!-- Message Bubble -->
       <div
-        class="bg-[#FF5555] rounded-lg px-2.5 sm:px-3 py-1.5 sm:py-2 inline-block max-w-60 sm:max-w-70 min-w-8 sm:min-w-10"
+        class="bg-[#FF5555] rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 inline-block max-w-full min-w-[2rem]"
       >
-        <p class="text-white text-2xs sm:text-xs font-light leading-3 sm:leading-4 whitespace-pre-line">
+        <p class="text-white text-sm sm:text-base font-normal leading-5 sm:leading-6 whitespace-pre-line break-words">
           {{ content }}
         </p>
       </div>
