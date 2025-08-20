@@ -14,12 +14,20 @@ export default defineConfig({
       registerType: 'autoUpdate',
       filename: 'sw.js',
       devOptions: {
-        enabled: true,
+        enabled: false,  // iOS Safari 호환성을 위해 비활성화
         type: 'module',
       },
       injectRegister: 'auto',
     }),
   ],
+  build: {
+    target: ['es2015', 'safari11'],  // iOS Safari 호환성
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,  // iOS에서 청크 로딩 이슈 방지
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
