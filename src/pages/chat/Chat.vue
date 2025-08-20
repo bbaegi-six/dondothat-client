@@ -212,6 +212,13 @@ const initializeChat = async () => {
     // 1. 사용자의 챌린지 상태 확인 (라우터 가드에서 확인했지만 최신 정보를 위해 다시 호출)
     const status = await chatStore.checkUserChallengeStatus();
 
+    // 추가 상태 검증: failed, completed, closed 상태에서는 채팅 접속 차단
+    if (!status.hasActiveChallenge || 
+        (status.status && status.status !== 'ongoing')) {
+      console.log('❌ 채팅 접속 불가능한 상태:', status);
+      throw new Error('채팅에 접속할 수 없는 상태입니다.');
+    }
+
     // 🚨 핵심: 사용자가 실제로 바뀌었는지 확인
     if (
       chatStore.currentUser?.userId &&
@@ -258,9 +265,12 @@ const initializeChat = async () => {
     console.error('❌ 채팅방 초기화 실패:', error);
     isCheckingStatus.value = false;
 
-    // 에러 발생 시 NoChat으로 이동
+    // 에러 발생 시 NoChat으로 이동 (상태 정보 포함)
     setTimeout(() => {
-      router.push('/no-chat');
+      router.push({ 
+        path: '/no-chat', 
+        query: { status: error?.response?.data?.status || 'error' } 
+      });
     }, 2000);
   }
 };
