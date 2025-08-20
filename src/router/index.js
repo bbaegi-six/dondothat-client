@@ -108,7 +108,9 @@ const routes = [
         // 두 번째 체크: 상태가 ongoing인지 직접 확인
         if (status.status && status.status !== 'ongoing') {
           console.log('❌ 챌린지 상태가 ongoing이 아닙니다:', status.status);
-          next({ path: '/no-chat', query: { status: status.status } });
+          // closed 상태는 기본 메시지로 처리
+          const queryStatus = status.status === 'closed' ? 'no_challenge' : status.status;
+          next({ path: '/no-chat', query: { status: queryStatus } });
           return;
         }
         

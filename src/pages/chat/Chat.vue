@@ -267,9 +267,12 @@ const initializeChat = async () => {
 
     // 에러 발생 시 NoChat으로 이동 (상태 정보 포함)
     setTimeout(() => {
+      const errorStatus = error?.response?.data?.status || 'error';
+      // closed 상태는 기본 메시지로 처리
+      const queryStatus = errorStatus === 'closed' ? 'no_challenge' : errorStatus;
       router.push({ 
         path: '/no-chat', 
-        query: { status: error?.response?.data?.status || 'error' } 
+        query: { status: queryStatus } 
       });
     }, 2000);
   }
